@@ -1,0 +1,21 @@
+{
+	"template_name": "ShipSkin",
+	"template_sections": {
+		"comment": "",
+		"sections": [
+			{
+				"comment": "",
+				"params": ["SkinID", "Left", "CensoredCategory", "CensoredTabName", "CensoredLeft", "BGImage", "Live2D", "Faces"]
+			}
+		]
+	},
+	"behavior": {
+		"default": {
+			"type": "remove_empty"
+		},
+		"SkinID": {
+			"type": "keep"
+		}
+	},
+	"prefer-wiki-data": []
+}

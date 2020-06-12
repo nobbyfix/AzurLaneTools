@@ -1,0 +1,34 @@
+{
+	"template_name": "Map",
+	"template_sections": {
+		"comment": "",
+		"sections": [
+			{
+				"comment": "",
+				"params": ["ctID", "Title", "Introduction", "Requirements", "ClearReward", "3StarReward"]
+			},
+			{
+				"comment": "",
+				"params": ["MobLevel", "SirenLevel", "MobExp1", "MobExp2", "MobExp3", "MobExpSiren", "MobSpawnOrder", "EliteSpawnOrder", "SirenSpawnOrder", "Boss", "BossLevel", "BossExp"]
+			},
+			{
+				"comment": "",
+				"params": ["BossBattleReq", "BossBattleClear", "Star1", "Star2", "Star3", "SuggestedAirSupremacy", "ActualAirSupremacy"]
+			},
+			{
+				"comment": "",
+				"params": ["Fleet1", "Fleet2", "StatRestrictions"]
+			},
+			{
+				"comment": "",
+				"params": ["MapDrops", "EquipmentDrops", "ShipDrops", "PreviewFile", "NodeMap", "Notes"]
+			}
+		]
+	},
+	"behavior": {
+		"default": {
+			"type": "remove_empty"
+		}
+	},
+	"prefer-wiki-data": []
+}

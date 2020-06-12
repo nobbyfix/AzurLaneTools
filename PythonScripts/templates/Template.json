@@ -1,0 +1,30 @@
+{
+	"template_name": "",
+	"template_sections": {
+		"comment": "",
+		"sections": [
+			{
+				"comment": "",
+				"sections": [
+					{
+						"comment": "",
+						"params": []
+					}
+				]
+			}
+		]
+	},
+	"behavior": {
+		"default": {
+			"type": "keep"
+		},
+		"SomeParam": {
+			"type": "dependency",
+			"dependency": {
+				"type": "keep_empty",
+				"dependent_params": []
+			}
+		}
+	},
+	"prefer-wiki-data": []
+}
