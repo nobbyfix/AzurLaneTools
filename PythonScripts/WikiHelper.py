@@ -87,11 +87,12 @@ class MultilineTemplate():
 
 		# compile section_wikitext if any parameters were added from this section
 		# section_wikitext consists of the comment before params, then the block of params, each on a new line
-		if section_params or sub_wikitexts:
+		if section_params:
+			sub_wikitexts.insert(0, '\n'.join(section_params))
+		if sub_wikitexts:
 			comment = section['comment']
-			swikitext = comment and comment+'\n'
-			swikitext += '\n'.join(section_params)
-			return swikitext+'\n\n'.join(sub_wikitexts).rstrip('\n')
+			comment = comment and comment+'\n'
+			return comment+'\n\n'.join(sub_wikitexts).rstrip('\n')
 
 	def fill(self, content:Dict[str, Any], wiki_content:Dict[str, Any]=dict()) -> str:
 		filled_sections = self._fill_section(self.sections, content, wiki_content)
