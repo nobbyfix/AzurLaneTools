@@ -107,13 +107,14 @@ def remove_comments(wikitext:str) -> str:
 	b, _ = COMMENT_PART.subn('', a)
 	return b
 
+PARAMS_RE = re.compile(r'\n\ *\|')
 def parse_multiline_template(wikitext:str, do_remove_comments:bool=True) -> str:
 	if do_remove_comments: wikitext = remove_comments(wikitext)
 	template = dict()
-	params = wikitext[2:-2].split('|')
+	params = PARAMS_RE.split(wikitext[2:-2])
 	for param in params:
 		if '=' in param:
-			key, value = param.split('=')
+			key, value = param.split('=', 1)
 			template[key.strip()] = value.strip()
 	return template
 
