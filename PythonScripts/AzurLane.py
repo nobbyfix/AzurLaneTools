@@ -64,7 +64,7 @@ class Award:
 	def load4(self, api):
 		ship_data_statistics = api.load_multi_sharecfg('ship_data_statistics', api.ALL_CLIENTS)
 		ship = api.load_from_first_client(ship_data_statistics, str(self.data_id))
-		self.name = api.converter.getNameFromID(self.data_id//10)
+		self.name = api.converter.get_shipname(self.data_id//10)
 		self.rarity = ship.get('rarity')-1
 
 	# DROP TYPE FURNITURE
