@@ -1,5 +1,6 @@
 from typing import Union, List, Dict, Any
 import re, os, json, mwclient
+import Constants
 
 WIKI_SETTINGS_PATH = os.path.join('data', 'wiki_settings.json')
 def load_mwclient_site(settings_path:str=WIKI_SETTINGS_PATH) -> mwclient.Site:
@@ -125,3 +126,13 @@ def put_icon(filename:str, itemname:str='', size:int=25, nolink:bool=False) -> s
 	if nolink: nolink = '|link='
 	else: nolink = ''
 	return f'[[File:{filename}|{size}px{itemname}{nolink}]]'
+
+def award_to_display(award) -> str:
+	itemname = Constants.item_name(award.name) or ''
+	
+	if award.data_type == 4: icon = itemname+'Icon'
+	else: icon = award.icon or Constants.item_filename(award.name) or award.data_id
+	
+	rarity = Constants.RARITY_NAME[award.rarity]
+	name = str(award.amount)+'x '+itemname
+	return simple_template('Display', [icon, rarity, name])
