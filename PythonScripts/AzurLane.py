@@ -74,7 +74,7 @@ class Award:
 		furniture = api.load_from_first_client(furniture_data_template, str(self.data_id))
 		self.name = furniture.get('name')
 		self.rarity = furniture.get('rarity')
-		self.icon = furniture.get('icon')
+		self.icon = 'FurnIcon_'+furniture.get('icon')
 
 	# DROP TYPE STRATEGY
 	# loads strategy_data_template
