@@ -15,7 +15,7 @@ ITEMNAME_REPLACE = {
 
 def item_name(name:str) -> str:
 	for match in ITEMNAME_REPLACE:
-		if match in name: name.replace(match, ITEMNAME_REPLACE[match])
+		if match in name: name = name.replace(match, ITEMNAME_REPLACE[match])
 	return name
 
 def item_link(name:str) -> str:
