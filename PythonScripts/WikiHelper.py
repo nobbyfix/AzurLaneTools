@@ -125,11 +125,11 @@ def put_icon(filename:str, itemname:str='', size:str='x25px', nolink:bool=False)
 	return '[[File:'+'|'.join([filename, size, itemname, nolink]).strip('|')+']]'
 
 def award_to_display(award) -> str:
-	itemname = Constants.item_name(award.name) or ''
-	
+	itemname = Constants.item_name(award.name.strip()) or ''
+
 	if award.data_type == 4: icon = itemname+'Icon'
-	else: icon = award.icon or Constants.item_filename(award.name) or award.data_id
+	else: icon = award.icon or Constants.item_filename(itemname) or award.data_id
 	
 	rarity = Constants.RARITY_NAME[award.rarity]
 	name = str(award.amount)+'x '+itemname
-	return simple_template('Display', [icon, rarity, name])
+	return simple_template('Display', [str(icon), rarity, name])
