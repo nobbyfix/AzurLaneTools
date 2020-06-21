@@ -120,12 +120,9 @@ def parse_multiline_template(wikitext:str, do_remove_comments:bool=True) -> str:
 			template[key.strip()] = value.strip()
 	return template
 
-def put_icon(filename:str, itemname:str='', size:int=25, nolink:bool=False) -> str:
-	if not filename: return None
-	if itemname: itemname = '|'+itemname
-	if nolink: nolink = '|link='
-	else: nolink = ''
-	return f'[[File:{filename}|{size}px{itemname}{nolink}]]'
+def put_icon(filename:str, itemname:str='', size:str='x25px', nolink:bool=False) -> str:
+	nolink = 'link=' if nolink else ''
+	return '[[File:'+'|'.join([filename, size, itemname, nolink]).strip('|')+']]'
 
 def award_to_display(award) -> str:
 	itemname = Constants.item_name(award.name) or ''
