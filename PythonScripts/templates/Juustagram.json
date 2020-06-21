@@ -1,0 +1,18 @@
+{
+	"template_name": "Juustagram",
+	"template_sections": {
+		"comment": "",
+		"sections": [
+			{
+				"comment": "",
+				"params": ["pict", "post"]
+			}
+		]
+	},
+	"behavior": {
+		"default": {
+			"type": "keep"
+		}
+	},
+	"prefer-wiki-data": []
+}
