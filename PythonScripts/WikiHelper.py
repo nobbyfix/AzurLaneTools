@@ -29,9 +29,9 @@ def load_mwclient_site(settings_path:str=WIKI_SETTINGS_PATH) -> mwclient.Site:
 	return site
 
 
-def simple_template(name:str, params:List[str]) -> str:
+def simple_template(name:str, params:list) -> str:
 	params.insert(0, name)
-	wikitext = '|'.join(params)
+	wikitext = '|'.join([(str(param) if param != None else '') for param in params])
 	return '{{'+wikitext.rstrip('|')+'}}'
 
 
