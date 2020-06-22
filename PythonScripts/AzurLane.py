@@ -49,7 +49,9 @@ class Award:
 		eqicon = item.get('icon')
 		if 'Equips/' in eqicon:
 			self.icon = eqicon.replace('Equips/', '')
-	
+		elif 'Props/' in eqicon:
+			self.icon = eqicon.replace('Props/', '')
+
 	# DROP TYPE EQUIP
 	# loads equip_data_statistics
 	def load3(self, api):
