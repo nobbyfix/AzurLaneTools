@@ -42,14 +42,14 @@ def game_single_skin(fullid:int) -> dict:
 		live2d_counter[client.name] = '1' if 1 in gameskindata['tag'] else None
 
 		# the following values are always not set for retrofit and default skins
-		if fullid % 10 in {1, 9}: continue
+		if fullid % 10 in {0, 9}: continue
 
 		skin_ret['SkinName'+client.name] = JsonAPI.replace_namecode(gameskindata['name'], client).strip()
 		background_counter[client.name] = gameskindata['bg']
 		sp_background_counter[client.name] = gameskindata['bg_sp']
 		
 		# get shop data
-		if shopid := gameskindata['shop_id'] != 0:
+		if (shopid := gameskindata['shop_id']) != 0:
 			shopitem = shop_template[client].get(str(shopid))
 			if shopitem != None:
 				cost_counter[client.name] = shopitem['resource_num']
@@ -204,7 +204,7 @@ def main():
 		updates = [(input('Shipname: '), input('Default Category: ')) for _ in range(int(amount))]
 		for shipname, defcat in updates:
 			print(f'Updating {shipname}...')
-			update_gallery_page(shipname, defcat)
+			success = update_gallery_page(shipname, default_skincategory=defcat)
 			if not success: print('An error occured.')
 	elif mode == 'all':
 		print('Do you really want to update all gallery pages?')
