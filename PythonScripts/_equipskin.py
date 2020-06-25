@@ -56,7 +56,7 @@ def main():
 	
 	client = Client[args.client]
 	themes = [equipment_theme(client, themeid) for themeid in args.themeids]
-	Utility.output('equipskin', '\n'.join(themes))
+	Utility.output(args.file, '\n'.join(themes))
 
 if __name__ == "__main__":
 	main()
