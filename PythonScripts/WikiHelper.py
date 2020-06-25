@@ -128,7 +128,7 @@ def award_to_display(award) -> str:
 	itemname = Constants.item_name(award.name.strip()) or ''
 
 	if award.data_type == 4: icon = itemname+'Icon'
-	else: icon = award.icon or Constants.item_filename(itemname) or award.data_id
+	else: icon = Constants.item_filename(itemname) or award.icon or award.data_id
 	
 	rarity = Constants.RARITY_NAME[award.rarity]
 	name = str(award.amount)+'x '+itemname

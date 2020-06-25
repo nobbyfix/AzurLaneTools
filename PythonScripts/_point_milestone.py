@@ -19,7 +19,8 @@ def milestone(client, event_id:int, pt_filename:str, columns:int=3) -> str:
 		if (targetid % columns) == 0: wikitext += '|-\n'
 		awarddata = event_milestone['drop_client'][targetid]
 		wikitext += '|'+str(point_targets[targetid])+'\n'
-		wikitext += '|'+WikiHelper.award_to_display(JsonAPI.load_award(*awarddata))+'\n'
+		award = JsonAPI.load_award(*awarddata)
+		wikitext += '|'+WikiHelper.award_to_display(award)+'\n'
 	wikitext += '|}\n'
 	return wikitext
 
