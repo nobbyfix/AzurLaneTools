@@ -1,7 +1,7 @@
 import os, json
 
 RARITY_LETTER = [ 'E', 'E', 'B', 'P', 'G', 'R' ]
-RARITY_NAME = [ 'Normal', 'Normal', 'Rare', 'Elite', 'Super Rare', 'Ultra Rare' ]
+RARITY_NAME = [ 'Normal', 'Normal', 'Rare', 'Elite', 'Super Rare', 'Legendary' ]
 RARITY_NAME_RESEARCH = {4: 'Priority', 5: 'Decisive'}
 
 with open(os.path.join('data', 'item_wiki_filenames.json')) as jfile:
