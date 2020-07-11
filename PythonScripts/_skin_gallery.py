@@ -49,7 +49,8 @@ def game_single_skin(fullid:int) -> dict:
 		sp_background_counter[client.name] = gameskindata['bg_sp']
 		
 		# get shop data
-		if (shopid := gameskindata['shop_id']) != 0:
+		shopid = gameskindata['shop_id']
+		if shopid != 0:
 			shopitem = shop_template[client].get(str(shopid))
 			if shopitem != None:
 				cost_counter[client.name] = shopitem['resource_num']
@@ -147,7 +148,7 @@ def update_gallery_page(shipname:str, save_to_file:bool=False, default_skincateg
 	# retrieve skins from wiki and game
 	gallerypage = site.pages[shipname+'/Gallery']
 	skins_game = game_skins(groupid)
-	skins_wiki, additionalArt = wiki_skins(shipname, gallerypage)
+	skins_wiki, additionalArt = wiki_skins(shipname, gallerypage) or ({}, '')
 
 	# merge game and wiki skin information with game overwriting wiki
 	skins = dict()
