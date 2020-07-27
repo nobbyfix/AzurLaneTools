@@ -10,7 +10,9 @@ with open(os.path.join('data', 'item_wiki_filenames.json')) as jfile:
 ITEMNAME_REPLACE = {
 		'Mystery': 'Random',
 		'Series ': 'S',
-		'General Blueprint -': 'Strengthening Unit'
+		'General Blueprint -': 'Strengthening Unit',
+		'樱之御守': 'Sakura Amulets',
+		'荣誉之冠': 'Miniature Crowns'
 }
 
 def item_name(name:str) -> str:
