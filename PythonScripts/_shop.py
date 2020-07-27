@@ -55,4 +55,4 @@ def main():
 	Utility.output(args.file, result)
 
 if __name__ == "__main__":
-	Utility.output('shop', shop(Client.EN, 30432, 'IrisPt'))
+	main()

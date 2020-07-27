@@ -25,7 +25,7 @@ JsonAPI = Utility.defaultJsonAPI()
 
 def equipment_skin(client, eqid):
 	equip_skin_template = JsonAPI.load_sharecfg('equip_skin_template', client)
-	eqskin = equip_skin_template[client].get(str(eqid))
+	eqskin = equip_skin_template.get(str(eqid))
 	if not eqskin: raise ValueError(f'Equipment skinid {eqid} does not exist.')
 
 	name = eqskin['name'].strip()
@@ -40,7 +40,7 @@ def equipment_theme_skinlist(client, skinids:list):
 
 def equipment_theme(client, themeid):
 	equip_skin_theme_template = JsonAPI.load_sharecfg('equip_skin_theme_template', client)
-	theme = equip_skin_theme_template[client].get(str(themeid))
+	theme = equip_skin_theme_template.get(str(themeid))
 	if not theme: raise ValueError(f'Equipment theme {themeid} does not exist.')
 	
 	themename = theme['name'].strip()
