@@ -1,0 +1,18 @@
+syntax = "proto2";
+
+package p10;
+
+message Cs10800 {
+	required uint32 State = 1;
+	required string Platform = 2;
+}
+
+message Sc10801 {
+	required string GatewayIp = 1;
+	required uint32 GatewayPort = 2;
+	required string Url = 3;
+	repeated string Version = 4;
+	optional string ProxyIp = 5;
+	optional uint32 ProxyPort = 6;
+	required uint32 IsTs = 7;
+}

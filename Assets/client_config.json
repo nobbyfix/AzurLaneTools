@@ -1,0 +1,27 @@
+{
+	"EN": {
+		"gateip": "blhxusgate.yo-star.com",
+		"gateport": 80,
+		"cdnurl": "https://blhxusstatic.akamaized.net"
+	},
+	"CN": {
+		"gateip": "line1-login-bili-blhx.bilibiligame.net",
+		"gateport": 80,
+		"cdnurl": "https://line3-patch-blhx.bilibiligame.net"
+	},
+	"JP": {
+		"gateip": "blhxjploginapi.azurlane.jp",
+		"gateport": 80,
+		"cdnurl": "https://blhxstatic.akamaized.net"
+	},
+	"KR": {
+		"gateip": "bl-kr-gate.xdg.com",
+		"gateport": 80,
+		"cdnurl": "http://blcdn.imtxwy.com"
+	},
+	"TW": {
+		"gateip": "prod-all-login.azurlane.tw",
+		"gateport": 10080,
+		"cdnurl": "http://blhxstatic.azurlane.tw"
+	}
+}
