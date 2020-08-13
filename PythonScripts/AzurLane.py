@@ -118,12 +118,20 @@ class Award:
 	# DROP TYPE ICON_FRAME
 	# loads item_data_frame
 	def load14(self, api):
-		raise NotImplementedError('Unsupported Award Type: 14 - ICON_FRAME')
+		item_data_frame = api.load_multi_sharecfg('item_data_frame', api.ALL_CLIENTS)
+		iconframe = api.load_from_first_client(item_data_frame, str(self.data_id))
+		self.name = iconframe.get('name')
+		self.rarity = 1
+		self.icon = str(self.data_id)
 
 	# DROP TYPE CHAT_FRAME
 	# loads item_data_chat
 	def load15(self, api):
-		raise NotImplementedError('Unsupported Award Type: 15 - CHAT_FRAME')
+		item_data_chat = api.load_multi_sharecfg('item_data_chat', api.ALL_CLIENTS)
+		chatframe = api.load_from_first_client(item_data_chat, str(self.data_id))
+		self.name = chatframe.get('name')
+		self.rarity = 1
+		self.icon = str(self.data_id)
 
 	# DROP TYPE EMOJI
 	# loads emoji_template
