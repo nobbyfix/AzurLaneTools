@@ -70,7 +70,7 @@ if __name__ == "__main__":
 	args = parser.parse_args()
 	
 	clientname = args.client
-	if args.client is None:
+	if clientname is None:
 		clientname = input('Type which client to update: ')
 	
 	if clientname in Client.__members__:
