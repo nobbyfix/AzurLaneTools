@@ -99,6 +99,6 @@ def main(path: Path):
 
 if __name__ == "__main__":
 	parser = ArgumentParser()
-	parser.add_argument('-f', '--file', help='obb/apk file to extract')
+	parser.add_argument('-f', '--file', required=True, help='obb/apk file to extract')
 	args = parser.parse_args()
 	main(Path(args.file))

@@ -1,0 +1,29 @@
+{
+	"extractable_folder": [
+		"activitybanner",
+		"backyardtheme",
+		"bg",
+		"chatframe",
+		"clutter",
+		"commonbg",
+		"equips",
+		"furnitureicon",
+		"gallerycard",
+		"herohrzicon",
+		"iconframe",
+		"levelmap",
+		"loadingbg",
+		"memoryicon",
+		"musiccover",
+		"painting",
+		"props",
+		"qicon",
+		"shipmodels",
+		"shipyardicon",
+		"skillicon",
+		"squareicon",
+		"strategyicon",
+		"updatebg"
+	],
+	"extractable_files": [ "THIS IS NOT IMPLEMENTED YET, DONT TRY TO USE IT" ]
+}
