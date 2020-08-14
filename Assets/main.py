@@ -25,12 +25,23 @@ def load_client_config(client:Client):
 
 
 def load_user_config():
+	configpath = Path('user_config.json')
+	if not configpath.exists():
+		print('User config file has not been found. This is normal on the first startup.')
+		return create_user_config()
+
 	with open('user_config.json', 'r', encoding='utf8') as f:
 		configdata = json.load(f)
 		useragent = configdata.get('useragent')
 		if not useragent:
-			useragent = input('Type your desired useragent: ')
+			return create_user_config()
 		return UserConfig(useragent)
+
+def create_user_config():
+	useragent = input('Type your desired useragent: ')
+	uconfig = UserConfig(useragent)
+	save_user_config(uconfig)
+	return uconfig
 
 def save_user_config(userconfig:UserConfig):
 	with open('user_config.json', 'w', encoding='utf8') as f:

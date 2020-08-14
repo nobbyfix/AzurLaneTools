@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 
 import downloader, versioncontrol
-from classes import Client, CompareType, CompareResult, VersionType, VersionResult
+from classes import CompareType, CompareResult, VersionType, VersionResult
 
 
 def download_asset(cdnurl, filehash, useragent, save_destination):
