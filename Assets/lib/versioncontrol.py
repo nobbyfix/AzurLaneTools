@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from classes import VersionType, VersionResult
+from .classes import VersionType, VersionResult
 
 
 version_hash_name = {

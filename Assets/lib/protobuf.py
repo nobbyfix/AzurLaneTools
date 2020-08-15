@@ -1,4 +1,4 @@
-from proto import p10_pb2
+from .proto import p10_pb2
 
 CONFIGURED_COMMANDS = {
 	10800: p10_pb2.Cs10800,

@@ -4,8 +4,9 @@ from itertools import chain
 import multiprocessing as mp
 import json
 
-import imgrecon
-from classes import Client
+from lib import imgrecon
+from lib.classes import Client
+
 
 def get_file_list(filepath: Path):
 	with open(filepath, 'r', encoding='utf8') as f:
@@ -45,7 +46,7 @@ def extract_assetbundle(rootfolder: Path, filepath: str, targetfolder: Path):
 
 
 def load_extractable_folders():
-	with open('extract_config.json', 'r') as f:
+	with open(Path('config', 'extract_config.json'), 'r') as f:
 		return json.load(f)['extractable_folder']
 
 def extract_by_client(client: Client):

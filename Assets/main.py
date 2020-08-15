@@ -2,8 +2,8 @@ import socket, json
 from argparse import ArgumentParser
 from pathlib import Path
 
-import protobuf, versioncontrol, updater
-from classes import Client, UserConfig
+from lib import protobuf, versioncontrol, updater
+from lib.classes import Client, UserConfig
 
 
 def get_sc10801(gateip, gateport):
@@ -18,19 +18,19 @@ def get_sc10801(gateip, gateport):
 
 
 def load_client_config(client:Client):
-	with open('client_config.json', 'r', encoding='utf8') as f:
+	with open(Path('config', 'client_config.json'), 'r', encoding='utf8') as f:
 		configdata = json.load(f)
 		if not client.name in configdata: raise NotImplementedError(f'Client {client.name} has not been configured yet.')
 		return configdata[client.name]
 
 
 def load_user_config():
-	configpath = Path('user_config.json')
+	configpath = Path('config', 'user_config.json')
 	if not configpath.exists():
 		print('User config file has not been found. This is normal on the first startup.')
 		return create_user_config()
 
-	with open('user_config.json', 'r', encoding='utf8') as f:
+	with open(configpath, 'r', encoding='utf8') as f:
 		configdata = json.load(f)
 		useragent = configdata.get('useragent')
 		if not useragent:
@@ -44,7 +44,7 @@ def create_user_config():
 	return uconfig
 
 def save_user_config(userconfig:UserConfig):
-	with open('user_config.json', 'w', encoding='utf8') as f:
+	with open(Path('config', 'user_config.json'), 'w', encoding='utf8') as f:
 		configdata = {'useragent':userconfig.useragent}
 		json.dump(configdata, f)
 

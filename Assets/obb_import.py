@@ -4,7 +4,7 @@ from zipfile import Path as ZipPath
 from pathlib import Path
 import shutil
 
-from classes import Client, VersionType
+from lib.classes import Client, VersionType
 
 
 appnames = {
@@ -57,6 +57,7 @@ def unpack(path: Path, client: Client):
 			with open(Path(extract_to_folder, 'hashes'+suffix+'.csv'), 'wb') as fh:
 				with zipfile.open('assets/hashes'+suffix+'.csv', 'r') as zfh:
 					shutil.copyfileobj(zfh, fh)
+			
 			# also extract all assets
 			if versiontype == VersionType.AZL:
 				# remove all existing asset bundles

@@ -1,8 +1,8 @@
 import os
 from pathlib import Path
 
-import downloader, versioncontrol
-from classes import CompareType, CompareResult, VersionType, VersionResult
+from . import downloader, versioncontrol
+from .classes import CompareType, CompareResult, VersionType, VersionResult
 
 
 def download_asset(cdnurl, filehash, useragent, save_destination):
