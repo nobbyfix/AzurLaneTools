@@ -6,17 +6,6 @@ from lib import protobuf, versioncontrol, updater
 from lib.classes import Client, UserConfig
 
 
-def get_sc10801(gateip, gateport):
-	cs10800 = protobuf.BasicCommand(10800)
-	cs10800.pb.State = 21
-	cs10800.pb.Platform = "0"
-
-	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-	s.connect((gateip, gateport))
-	s.send(protobuf.serialize_pb(cs10800))
-	return protobuf.deserialize_pb(s.recv(1024))
-
-
 def load_client_config(client:Client):
 	with open(Path('config', 'client_config.json'), 'r', encoding='utf8') as f:
 		configdata = json.load(f)
@@ -59,7 +48,7 @@ def main(client:Client):
 	CLIENTPATH = Path('ClientAssets', client.name)
 	if not CLIENTPATH.parent.exists(): CLIENTPATH.parent.mkdir(parents=True)
 
-	sc10801 = get_sc10801(GATE_IP, GATE_PORT)
+	version_response = get_version_response(GATE_IP, GATE_PORT)
 	versionlist = [versioncontrol.parse_version_string(v) for v in sc10801.pb.Version if v.startswith('$')]
 	for vresult in versionlist:
 		updater.update(vresult, CDN_URL, USERAGENT, CLIENTPATH)
