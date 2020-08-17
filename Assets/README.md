@@ -2,7 +2,7 @@
 This tool automatically downloads the newest assets directly from the game cdn servers and extracts the Texture2D files as png from them.
 
 ## HOW TO USE
-### 1. Important files from obb/apk
+### 1. Import files from obb/apk
 While this is *not neccessary*, this step is **highly recommended**.    
 The files from the obb/apk archives can easily be imported using the `obb_import.py` script:
 ```
@@ -18,6 +18,8 @@ The `APPCODE` differs depending on the region you want the obb archive from:
 Since the CN client is not distributed through the Google Play Store, there is no obb file for it. Therefore you need the apk which contains all the files. You can simply download the apk from one of the many app distributors or, if you already have the app installed, it can be found on android in the folder `/data/app/com.bilibili.azurlane-1/` (Note: you need root permission to access this folder).
 
 ### 2. Download new updates from the game
+**Note: To prevent helping cheaters, two files needed for this part are missing. If you ask me nicely on Discord (nobbyfix#2338) i may provide them to you (usually only if you are an active wiki member).**
+
 All assets that are usually distributed through the in-app downloader can be downloaded by simply executing:
 ```
 ./main.py -c [CLIENT]
@@ -37,9 +39,9 @@ The newly downloaded assets can now be extracted by executing:
 ```
 ./extractor -c [CLIENT]
 ```
-where `CLIENT` is again one of EN, CN, JP, KR or TW. The extracted images will then be saved in `ClientExtract/[CLIENT]/` Since only Texture2D assets are extracted, its not desired to try to export from all assetbundles. Therefore in the config file `extract_config.json` is a list of all folders which should get extracted, which can be edited as desired.
+where `CLIENT` is again one of EN, CN, JP, KR or TW. The extracted images will then be saved in `ClientExtract/[CLIENT]/` Since only Texture2D assets are exported, its not desired to try to export from all assetbundles. Therefore in the config file `extract_config.json` is a list of all folders which should get extracted, which can be edited as desired.
 
-Additionally all `painting`s will also be automatically reconstructed
+Additionally all `painting`s will also be automatically reconstructed.
 
 ### 4. Enjoy the files
 
