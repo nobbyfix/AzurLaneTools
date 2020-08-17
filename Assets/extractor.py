@@ -24,8 +24,8 @@ def get_new_files(parent_directory: Path):
 def restore_painting(image, abpath: Path, imgname: str):
 	mesh = imgrecon.load_mesh(abpath, imgname+'-mesh')
 	if mesh is None:
-		# for these images, the mesh is in the non-tex asset bundle for some reason
-		if abpath.name in ['rexin_tex', 'susaikesi_tex']:
+		# for some images, the mesh is in the non-tex asset bundle for some reason
+		if abpath.name.endswith('_tex'):
 			return restore_painting(image, abpath.with_name(abpath.name[:-4]), imgname)
 		return image
 	return imgrecon.recon(image, mesh)
@@ -78,6 +78,11 @@ def wait_and_close_pool(pool: mp.Pool, asyncresults: list):
 	pool.close()
 	pool.join()
 
+
+def extract_single_assetbundle(client: Client, assetpath: str):
+	client_directory = Path('ClientAssets', client.name, 'AssetBundles')
+	extract_directory = Path('ClientExtract', client.name)
+	extract_assetbundle(client_directory, assetpath, extract_directory)
 
 if __name__ == "__main__":
 	parser = ArgumentParser()

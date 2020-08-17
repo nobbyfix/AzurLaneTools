@@ -48,8 +48,8 @@ def main(client:Client):
 	CLIENTPATH = Path('ClientAssets', client.name)
 	if not CLIENTPATH.parent.exists(): CLIENTPATH.parent.mkdir(parents=True)
 
-	version_response = get_version_response(GATE_IP, GATE_PORT)
-	versionlist = [versioncontrol.parse_version_string(v) for v in sc10801.pb.Version if v.startswith('$')]
+	version_response = protobuf.get_version_response(GATE_IP, GATE_PORT)
+	versionlist = [versioncontrol.parse_version_string(v) for v in version_response.pb.Version if v.startswith('$')]
 	for vresult in versionlist:
 		updater.update(vresult, CDN_URL, USERAGENT, CLIENTPATH)
 
