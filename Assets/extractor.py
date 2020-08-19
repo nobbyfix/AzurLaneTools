@@ -21,12 +21,15 @@ def get_new_files(parent_directory: Path):
 	return get_file_list(Path(parent_directory, 'diff_new.txt'))
 
 
-def restore_painting(image, abpath: Path, imgname: str):
+def restore_painting(image, abpath: Path, imgname: str, do_retry:bool):
 	mesh = imgrecon.load_mesh(abpath, imgname+'-mesh')
 	if mesh is None:
-		# for some images, the mesh is in the non-tex asset bundle for some reason
-		if abpath.name.endswith('_tex'):
-			return restore_painting(image, abpath.with_name(abpath.name[:-4]), imgname)
+		if do_retry:
+			# for some images, the mesh is in the non-tex asset bundle for some reason
+			if abpath.name.endswith('_tex'):
+				return restore_painting(image, abpath.with_name(abpath.name[:-4]), imgname, False)
+			else:
+				return restore_painting(image, abpath.with_name(abpath.name+'_tex'), imgname, False)
 		return image
 	return imgrecon.recon(image, mesh)
 
@@ -38,7 +41,7 @@ def extract_assetbundle(rootfolder: Path, filepath: str, targetfolder: Path):
 
 		image = imageobj.image
 		if filepath.split('/')[0] == 'painting':
-			image = restore_painting(image, abpath, imageobj.name)
+			image = restore_painting(image, abpath, imageobj.name, True)
 		
 		target = Path(Path(targetfolder, filepath).parent, imageobj.name+'.png')
 		target.parent.mkdir(parents=True, exist_ok=True)
