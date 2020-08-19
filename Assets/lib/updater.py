@@ -53,14 +53,19 @@ def update_assets(cdnurl, newhashes, useragent, client_directory: Path):
 
 	assetbasepath = Path(client_directory, 'AssetBundles')
 	version_diff_output = {t: [] for t in CompareType}
-	for result in comparison_results.values():
+
+	fileamount = len(comparison_results.values())
+	for i, result in enumerate(comparison_results.values()):
 		version_diff_output[result.compare_type].append(result.filepath)
 		assetpath = Path(assetbasepath, result.filepath)
 		if result.compare_type == CompareType.New:
+			print(f'Downloading {result.filepath} ({i}/{fileamount}).')
 			download_asset(cdnurl, result.md5hash_new, useragent, assetpath)
 		elif result.compare_type == CompareType.Changed:
+			print(f'Downloading {result.filepath} ({i}/{fileamount}).')
 			download_asset(cdnurl, result.md5hash_new, useragent, assetpath)
 		elif result.compare_type == CompareType.Deleted:
+			print(f'Deleting {result.filepath} ({i}/{fileamount}).')
 			remove_asset(assetpath)
 	
 	for comp_type, filepaths in version_diff_output.items():
