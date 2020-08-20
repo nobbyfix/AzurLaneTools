@@ -76,6 +76,7 @@ def update_assets(cdnurl, newhashes, useragent, client_directory: Path):
 def update(version_result: VersionResult, cdnurl, useragent, client_directory: Path):
 	oldversion = versioncontrol.load_version_string(version_result.version_type, client_directory)
 	if oldversion != version_result.version:
+		print(f'{version_result.version_type.name}: Current version {oldversion} is older than latest version {version_result.version}.')
 		hashes = downloader.download_hashes(cdnurl, version_result.rawstring, useragent)
 
 		if version_result.version_type == VersionType.AZL:
@@ -83,3 +84,5 @@ def update(version_result: VersionResult, cdnurl, useragent, client_directory: P
 
 		versioncontrol.save_version_string(version_result, client_directory)
 		versioncontrol.save_hash_file(version_result.version_type, client_directory, hashes)
+	else:
+		print(f'{version_result.version_type.name}: Current version {oldversion} is latest.')
