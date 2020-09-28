@@ -167,7 +167,7 @@ class ALJsonAPI:
 		return {client: self.load_sharecfg(sharecfg_name, client) for client in clients}
 
 	def load_gamecfg(self, gamecfg_name:str, client:Client) -> dict:
-		with open(join(self.SOURCE_PATH, client, gamecfg_name+'.json'), 'r', encoding='utf8') as jfile:
+		with open(join(self.SOURCE_PATH, client.name, gamecfg_name+'.json'), 'r', encoding='utf8') as jfile:
 			return json.load(jfile)
 
 	def load_multi_gamecfg(self, gamecfg_name:str, clients:List[Client]) -> Dict[Client, dict]:
