@@ -47,15 +47,15 @@ def compare_hashes(oldhashes, newhashes):
 	return results
 
 
-def update_assets(cdnurl, newhashes, useragent, client_directory: Path):
-	oldhashes = versioncontrol.load_hash_file(VersionType.AZL, client_directory)
+def update_assets(version_type: VersionType, cdnurl, newhashes, useragent, client_directory: Path):
+	oldhashes = versioncontrol.load_hash_file(version_type, client_directory)
 	comparison_results = compare_hashes(oldhashes, newhashes)
 
 	assetbasepath = Path(client_directory, 'AssetBundles')
 	version_diff_output = {t: [] for t in CompareType}
 
 	fileamount = len(comparison_results.values())
-	for i, result in enumerate(comparison_results.values()):
+	for i, result in enumerate(comparison_results.values(), 1):
 		version_diff_output[result.compare_type].append(result.filepath)
 		assetpath = Path(assetbasepath, result.filepath)
 		if result.compare_type == CompareType.New:
@@ -69,7 +69,8 @@ def update_assets(cdnurl, newhashes, useragent, client_directory: Path):
 			remove_asset(assetpath)
 	
 	for comp_type, filepaths in version_diff_output.items():
-		fileoutpath = Path(client_directory, 'diff_'+comp_type.name.lower()+'.txt')
+		fileoutpath = Path(client_directory, 'difflog', f'diff_{version_type.name.lower()}_{comp_type.name.lower()}.txt')
+		fileoutpath.parent.mkdir(exist_ok=True)
 		with open(fileoutpath, 'w', encoding='utf8') as f:
 			f.write('\n'.join(filepaths))
 
@@ -78,10 +79,7 @@ def update(version_result: VersionResult, cdnurl, useragent, client_directory: P
 	if oldversion != version_result.version:
 		print(f'{version_result.version_type.name}: Current version {oldversion} is older than latest version {version_result.version}.')
 		hashes = downloader.download_hashes(cdnurl, version_result.rawstring, useragent)
-
-		if version_result.version_type == VersionType.AZL:
-			update_assets(cdnurl, hashes, useragent, client_directory)
-
+		update_assets(version_result.version_type, cdnurl, hashes, useragent, client_directory)
 		versioncontrol.save_version_string(version_result, client_directory)
 		versioncontrol.save_hash_file(version_result.version_type, client_directory, hashes)
 	else:

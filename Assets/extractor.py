@@ -15,10 +15,10 @@ def get_file_list(filepath: Path):
 			yield line.replace('\n', '')
 
 def get_changed_files(parent_directory: Path):
-	return get_file_list(Path(parent_directory, 'diff_changed.txt'))
+	return get_file_list(Path(parent_directory, 'difflog', 'diff_azl_changed.txt'))
 
 def get_new_files(parent_directory: Path):
-	return get_file_list(Path(parent_directory, 'diff_new.txt'))
+	return get_file_list(Path(parent_directory, 'difflog', 'diff_azl_new.txt'))
 
 
 def restore_painting(image, abpath: Path, imgname: str, do_retry:bool):
