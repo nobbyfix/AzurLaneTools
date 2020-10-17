@@ -305,9 +305,6 @@
 		"JPName": {
 			"type": "keep"
 		},
-		"KRName": {
-			"type": "keep"
-		},
 		"Rarity": {
 			"type": "keep"
 		},
