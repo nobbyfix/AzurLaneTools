@@ -46,10 +46,13 @@ def extract_assetbundle(rootfolder: Path, filepath: str, targetfolder: Path):
 		target = Path(Path(targetfolder, filepath).parent, imageobj.name+'.png')
 		target.parent.mkdir(parents=True, exist_ok=True)
 
-		if target.exists():
-			print(f'ERROR: Tried to save "{imageobj.name}" from "{abpath}" to "{target}", but the file already exists.')
-		else:
-			image.save(target)
+		while True:
+			if target.exists():
+				print(f'ERROR: Tried to save "{imageobj.name}" from "{abpath}" to "{target}", but the file already exists.')
+				target = target.with_name(target.stem + "_" + target.suffix)
+			else:
+				image.save(target)
+				break
 
 
 def load_extractable_folders():
