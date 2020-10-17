@@ -179,12 +179,12 @@ def update_gallery_page(shipname:str, save_to_file:bool=False, default_skincateg
 	if save_to_file:
 		#save wikitext to file
 		Utility.output('skin_gallery', wikitext)
-		sleep(3.5)
+		sleep(1)
 	else:
 		# update gallerypage on the wiki
 		summary = 'Added missing skins/updated changed information' if gallerypage.exists else 'Created gallery page'
 		gallerypage.save(wikitext, summary=summary)
-		sleep(5)
+		sleep(2)
 	return True
 
 def main():
