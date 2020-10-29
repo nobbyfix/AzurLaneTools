@@ -43,7 +43,7 @@ def update_converter(JsonAPI, filepath=PATH_CONVERT):
 			if not shipstat:
 				print(f'Name of "{groupid}" could not be in "{client}" found, are the overrides incomplete?')
 				continue
-			shipname = shipstat['name']
+			shipname = shipstat['name'].strip()
 			conversions['ship'][shipname] = groupid
 			conversions['groupid'][groupid] = shipname
 			break
