@@ -32,3 +32,9 @@ def output(fname:str, text:str):
 	makedirs('output')
 	with open(join('output', fname+'.wikitext'), 'w', encoding='utf8') as f:
 		f.write(text)
+
+def dict_args_query(dict_input: dict, *args):
+	for arg in args:
+		if isinstance(dict_input, dict):
+			dict_input = dict_input.get(arg)
+	return dict_input
