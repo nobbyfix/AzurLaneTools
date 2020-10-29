@@ -24,7 +24,7 @@ def item_name(name:str) -> str:
 def item_link(name:str) -> str:
 	if not name: return ''
 	if 'Strengthening Unit' in name: return 'Research'
-	if name == 'Cognitive Chips': return 'Dockyard#Cognition_Awaken'
+	if name == 'Cognitive Chips': return 'Dockyard#Cognitive_Awakening'
 	if name == 'Oxy-cola': return 'Living_Area#Refilling_supplies'
 	if name.endswith('Cat Box'): return 'Meowfficer#Cat_Lodge'
 	if name.startswith('T') and name.endswith('Tech Pack'): return 'Equipment#Equipment_Boxes'
@@ -63,4 +63,23 @@ SKILL_TYPE = {
 	1: 'Offense',
 	2: 'Defense',
 	3: 'Support',
+}
+
+SHIPTYPE_FULLNAME = {
+	1:	'Destroyer',
+	2:	'Light Cruiser',
+	3:	'Heavy Cruiser',
+	4:	'Battlecruiser',
+	5:	'Battleship',
+	6:	'Light Aircraft Carrier',
+	7:	'Aircraft Carrier',
+	8:	'Submarine',
+	9:	'Aviation Cruiser',
+	10:	'Aviation Battleship',
+	11:	'Torpedo Cruiser',
+	12:	'Repair Ship',
+	13:	'Monitor',
+	17:	'Submarine Carrier',
+	18:	'Large Cruiser',
+	19:	'Ammunition Ship',
 }
