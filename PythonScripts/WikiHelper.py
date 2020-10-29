@@ -120,7 +120,7 @@ def parse_multiline_template(wikitext:str, do_remove_comments:bool=True) -> str:
 			template[key.strip()] = value.strip()
 	return template
 
-def put_icon(filename:str, itemname:str='', size:str='x25px', nolink:bool=False) -> str:
+def put_icon(filename:str, itemname:str='', size:str='x22px', nolink:bool=False) -> str:
 	nolink = 'link=' if nolink else ''
 	args = [filename, size, itemname, nolink]
 	args = [arg for arg in args if arg != '']
