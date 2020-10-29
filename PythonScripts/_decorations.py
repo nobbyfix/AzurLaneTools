@@ -62,7 +62,7 @@ def decotheme(client, themeid):
 		name = furniture['name'].strip()
 		desc = furniture['describe'].strip()
 		icon = furniture['icon'].strip()
-		rarity = Constants.RARITY_NAME[furniture['rarity']]
+		rarity = Constants.RARITY_NAME_ITEM[furniture['rarity']]
 		furntype = FURNTYPE[furniture['type']]
 		comf = furniture['comfortable']
 		

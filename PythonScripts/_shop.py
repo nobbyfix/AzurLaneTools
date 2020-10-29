@@ -19,7 +19,7 @@ def shop(client, eventid:int, pt_filename:str):
 		award = JsonAPI.load_award(shopitem['commodity_type'], shopitem['commodity_id'])
 		
 		item_name = Constants.item_name(award.name.strip())
-		item_rarity = Constants.RARITY_NAME[award.rarity]
+		item_rarity = Constants.RARITY_NAME_ITEM[award.rarity]
 		item_link = Constants.item_link(item_name)
 		item_icon = Constants.item_filename(item_name) or award.icon or ''
 
