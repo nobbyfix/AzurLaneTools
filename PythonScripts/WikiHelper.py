@@ -1,4 +1,4 @@
-from typing import Union, List, Dict, Any
+from typing import Any
 import re, json, time, mwclient
 from pathlib import Path
 import Constants
@@ -58,7 +58,7 @@ def simple_template(name: str, params: list) -> str:
 
 
 class MultilineTemplate():
-	def __init__(self, template:str):
+	def __init__(self, template: str):
 		with open('templates/'+template+'.json', 'r') as jfile:
 			jsontemplate = json.load(jfile)
 		self.template_name = jsontemplate["template_name"]
@@ -117,7 +117,7 @@ class MultilineTemplate():
 			comment = comment and comment+'\n'
 			return comment+'\n\n'.join(sub_wikitexts).rstrip('\n')
 
-	def fill(self, content:Dict[str, Any], wiki_content:Dict[str, Any]=dict()) -> str:
+	def fill(self, content: dict[str, Any], wiki_content: dict[str, Any]=dict()) -> str:
 		filled_sections = self._fill_section(self.sections, content, wiki_content)
 		
 		# add all sections with one empty line spacing between them to result wikitext
@@ -132,7 +132,7 @@ def remove_comments(wikitext:str) -> str:
 	return b
 
 PARAMS_RE = re.compile(r'\n\ *\|')
-def parse_multiline_template(wikitext:str, do_remove_comments:bool=True) -> str:
+def parse_multiline_template(wikitext: str, do_remove_comments: bool = True) -> str:
 	if do_remove_comments: wikitext = remove_comments(wikitext)
 	template = dict()
 	params = PARAMS_RE.split(wikitext[2:-2])
@@ -142,7 +142,7 @@ def parse_multiline_template(wikitext:str, do_remove_comments:bool=True) -> str:
 			template[key.strip()] = value.strip()
 	return template
 
-def put_icon(filename:str, itemname:str='', size:str='x22px', nolink:bool=False) -> str:
+def put_icon(filename: str, itemname: str = '', size: str = 'x22px', nolink: bool = False) -> str:
 	nolink = 'link=' if nolink else ''
 	args = [filename, size, itemname, nolink]
 	args = [arg for arg in args if arg != '']
