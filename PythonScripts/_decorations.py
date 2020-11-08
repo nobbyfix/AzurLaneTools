@@ -41,18 +41,20 @@ def decotheme(client, themeid):
 	furniture_data_template = JsonAPI.load_sharecfg('furniture_data_template', client)
 	furniture_shop_template = JsonAPI.load_sharecfg('furniture_shop_template', client)
 
-	theme = backyard_theme_template.get(str(themeid))
-	if not theme:
-		raise ValueError(f'Client {client.name} has no theme with id {themeid}.')
+	wikitext = ""
+	if themeid != 0:
+		theme = backyard_theme_template.get(str(themeid))
+		if not theme:
+			raise ValueError(f'Client {client.name} has no theme with id {themeid}.')
 
-	theme_name = theme['name'].strip()
-	theme_desc = theme['desc'].strip()
-	theme_icon = theme['icon'].strip()
-	
-	# add as wikitext
-	wikitext = f'== {theme_name} ==\n'
-	wikitext += f"*'''Description:''' ''{theme_desc}''\n"
-	wikitext += WikiHelper.simple_template('FurnitureTableHeader', [f'FurnIcon_{theme_icon}.png'])+'\n'
+		theme_name = theme['name'].strip()
+		theme_desc = theme['desc'].strip()
+		theme_icon = theme['icon'].strip()
+		
+		# add as wikitext
+		wikitext = f'== {theme_name} ==\n'
+		wikitext += f"*'''Description:''' ''{theme_desc}''\n"
+		wikitext += WikiHelper.simple_template('FurnitureTableHeader', [f'FurnIcon_{theme_icon}.png'])+'\n'
 
 	furniture_rows = []
 	for furnid in furniture_data_template['all']:
@@ -65,6 +67,7 @@ def decotheme(client, themeid):
 		rarity = Constants.RARITY_NAME_ITEM[furniture['rarity']]
 		furntype = FURNTYPE[furniture['type']]
 		comf = furniture['comfortable']
+		if comf == 0: comf = ''
 		
 		size = furniture['size'] or ''
 		if size: size = str(size[0])+'x'+str(size[1])
