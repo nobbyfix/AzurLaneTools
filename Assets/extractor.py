@@ -22,7 +22,7 @@ def get_new_files(parent_directory: Path):
 
 
 def restore_painting(image, abpath: Path, imgname: str, do_retry:bool):
-	mesh = imgrecon.load_mesh(abpath, imgname+'-mesh')
+	mesh = imgrecon.load_mesh(str(abpath), imgname+'-mesh')
 	if mesh is None:
 		if do_retry:
 			# for some images, the mesh is in the non-tex asset bundle for some reason
@@ -53,6 +53,7 @@ def extract_assetbundle(rootfolder: Path, filepath: str, targetfolder: Path):
 			else:
 				image.save(target)
 				break
+		return target
 
 
 def load_extractable_folders():
@@ -88,7 +89,7 @@ def wait_and_close_pool(pool: mp.Pool, asyncresults: list):
 def extract_single_assetbundle(client: Client, assetpath: str):
 	client_directory = Path('ClientAssets', client.name, 'AssetBundles')
 	extract_directory = Path('ClientExtract', client.name)
-	extract_assetbundle(client_directory, assetpath, extract_directory)
+	return extract_assetbundle(client_directory, assetpath, extract_directory)
 
 if __name__ == "__main__":
 	parser = ArgumentParser()
