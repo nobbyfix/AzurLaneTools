@@ -1,0 +1,18 @@
+{
+	"template_name": "Story",
+	"template_sections": {
+		"comment": "",
+		"sections": [
+			{
+				"comment": "",
+				"params": ["Title", "Unlock", "Language"]
+			}
+		]
+	},
+	"behavior": {
+		"default": {
+			"type": "keep"
+		}
+	},
+	"prefer-wiki-data": []
+}
