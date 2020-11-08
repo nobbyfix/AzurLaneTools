@@ -1,35 +1,57 @@
 from typing import Union, List, Dict, Any
-import re, os, json, mwclient
+import re, json, time, mwclient
+from pathlib import Path
 import Constants
 
-WIKI_SETTINGS_PATH = os.path.join('data', 'wiki_settings.json')
-def load_mwclient_site(settings_path:str=WIKI_SETTINGS_PATH) -> mwclient.Site:
-	# create wiki_settings.json file if not found
-	print('reading wiki settings ...')
-	if os.path.exists(settings_path):
-		with open(settings_path, 'r', encoding='utf8') as settings_file:
-			settings = json.load(settings_file)
-		print('Loaded settings.')
-	else:
-		print(f'{settings_path} not found. Creating new file...')
-		settings_data = dict()
-		settings_data['username'] = input('Username: ')
-		settings_data['password'] = input('Password: ')
-		settings_data['url'] = input('URL: ')
-		settings_data['useragent'] = input('Useragent: ')
-		with open(settings_path, 'w') as settings_file:
-			json.dump(settings_data, settings_file)
-		print('Settings file created.')
+class WikiClient():
+	def __init__(self, execution_delay: float = 1, settings_path: Path = Path('data', 'wiki_settings.json')):
+		self.settings_path = settings_path
+		self.mwclient = None
+		self.execution_delay = execution_delay
+		self.last_execute_time = 0
+	
+	def login(self):
+		if self.mwclient: return 
 
-	# log into wiki
-	print('Logging into mediawiki...')
-	site = mwclient.Site(settings.get('url'), clients_useragent=settings.get('useragent'))
-	site.login(settings.get('username'), settings.get('password'))
-	print('Logged in.')
-	return site
+		# create wiki_settings.json file if not found
+		print('reading wiki settings ...')
+		if self.settings_path.exists():
+			with open(self.settings_path, 'r', encoding='utf8') as settings_file:
+				settings = json.load(settings_file)
+			print('Loaded settings.')
+		else:
+			print(f'{self.settings_path} not found. Creating new file...')
+			settings_data = dict()
+			settings_data['username'] = input('Username: ')
+			settings_data['password'] = input('Password: ')
+			settings_data['url'] = input('URL: ')
+			settings_data['useragent'] = input('Useragent: ')
+			with open(self.settings_path, 'w', encoding='utf8') as settings_file:
+				json.dump(settings_data, settings_file)
+			print('Settings file created.')
+
+		# log into wiki
+		print('Logging into mediawiki...')
+		site = mwclient.Site(settings.get('url'), clients_useragent=settings.get('useragent'))
+		site.login(settings.get('username'), settings.get('password'))
+		print('Logged in.')
+		self.mwclient = site
+
+	def execute(self, func: callable, *args, **kwargs):
+		delta_last_execute = time.time() - self.last_execute_time
+		if delta_last_execute < self.execution_delay:
+			time.sleep(delta_last_execute)
+		self.last_execute_time = time.time()
+		return func(*args, **kwargs)
 
 
-def simple_template(name:str, params:list) -> str:
+@DeprecationWarning("Replace with usage of 'WikiClient' class.")
+def load_mwclient_site(settings_path: Path = Path('data', 'wiki_settings.json')) -> mwclient.Site:
+	wikiclient = WikiClient(settings_path=settings_path)
+	wikiclient.login()
+	return wikiclient.mwclient
+
+def simple_template(name: str, params: list) -> str:
 	params.insert(0, name)
 	wikitext = '|'.join([(str(param) if param != None else '') for param in params])
 	return '{{'+wikitext.rstrip('|')+'}}'
