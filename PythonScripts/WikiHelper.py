@@ -45,8 +45,9 @@ class WikiClient():
 		return func(*args, **kwargs)
 
 
-@DeprecationWarning("Replace with usage of 'WikiClient' class.")
+import warnings
 def load_mwclient_site(settings_path: Path = Path('data', 'wiki_settings.json')) -> mwclient.Site:
+	warnings.warn("Replace with usage of 'WikiClient' class.", DeprecationWarning)
 	wikiclient = WikiClient(settings_path=settings_path)
 	wikiclient.login()
 	return wikiclient.mwclient
