@@ -36,6 +36,7 @@ class WikiClient():
 		site.login(settings.get('username'), settings.get('password'))
 		print('Logged in.')
 		self.mwclient = site
+		return self
 
 	def execute(self, func: callable, *args, **kwargs):
 		delta_last_execute = time.time() - self.last_execute_time
@@ -44,13 +45,6 @@ class WikiClient():
 		self.last_execute_time = time.time()
 		return func(*args, **kwargs)
 
-
-import warnings
-def load_mwclient_site(settings_path: Path = Path('data', 'wiki_settings.json')) -> mwclient.Site:
-	warnings.warn("Replace with usage of 'WikiClient' class.", DeprecationWarning)
-	wikiclient = WikiClient(settings_path=settings_path)
-	wikiclient.login()
-	return wikiclient.mwclient
 
 def simple_template(name: str, params: list) -> str:
 	params.insert(0, name)

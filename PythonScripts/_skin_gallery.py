@@ -8,7 +8,7 @@ JsonAPI = Utility.defaultJsonAPI()
 ship_skin_template = JsonAPI.load_multi_sharecfg('ship_skin_template', JsonAPI.ALL_CLIENTS)
 shop_template = JsonAPI.load_multi_sharecfg('shop_template', JsonAPI.ALL_CLIENTS)
 ship_converter = JsonAPI.converter
-site = WikiHelper.load_mwclient_site()
+wikiclient = WikiHelper.WikiClient().login()
 t_shipskin = WikiHelper.MultilineTemplate('ShipSkin')
 t_shipskin0 = WikiHelper.MultilineTemplate('ShipSkin0')
 
@@ -113,7 +113,7 @@ def wiki_skins(shipname:str, gallerypage=None) -> dict:
 	:param shipname: name of the ship
 	:param gallerypage: if the gallerypage if alraedy loaded, it can be passed over
 	"""
-	if gallerypage == None: gallerypage = site.pages[shipname+'/Gallery']
+	if gallerypage == None: gallerypage = wikiclient.execute(wikiclient.mwclient.pages.get, shipname+'/Gallery')
 	if not gallerypage.exists: return
 
 	skins = dict()
@@ -146,7 +146,7 @@ def update_gallery_page(shipname:str, save_to_file:bool=False, default_skincateg
 	if not groupid: raise ValueError(f'Shipname {shipname} does not lead to a valid groupid.')
 
 	# retrieve skins from wiki and game
-	gallerypage = site.pages[shipname+'/Gallery']
+	gallerypage = wikiclient.execute(wikiclient.mwclient.pages.get, shipname+'/Gallery')
 	skins_game = game_skins(groupid)
 	skins_wiki, additionalArt = wiki_skins(shipname, gallerypage) or ({}, '')
 
