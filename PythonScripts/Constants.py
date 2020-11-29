@@ -51,6 +51,7 @@ NATIONALITY = {
 	103: 'Utawarerumono',
 	104: 'Kizuna AI',
 	105: 'Hololive',
+	106: 'Venus Vacation'
 }
 
 AMRMOR_TYPE = {
