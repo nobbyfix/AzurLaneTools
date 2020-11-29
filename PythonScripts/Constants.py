@@ -83,3 +83,27 @@ SHIPTYPE_FULLNAME = {
 	18:	'Large Cruiser',
 	19:	'Ammunition Ship',
 }
+
+SHIPTYPE_TEMPLATENAME = {
+	1: 'DD',
+	2: 'CL',
+	3: 'CA',
+	4: 'BC',
+	5: 'BB',
+	6: 'CVL',
+	7: 'CV',
+	8: 'SS',
+	9: 'CAV',
+	10: 'BBV',
+	11: 'CT',
+	12: 'AR',
+	13: 'BM',
+	17: 'SSV',
+	18: 'CB',
+	19: 'AE',
+	'zhan': 'BC',
+	'hang': 'CVL',
+	'qian': 'SS',
+	'zhong': 'CB',
+	'fanqian': 'DD',
+}
