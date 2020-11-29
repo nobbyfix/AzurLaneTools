@@ -79,6 +79,10 @@ def update(version_result: VersionResult, cdnurl, useragent, client_directory: P
 	if oldversion != version_result.version:
 		print(f'{version_result.version_type.name}: Current version {oldversion} is older than latest version {version_result.version}.')
 		hashes = downloader.download_hashes(cdnurl, version_result.rawstring, useragent)
+		if not hashes:
+			print('The server did not give a proper response, exiting update routine.')
+			exit(1)
+			
 		update_assets(version_result.version_type, cdnurl, hashes, useragent, client_directory)
 		versioncontrol.save_version_string(version_result, client_directory)
 		versioncontrol.save_hash_file(version_result.version_type, client_directory, hashes)
