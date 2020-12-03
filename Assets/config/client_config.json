@@ -12,7 +12,7 @@
 	"JP": {
 		"gateip": "blhxjploginapi.azurlane.jp",
 		"gateport": 80,
-		"cdnurl": "https://blhxstatic.akamaized.net"
+		"cdnurl": "https://blhxstatic.yo-star.com"
 	},
 	"KR": {
 		"gateip": "bl-kr-gate.xdg.com",
