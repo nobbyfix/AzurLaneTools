@@ -41,7 +41,7 @@ def update_converter(JsonAPI, filepath=PATH_CONVERT):
 
 			# if the client does not contain the ship of current groupid, its usually that overrides are missing
 			if not shipstat:
-				print(f'Name of "{groupid}" could not be in "{client}" found, are the overrides incomplete?')
+				print(f'Name of "{groupid}" could not be found in "{client}", are the overrides incomplete?')
 				continue
 			shipname = shipstat['name'].strip()
 			conversions['ship'][shipname] = groupid
