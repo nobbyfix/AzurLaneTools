@@ -45,6 +45,7 @@ NATIONALITY = {
 	7: 'North Union',
 	8: 'Iris Libre',
 	9: 'Vichya Dominion',
+	97: 'META',
 	98: 'Universal',
 	101: 'Neptunia',
 	102: 'Bilibili',
