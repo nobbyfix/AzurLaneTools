@@ -1,6 +1,6 @@
 from typing import List, Union, Dict
 from enum import Enum
-from os.path import join, dirname, abspath
+from os.path import join, dirname, abspath, exists
 import json, re
 
 import ShipIDConverter
@@ -154,7 +154,9 @@ class ALJsonAPI:
 		:param sharecfg_name: name of the sharecfg file to return contents from
 		:param client: the client to load the sharecfg file from"""
 		if not (sharecfg_name in self.data_pool[client]):
-			with open(join(self.SOURCE_PATH, client.name, 'sharecfg', sharecfg_name+'.json'), 'r', encoding='utf8') as jfile:
+			jsonpath = join(self.SOURCE_PATH, client.name, 'sharecfg', sharecfg_name+'.json')
+			if not exists(jsonpath): return
+			with open(jsonpath, 'r', encoding='utf8') as jfile:
 				json_data = json.load(jfile)
 			self.data_pool[client][sharecfg_name] = json_data
 		return self.data_pool[client][sharecfg_name]
@@ -164,7 +166,11 @@ class ALJsonAPI:
 		
 		:param sharecfg_name: name of the sharecfg file to return contents from
 		:param clients: list of clients to return sharecfg files from """
-		return {client: self.load_sharecfg(sharecfg_name, client) for client in clients}
+		multi_sharecfg = {}
+		for client in clients:
+			json_data = self.load_sharecfg(sharecfg_name, client)
+			if json_data: multi_sharecfg[client] = json_data
+		return multi_sharecfg
 
 	def load_gamecfg(self, gamecfg_name:str, client:Client) -> dict:
 		with open(join(self.SOURCE_PATH, client.name, gamecfg_name+'.json'), 'r', encoding='utf8') as jfile:
