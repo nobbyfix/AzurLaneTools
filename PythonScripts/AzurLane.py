@@ -1,10 +1,9 @@
 from typing import List, Union, Dict
 from enum import Enum
-from os.path import join, dirname, abspath, exists
+from os.path import join, exists
 import json, re
 
 import ShipIDConverter
-import WikiHelper
 
 class Client(Enum):
 	EN = 1

@@ -190,7 +190,7 @@ def update_gallery_page(shipname:str, save_to_file:bool=False, default_skincateg
 def main():
 	mode = input('Execute (all/test/single/list): ')
 	if mode == 'test':
-		while(1):
+		while True:
 			shipname = input('Shipname: ')
 			success = update_gallery_page(shipname, True)
 			if not success: print('An error occured.')
