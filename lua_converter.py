@@ -15,13 +15,28 @@ def get_file_hash(filepath:str):
 	return md5.hexdigest()
 
 def convert_lua(filepath, savedest):
-	if 'sharecfg' in filepath:
-		pgname = os.path.basename(filepath)
-		try: result = subprocess.check_output(['lua', 'serializer.lua', filepath, pgname], stderr=subprocess.DEVNULL)
-		except: return
-	else:
-		try: result = subprocess.check_output(['lua', 'serializer2.lua', filepath], stderr=subprocess.DEVNULL)
-		except: return
+	try:
+		if 'sharecfg' in filepath:
+			pgname = os.path.basename(filepath)
+
+			# manipulate file, so the serializer can import it as a lua module
+			revert_file = False
+			if pgname in ["expedition_data_template", "weapon_property", "world_chapter_template"]:
+				revert_file = True
+				with open(filepath+".lua", 'r', encoding="utf8") as file:
+					content = file.read()
+				content_replaced = content.replace("function ()", "").replace("end()", "")
+				with open(filepath+".lua", 'w', encoding="utf8") as file:
+					file.write(content_replaced)
+
+			result = subprocess.check_output(['lua', 'serializer.lua', filepath, pgname], stderr=subprocess.DEVNULL)
+
+			if revert_file:
+				with open(filepath+".lua", 'w', encoding="utf8") as file:
+					file.write(content)
+		else:
+			result = subprocess.check_output(['lua', 'serializer2.lua', filepath], stderr=subprocess.DEVNULL)
+	except: return
 
 	rstr = result.decode('utf8')
 	if rstr.startswith('null'): return
