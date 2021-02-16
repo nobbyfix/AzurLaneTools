@@ -23,13 +23,13 @@ def parse_version_string(rawstring):
 	parts = rawstring.split('$')[1:]
 	versionname = parts[0]
 	versiontype = version_hash_name.get(versionname)
-	if not versiontype: raise NotImplementedError(f'Unknown versionname {versionname}.')
+	if not versiontype:
+		raise NotImplementedError(f'Unknown versionname {versionname}.')
 
 	if versiontype == VersionType.AZL:
 		version = '.'.join(parts[1:-1])
 		return VersionResult(version, parts[-1], rawstring, versiontype)
-	else:
-		return VersionResult(parts[1], parts[2], rawstring, versiontype)
+	return VersionResult(parts[1], parts[2], rawstring, versiontype)
 
 
 def load_version_string(version_type: VersionType, relative_parent_dir: Path):

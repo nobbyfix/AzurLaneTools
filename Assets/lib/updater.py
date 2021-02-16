@@ -1,4 +1,4 @@
-import os
+import sys
 from pathlib import Path
 
 from . import downloader, versioncontrol
@@ -67,7 +67,7 @@ def update_assets(version_type: VersionType, cdnurl, newhashes, useragent, clien
 		elif result.compare_type == CompareType.Deleted:
 			print(f'Deleting {result.filepath} ({i}/{fileamount}).')
 			remove_asset(assetpath)
-	
+
 	for comp_type, filepaths in version_diff_output.items():
 		fileoutpath = Path(client_directory, 'difflog', f'diff_{version_type.name.lower()}_{comp_type.name.lower()}.txt')
 		fileoutpath.parent.mkdir(exist_ok=True)
@@ -80,9 +80,8 @@ def update(version_result: VersionResult, cdnurl, useragent, client_directory: P
 		print(f'{version_result.version_type.name}: Current version {oldversion} is older than latest version {version_result.version}.')
 		hashes = downloader.download_hashes(cdnurl, version_result.rawstring, useragent)
 		if not hashes:
-			print('The server did not give a proper response, exiting update routine.')
-			exit(1)
-			
+			sys.exit('The server did not give a proper response, exiting update routine.')
+
 		update_assets(version_result.version_type, cdnurl, hashes, useragent, client_directory)
 		versioncontrol.save_version_string(version_result, client_directory)
 		versioncontrol.save_hash_file(version_result.version_type, client_directory, hashes)
