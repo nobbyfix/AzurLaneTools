@@ -25,3 +25,13 @@ class VersionResult:
 @dataclass
 class UserConfig:
 	useragent: str
+	download_isblacklist: bool
+	download_filter: list[str]
+	extract_isblacklist: bool
+	extract_filter: list[str]
+
+@dataclass
+class ClientConfig:
+	gateip: str
+	gateport: int
+	cdnurl: str

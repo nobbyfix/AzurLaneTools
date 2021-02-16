@@ -1,70 +1,82 @@
-import socket, json
-from argparse import ArgumentParser
+import sys
+import json
+from shutil import copy
 from pathlib import Path
+from argparse import ArgumentParser
+import yaml
 
 from lib import protobuf, versioncontrol, updater
-from lib.classes import Client, UserConfig
+from lib.classes import Client, UserConfig, ClientConfig
 
 
-def load_client_config(client:Client):
-	with open(Path('config', 'client_config.json'), 'r', encoding='utf8') as f:
+YAML_CONFIG_PATH = Path("config", "user_config.yml")
+YAML_TEMPLATE_PATH = Path("config", "user_config_template.yml")
+CLIENT_CONFIG_PATH = Path('config', 'client_config.json')
+
+def load_user_config() -> UserConfig:
+	if not YAML_CONFIG_PATH.exists():
+		print("Userconfig does not exist. A new one will be created.")
+		print("Note that the useragent is empty and it is advised to set one.")
+		copy(YAML_TEMPLATE_PATH, YAML_CONFIG_PATH)
+		return load_user_config()
+
+	with open(YAML_CONFIG_PATH, 'r', encoding='utf8') as file:
+		yamlconfig = yaml.safe_load(file)
+
+	try:
+		userconfig = UserConfig(
+			useragent=yamlconfig['useragent'],
+			download_isblacklist=yamlconfig['download-folder-listtype'] == 'blacklist',
+			download_filter=yamlconfig['download-folder-list'],
+			extract_isblacklist=yamlconfig['extract-folder-listtype'] == 'blacklist',
+			extract_filter=yamlconfig['extract-folder-list'])
+	except KeyError:
+		print("There is an error inside the userconfig file. Delete it or change the wrong values.")
+		sys.exit(1)
+
+	return userconfig
+
+def load_client_config(client: Client) -> ClientConfig:
+	with open(CLIENT_CONFIG_PATH, 'r', encoding='utf8') as f:
 		configdata = json.load(f)
-		if not client.name in configdata: raise NotImplementedError(f'Client {client.name} has not been configured yet.')
-		return configdata[client.name]
+
+	if not client.name in configdata:
+		raise NotImplementedError(f'Client {client.name} has not been configured yet.')
+
+	config = configdata[client.name]
+	try:
+		clientconfig = ClientConfig(config['gateip'], config['gateport'], config['cdnurl'])
+	except KeyError:
+		print("The clientconfig has been wrongly configured.")
+		sys.exit(1)
+
+	return clientconfig
 
 
-def load_user_config():
-	configpath = Path('config', 'user_config.json')
-	if not configpath.exists():
-		print('User config file has not been found. This is normal on the first startup.')
-		return create_user_config()
-
-	with open(configpath, 'r', encoding='utf8') as f:
-		configdata = json.load(f)
-		useragent = configdata.get('useragent')
-		if not useragent:
-			return create_user_config()
-		return UserConfig(useragent)
-
-def create_user_config():
-	useragent = input('Type your desired useragent: ')
-	uconfig = UserConfig(useragent)
-	save_user_config(uconfig)
-	return uconfig
-
-def save_user_config(userconfig:UserConfig):
-	with open(Path('config', 'user_config.json'), 'w', encoding='utf8') as f:
-		configdata = {'useragent':userconfig.useragent}
-		json.dump(configdata, f)
-
-
-def main(client:Client):
-	config = load_client_config(client)
-	GATE_IP = config['gateip']
-	GATE_PORT = config['gateport']
-	CDN_URL = config['cdnurl']
-	USERAGENT = load_user_config().useragent
+def main(client: Client):
+	userconfig = load_user_config()
+	clientconfig = load_client_config(client)
 
 	CLIENTPATH = Path('ClientAssets', client.name)
 	if not CLIENTPATH.parent.exists(): CLIENTPATH.parent.mkdir(parents=True)
 
-	version_response = protobuf.get_version_response(GATE_IP, GATE_PORT)
+	version_response = protobuf.get_version_response(clientconfig.gateip, clientconfig.gateport)
 	versionlist = [versioncontrol.parse_version_string(v) for v in version_response.pb.Version if v.startswith('$')]
 	for vresult in versionlist:
-		updater.update(vresult, CDN_URL, USERAGENT, CLIENTPATH)
+		updater.update(vresult, clientconfig.cdnurl, userconfig.useragent, CLIENTPATH)
 
 if __name__ == "__main__":
 	parser = ArgumentParser()
 	parser.add_argument('-c', '--client', help='client to update')
 	args = parser.parse_args()
-	
+
 	clientname = args.client
 	if clientname is None:
 		clientname = input('Type which client to update: ')
-	
+
 	if clientname in Client.__members__:
 		client = Client[clientname]
 		main(client)
 	else:
 		print(f'The client {clientname} is not supported or does not exist.')
-		exit(1)
+		sys.exit(1)
