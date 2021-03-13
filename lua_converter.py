@@ -1,111 +1,138 @@
-import os
-from os.path import join
 import json
-import hashlib
+import shutil
 import subprocess
+from enum import Enum
+from pathlib import Path
 import multiprocessing as mp
 
-def get_file_hash(filepath:str):
-	md5 = hashlib.md5()
-	with open(filepath, 'rb') as f:
-		while True:
-			data = f.read(32768)
-			if not data: break
-			md5.update(data)
-	return md5.hexdigest()
 
-def convert_lua(filepath, savedest):
-	try:
-		if 'sharecfg' in filepath:
-			pgname = os.path.basename(filepath)
+class Client(Enum):
+	locale_code: str
 
-			# manipulate file, so the serializer can import it as a lua module
-			revert_file = False
-			if pgname in ["expedition_data_template", "weapon_property", "world_chapter_template"]:
-				revert_file = True
-				with open(filepath+".lua", 'r', encoding="utf8") as file:
-					content = file.read()
-				content_replaced = content.replace("function ()", "").replace("end()", "")
-				with open(filepath+".lua", 'w', encoding="utf8") as file:
-					file.write(content_replaced)
+	def __new__(cls, value, locale):
+		obj = object.__new__(cls)
+		obj._value_ = value
+		obj.locale_code = locale
+		return obj
 
-			result = subprocess.check_output(['lua', 'serializer.lua', filepath, pgname], stderr=subprocess.DEVNULL)
+	EN = (1, "en-US")
+	CN = (2, "zh-CN")
+	JP = (3, "ja-JP")
+	KR = (4, "ko-KR")
+	TW = (5, "zh-TW")
 
-			if revert_file:
-				with open(filepath+".lua", 'w', encoding="utf8") as file:
-					file.write(content)
-		else:
-			result = subprocess.check_output(['lua', 'serializer2.lua', filepath], stderr=subprocess.DEVNULL)
-	except: return
-
-	rstr = result.decode('utf8')
-	if rstr.startswith('null'): return
-
-	jsondata = json.loads(rstr)
-	jsons = json.dumps(jsondata, indent=2, ensure_ascii=False)
-
-	with open(savedest, 'w', encoding='utf8') as jfile:
-		jfile.write(jsons)
-
-clients = {
-	'EN': 'en-US',
-	'CN': 'zh-CN',
-	'JP': 'ja-JP',
-	'KR': 'ko-KR',
-	'TW': 'zh-TW'
-}
 
 directory_destinations = [
-	('sharecfg', 'sharecfg'),
-	(join('gamecfg', 'buff'),  'buff'),
-	(join('gamecfg', 'dungeon'), 'dungeon'),
-	(join('gamecfg', 'skill'), 'skill'),
-	(join('gamecfg', 'story'), 'story'),
+	(Path("sharecfg"), "sharecfg"),
+	(Path("gamecfg", "buff"),  "buff"),
+	(Path("gamecfg", "dungeon"), "dungeon"),
+	(Path("gamecfg", "skill"), "skill"),
+	(Path("gamecfg", "story"), "story"),
 ]
 
+
+def convert_lua(filepath: Path, savedest: Path):
+	if "sharecfg" in filepath.parts:
+		# if file is also modified to contain function blocks, remove them
+		modified_file = False
+		with open(filepath, "r", encoding="utf8") as f:
+			content = f.read()
+		if "function ()" in content and "end()" in content:
+			content_replaced = content.replace("function ()", "").replace("end()", "")
+			with open(filepath, "w", encoding="utf8") as f:
+				f.write(content_replaced)
+			modified_file = True
+
+		# convert the file
+		try:
+			result = subprocess.check_output(["lua", "serializer.lua",
+				str(filepath.with_suffix("")), filepath.stem], stderr=subprocess.DEVNULL)
+		except: return
+		finally:
+			# revert the file, even if it fails to convert them
+			if modified_file:
+				with open(filepath, "w", encoding="utf8") as f:
+					f.write(content)
+
+	# convert non-sharecfg files with other lua serializer script
+	else:
+		try:
+			result = subprocess.check_output(["lua", "serializer2.lua",
+				str(filepath.with_suffix(""))], stderr=subprocess.DEVNULL)
+		except: return
+
+	json_string = result.decode("utf8")
+	if json_string.startswith("null"): return
+
+	json_data = json.loads(json_string)
+	# if the parsed json is empty (or an empty structure), don't save that
+	if not json_data: return
+	json_string = json.dumps(json_data, indent=2, ensure_ascii=False)
+
+	savedest.parent.mkdir(parents=True, exist_ok=True)
+	with open(savedest, "w", encoding="utf8") as jfile:
+		jfile.write(json_string)
+
+# wrapper to pass into multiprocessing.Pool functions
+_convert_lua = lambda args: convert_lua(*args)
+
+
 def main():
-	# convert client string to the one dim uses
-	input_client = input('Type the game version to convert: ')
-	conv_clinet = clients.get(input_client)
-	if not conv_clinet:
-		print('Unknown client, aborting.')
+	client_input = input("Type the game version to convert: ")
+	if not client_input in Client.__members__:
+		print(f"Unknown client {client_input}, aborting.")
 		return
+	client = Client[client_input]
 
-	hashes = dict()
-	HASHTABLE_PATH = join('SrcJson', 'Hashes', input_client+'.json')
-	if os.path.exists(HASHTABLE_PATH):
-		with open(HASHTABLE_PATH, 'r', encoding='utf8') as jfile:
-			hashes = json.load(jfile)
-	else: print('No hash file found, all files will be converted.')
+	with mp.Pool(processes=mp.cpu_count()) as pool:
+		for DIR_FROM, DIR_TO in directory_destinations:
+			# jp has different folder for story files
+			if DIR_FROM.name == "story" and client_input == "JP":
+				DIR_FROM = DIR_FROM.with_name(DIR_FROM.name+"jp")
 
-	args = []
+			# set path constants
+			CONVERT_FROM = Path("Src", client.locale_code, DIR_FROM)
+			CONVERT_TO = Path("SrcJson", client_input, DIR_TO)
 
-	for DIR_FROM, DIR_TO in directory_destinations:
-		# set path constants
-		if DIR_FROM.endswith('story') and input_client == 'JP': DIR_FROM += 'jp'
-		CONVERT_FROM = join('Src', conv_clinet, DIR_FROM)
-		CONVERT_TO = join('SrcJson', input_client, DIR_TO)
-		os.makedirs(CONVERT_TO, exist_ok=True)
+			# find all files inside the folder
+			for file in CONVERT_FROM.rglob("*.lua"):
+				target = Path(CONVERT_TO, file.relative_to(CONVERT_FROM).with_suffix(".json"))
+				pool.apply_async(convert_lua, (file, target,))
+		pool.close()
+		pool.join()
 
-		for entry in os.scandir(CONVERT_FROM):
-			if entry.is_dir(): continue
-			fname_noext = entry.name.replace('.lua', '')
+	# merge sublisted sharecfg files
+	SHARECFG_JSON_FOLDER = Path("SrcJson", client_input, "sharecfg")
+	for filetarget in SHARECFG_JSON_FOLDER.glob("*.json"):
+		with open(filetarget, "r", encoding="utf8") as f:
+			sharecfg_content = json.load(f)
 
-			oldhash = hashes.get(fname_noext)
-			newhash = get_file_hash(entry.path)
-			if oldhash == newhash: continue
+		# check if sharecfg file is splitted
+		if "subList" in sharecfg_content and "subFolderName" in sharecfg_content:
+			subdir = Path(SHARECFG_JSON_FOLDER, sharecfg_content["subFolderName"].lower())
+			json_content = {}
 
-			hashes[fname_noext] = newhash
-			arg = (join(CONVERT_FROM, fname_noext), join(CONVERT_TO, fname_noext+'.json'))
-			args.append(arg)
+			# iterate over all subfiles
+			for subfilename in sharecfg_content["subList"]:
+				subfile = Path(subdir, subfilename+".json")
+				if not subfile.exists(): continue
 
-	pool = mp.Pool(processes=mp.cpu_count())
-	pool.starmap(convert_lua, reversed(args))
+				with open(subfile, "r", encoding="utf8") as sf:
+					subcontent = json.load(sf)
+				json_content = json_content | subcontent
 
-	# save hashtable
-	os.makedirs(os.path.dirname(HASHTABLE_PATH), exist_ok=True)
-	with open(HASHTABLE_PATH, 'w', encoding='utf8') as jfile:
-		json.dump(hashes, jfile, ensure_ascii=False)
+			# copy all other data over
+			for k in sharecfg_content:
+				if k not in ("subList", "subFolderName", "indexs"):
+					json_content[k] = sharecfg_content[k]
 
-if __name__ == '__main__':
+			# save it all into a single file
+			with open(filetarget, "w", encoding="utf8") as f:
+				json.dump(json_content, f, indent=2, ensure_ascii=False)
+
+			# remove sublistfolder after the data has been merged
+			shutil.rmtree(subdir, ignore_errors=True)
+
+
+if __name__ == "__main__":
 	main()
