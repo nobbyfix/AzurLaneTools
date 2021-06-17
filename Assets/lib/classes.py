@@ -26,9 +26,9 @@ class VersionResult:
 class UserConfig:
 	useragent: str
 	download_isblacklist: bool
-	download_filter: list[str]
+	download_filter: list
 	extract_isblacklist: bool
-	extract_filter: list[str]
+	extract_filter: list
 
 @dataclass
 class ClientConfig:
