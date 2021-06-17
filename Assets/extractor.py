@@ -1,10 +1,11 @@
+import sys
+import json
 from argparse import ArgumentParser
 from pathlib import Path
 from itertools import chain
 import multiprocessing as mp
-import json
 
-from lib import imgrecon
+from lib import imgrecon, config
 from lib.classes import Client
 
 
@@ -23,15 +24,17 @@ def get_new_files(parent_directory: Path):
 
 def restore_painting(image, abpath: Path, imgname: str, do_retry:bool):
 	mesh = imgrecon.load_mesh(str(abpath), imgname+'-mesh')
-	if mesh is None:
-		if do_retry:
-			# for some images, the mesh is in the non-tex asset bundle for some reason
-			if abpath.name.endswith('_tex'):
-				return restore_painting(image, abpath.with_name(abpath.name[:-4]), imgname, False)
-			else:
-				return restore_painting(image, abpath.with_name(abpath.name+'_tex'), imgname, False)
+	if mesh is not None:
+		return imgrecon.recon(image, mesh)
+
+	if not do_retry:
 		return image
-	return imgrecon.recon(image, mesh)
+
+	# for some images, the mesh is in the non-tex asset bundle for some reason
+	if abpath.name.endswith('_tex'):
+		return restore_painting(image, abpath.with_name(abpath.name[:-4]), imgname, False)
+
+	return restore_painting(image, abpath.with_name(abpath.name+'_tex'), imgname, False)
 
 def extract_assetbundle(rootfolder: Path, filepath: str, targetfolder: Path):
 	abpath = Path(rootfolder, filepath)
@@ -42,7 +45,7 @@ def extract_assetbundle(rootfolder: Path, filepath: str, targetfolder: Path):
 		image = imageobj.image
 		if filepath.split('/')[0] == 'painting':
 			image = restore_painting(image, abpath, imageobj.name, True)
-		
+
 		target = Path(Path(targetfolder, filepath).parent, imageobj.name+'.png')
 		target.parent.mkdir(parents=True, exist_ok=True)
 
@@ -66,8 +69,8 @@ def extract_by_client(client: Client):
 	new_files = get_new_files(client_directory)
 
 	extract_directory = Path('ClientExtract', client.name)
-	extractable_folder = load_extractable_folders()
-	
+	extractable_folder = config.load_user_config().extract_filter
+
 	pool = mp.Pool(processes=mp.cpu_count()-1)
 	async_results = []
 
@@ -75,7 +78,6 @@ def extract_by_client(client: Client):
 		if assetpath.split('/')[0] in extractable_folder:
 			async_result = pool.apply_async(extract_assetbundle, (Path(client_directory, 'AssetBundles'), assetpath, extract_directory,))
 			async_results.append(async_result)
-			#extract_assetbundle(Path(client_directory, 'AssetBundles'), assetpath, extract_directory)
 	wait_and_close_pool(pool, async_results)
 
 
@@ -92,17 +94,16 @@ def extract_single_assetbundle(client: Client, assetpath: str):
 	return extract_assetbundle(client_directory, assetpath, extract_directory)
 
 if __name__ == "__main__":
+	# setup argument parser
 	parser = ArgumentParser()
-	parser.add_argument('-c', '--client', help='client to extract assets from')
+	parser.add_argument("client", metavar="CLIENT", type=str, help="client to update")
 	args = parser.parse_args()
-	
+
+	# parse arguments
 	clientname = args.client
-	if clientname is None:
-		clientname = input('Type which client to extract assets from: ')
-	
-	if clientname in Client.__members__:
-		client = Client[clientname]
-		extract_by_client(client)
-	else:
-		print(f'The client {clientname} is not supported or does not exist.')
-		exit(1)
+	if not clientname in Client._member_names_:
+		sys.exit(f"The client {clientname} is not supported or does not exist.")
+	client = Client[clientname]
+
+	# execute
+	extract_by_client(client)
