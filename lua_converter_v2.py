@@ -103,7 +103,7 @@ def convert_new_files(override_commit: str = None):
 
 if __name__ == "__main__":
 	parser = ArgumentParser()
-	parser.add_argument("-c", "--commit-sha", default=None, type=str, help="commit sha from which to start converting")
+	parser.add_argument("-c", "--commit-sha", type=str, help="commit sha from which to start converting")
 	args = parser.parse_args()
 
 	if sha := args.commit_sha:

@@ -96,7 +96,7 @@ if __name__ == "__main__":
 
 	# parse arguments and execute
 	client = Client[args.client]
-	if filepath := args.file:
+	if filepath := args.filepath:
 		extract_single_assetbundle(client, filepath)
 	else:	
 		extract_by_client(client)
