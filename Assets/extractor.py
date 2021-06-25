@@ -70,23 +70,16 @@ def extract_by_client(client: Client):
 
 	extract_directory = Path('ClientExtract', client.name)
 	extractable_folder = config.load_user_config().extract_filter
+	
+	with mp.Pool(processes=mp.cpu_count()) as pool:
+		for assetpath in chain(changed_files, new_files):
+			if assetpath.split('/')[0] in extractable_folder:
+				pool.apply_async(extract_assetbundle, (Path(client_directory, 'AssetBundles'), assetpath, extract_directory,))
 
-	pool = mp.Pool(processes=mp.cpu_count()-1)
-	async_results = []
-
-	for assetpath in chain(changed_files, new_files):
-		if assetpath.split('/')[0] in extractable_folder:
-			async_result = pool.apply_async(extract_assetbundle, (Path(client_directory, 'AssetBundles'), assetpath, extract_directory,))
-			async_results.append(async_result)
-	wait_and_close_pool(pool, async_results)
-
-
-def wait_and_close_pool(pool: mp.Pool, asyncresults: list):
-	for res in asyncresults:
-		res.wait()
-	pool.close()
-	pool.join()
-
+		# explicitly join pool
+		# this causes the pool to wait for all asnyc tasks to complete
+		pool.close()
+		pool.join()
 
 def extract_single_assetbundle(client: Client, assetpath: str):
 	client_directory = Path('ClientAssets', client.name, 'AssetBundles')
@@ -95,15 +88,15 @@ def extract_single_assetbundle(client: Client, assetpath: str):
 
 if __name__ == "__main__":
 	# setup argument parser
-	parser = ArgumentParser()
-	parser.add_argument("client", metavar="CLIENT", type=str, help="client to update")
+	parser = ArgumentParser(description="Extracts image assets as pngs.",
+		epilog="If '--file' is not set, all files from the latest update will be extracted.")
+	parser.add_argument("client", metavar="CLIENT", type=str, choices=Client._member_names_, help="client to extract files of")
+	parser.add_argument("-f", "--filepath", type=str, help="Path to the file to extract only this single file")
 	args = parser.parse_args()
 
-	# parse arguments
-	clientname = args.client
-	if not clientname in Client._member_names_:
-		sys.exit(f"The client {clientname} is not supported or does not exist.")
-	client = Client[clientname]
-
-	# execute
-	extract_by_client(client)
+	# parse arguments and execute
+	client = Client[args.client]
+	if filepath := args.file:
+		extract_single_assetbundle(client, filepath)
+	else:	
+		extract_by_client(client)
