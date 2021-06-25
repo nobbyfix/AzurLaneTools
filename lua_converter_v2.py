@@ -1,14 +1,19 @@
 import re
 from pathlib import Path
 import multiprocessing as mp
+from argparse import ArgumentParser
 from git import Repo
 
 from lua_convert import Client, convert_lua
 
 
+ALLOWED_GAMECFG_FOLDERS = {"buff", "dungeon", "skill", "story", "storyjp", "backyardtheme", "guide"}
+
 LUA_REPO_NAME = "Src"
 JSON_REPO_NAME = "SrcJson"
 REGEX = re.compile(r"\[(..-..)\] AZ: (\d+\.\d+\.\d+)")
+
+
 class SrcRepo(Repo):
 	def pull(self):
 		"""
@@ -53,7 +58,6 @@ class SrcRepo(Repo):
 			return *re_result[0], files
 
 
-ALLOWED_GAMECFG_FOLDERS = {"buff", "dungeon", "skill", "story", "storyjp", "backyardtheme", "guide"}
 def is_allowed_gamecfg(path: Path):
 	return bool(ALLOWED_GAMECFG_FOLDERS.intersection(path.parts))
 
@@ -88,6 +92,8 @@ def convert_new_files(override_commit: str = None):
 				json_destination = Path(JSON_REPO_NAME, client.name, path2.with_suffix(".json"))
 				pool.apply_async(convert_lua, (lua_require, json_destination,))
 
+			# explicitly join the pool
+			# since the pool only receives async tasks, this waits for their completion
 			pool.close()
 			pool.join()
 
@@ -96,5 +102,11 @@ def convert_new_files(override_commit: str = None):
 	repo_json.remotes.origin.push()
 
 if __name__ == "__main__":
-	commit_sha = input("Commit Sha: ")
-	convert_new_files(commit_sha or None)
+	parser = ArgumentParser()
+	parser.add_argument("-c", "--commit-sha", default=None, type=str, help="commit sha from which to start converting")
+	args = parser.parse_args()
+
+	if sha := args.commit_sha:
+		convert_new_files(sha)
+	else:
+		convert_new_files()
