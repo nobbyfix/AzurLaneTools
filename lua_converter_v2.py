@@ -81,7 +81,6 @@ def convert_new_files(override_commit: str = None):
 				if "gamecfg" in filepath.parts:
 					if not is_allowed_gamecfg(filepath):
 						continue
-					filepath = normalize_gamecfg_paths(filepath)
 					index += 1
 				elif "sharecfg" not in filepath.parts:
 					continue
@@ -89,7 +88,7 @@ def convert_new_files(override_commit: str = None):
 				path2 = filepath.relative_to(*filepath.parts[:index])
 
 				lua_require = Path(LUA_REPO_NAME, filepath)
-				json_destination = Path(JSON_REPO_NAME, client.name, path2.with_suffix(".json"))
+				json_destination = normalize_gamecfg_paths( Path(JSON_REPO_NAME, client.name, path2.with_suffix(".json")) )
 				pool.apply_async(convert_lua, (lua_require, json_destination,))
 
 			# explicitly join the pool
