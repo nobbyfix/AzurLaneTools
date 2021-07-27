@@ -47,15 +47,15 @@
 				"sections": [
 					{
 						"comment": "",
-						"params": ["Eq1Type", "Eq1EffInit", "Eq1EffInitMax", "Eq1EffInitKai"]
+						"params": ["Eq1Type", "Eq1BaseMax", "Eq1EffInit", "Eq1EffInitMax", "Eq1EffInitKai"]
 					},
 					{
 						"comment": "",
-						"params": ["Eq2Type", "Eq2EffInit", "Eq2EffInitMax", "Eq2EffInitKai"]
+						"params": ["Eq2Type", "Eq2BaseMax", "Eq2EffInit", "Eq2EffInitMax", "Eq2EffInitKai"]
 					},
 					{
 						"comment": "",
-						"params": ["Eq3Type", "Eq3EffInit", "Eq3EffInitMax", "Eq3EffInitKai"]
+						"params": ["Eq3Type", "Eq3BaseMax", "Eq3EffInit", "Eq3EffInitMax", "Eq3EffInitKai"]
 					}
 				]
 			},
