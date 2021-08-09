@@ -1,10 +1,11 @@
-from argparse import ArgumentParser
-from zipfile import ZipFile
-from zipfile import Path as ZipPath
-from pathlib import Path
+import sys
 import shutil
+from argparse import ArgumentParser
+from zipfile import ZipFile, Path as ZipPath
+from pathlib import Path
 
-from lib.classes import Client, VersionType
+from lib import versioncontrol, updater
+from lib.classes import Client, CompareResult, CompareType, VersionType
 
 
 appnames = {
@@ -14,14 +15,6 @@ appnames = {
 	'com.hkmanjuu.azurlane.gp.obb': Client.TW,
 }
 
-version_file_suffix = {
-	VersionType.AZL: '',
-	VersionType.CV: '-cv',
-	VersionType.L2D: '-live2d',
-	VersionType.PIC: '-pic',
-	VersionType.BGM: '-bgm',
-}
-
 
 def unpack(path: Path, client: Client):
 	print('Unpacking archive...')
@@ -29,58 +22,62 @@ def unpack(path: Path, client: Client):
 		extract_to_folder = Path('ClientAssets', client.name)
 		if not extract_to_folder.exists(): extract_to_folder.mkdir(parents=True)
 
-		for versiontype, suffix in version_file_suffix.items():
+		for versiontype, suffix in versioncontrol.version_file_suffix.items():
 			versionfname = 'version'+suffix+'.txt'
 			if not 'assets/'+versionfname in zipfile.namelist():
-				print(f'The file {versionfname} could not be found in the archive. Has the archive been modified?')
+				print(f'{versiontype.name}: The file {versionfname} could not be found in the archive. Has the archive been modified?')
 				continue
 
-			versionpath = Path(extract_to_folder, versionfname)
+			# read version string from obb
 			with zipfile.open('assets/'+versionfname, 'r') as zf:
-				obbversion = zf.read().decode('utf8') 
+				obbversion = zf.read().decode('utf8')
 
 			# if a version file already exists, compare the versions
-			# if the obbversion is smaller, don't extract data from obb
-			if versionpath.exists():
-				with open(versionpath, 'r') as f:
-					currentversion = f.read()
-				
-				if tuple(obbversion.split('.')) < tuple(currentversion.split('.')):
-					print(f'Current version {currentversion} is higher or same as obb version {obbversion} for {versionfname}.')
-					continue
+			# if the obbversion is smaller (older), don't extract data from obb
+			currentversion = versioncontrol.load_version_string(versiontype, extract_to_folder)
+			if currentversion and tuple(obbversion.split('.')) < tuple(currentversion.split('.')):
+				print(f'{versiontype.name}: Current version {currentversion} is same or newer than obb version {obbversion}.')
+				continue
 
-			# write new version to file
-			with open(versionpath, 'w') as f:
-				f.write(obbversion)
-			
-			# extract corresponding hashfile
-			with open(Path(extract_to_folder, 'hashes'+suffix+'.csv'), 'wb') as fh:
-				with zipfile.open('assets/hashes'+suffix+'.csv', 'r') as zfh:
-					shutil.copyfileobj(zfh, fh)
-			
-			# also extract all assets
-			if versiontype == VersionType.AZL:
-				# remove all existing asset bundles
-				abpath = Path(extract_to_folder, 'AssetBundles')
-				shutil.rmtree(abpath, ignore_errors=True)
+			# read hash files from obb and current file and compare them
+			with zipfile.open('assets/hashes'+suffix+'.csv', 'r') as hashfile:
+				obbhashes = hashfile.read().decode('utf8')
+			currenthashes = versioncontrol.load_hash_file(versiontype, extract_to_folder)
+			hash_compare_results = updater.compare_hashes(currenthashes, obbhashes)
 
-				# extract assets now
-				zipabpath = ZipPath(zipfile, 'assets/AssetBundles/')
-				extract_folder(zipfile, zipabpath, zipabpath, abpath)
+			# extract and delete files
+			abpath = Path(extract_to_folder, 'AssetBundles')
+			version_diff_output = {t: [] for t in CompareType}
+			fileamount = len(hash_compare_results.values())
+			for i, result in enumerate(hash_compare_results.values(), 1):
+				version_diff_output[result.compare_type].append(result.filepath)
+				assetpath = Path(abpath, result.filepath)
+				if result.compare_type in [CompareType.New, CompareType.Changed]:
+					print(f'Saving {result.filepath} ({i}/{fileamount}).')
+					extract_asset(zipfile, result.filepath, assetpath)
+				elif result.compare_type == CompareType.Deleted:
+					print(f'Deleting {result.filepath} ({i}/{fileamount}).')
+					updater.remove_asset(assetpath)
 
-def extract_folder(zipfile: ZipFile, rootfolder: ZipPath, folderpath: ZipPath, target: Path):
-	for entry in folderpath.iterdir():
-		if entry.is_dir(): extract_folder(zipfile, rootfolder, entry, target)
-		elif entry.is_file():
-			file_target = Path(target, entry.at.replace(rootfolder.at, ''))
-			file_target.parent.mkdir(parents=True, exist_ok=True)
-			with zipfile.open(entry.at, 'r') as zf, open(file_target, 'wb') as f:
-				f.write(zf.read())
+			# write difflog files
+			for comp_type, filepaths in version_diff_output.items():
+				fileoutpath = Path(extract_to_folder, 'difflog', f'diff_{versiontype.name.lower()}_{comp_type.name.lower()}.txt')
+				fileoutpath.parent.mkdir(exist_ok=True)
+				with open(fileoutpath, 'w', encoding='utf8') as f:
+					f.write('\n'.join(filepaths))
+
+			# update local version and hashfile
+			versioncontrol.update_version_data(versiontype, extract_to_folder, obbversion, obbhashes)
+
+
+def extract_asset(zipfile: ZipFile, filepath: str, target: Path):
+	with zipfile.open('assets/AssetBundles/'+filepath, 'r') as zf, open(target, 'wb') as f:
+		shutil.copyfileobj(zf, f)
+
 
 def main(path: Path):
 	if not path.exists():
-		print('This file does not exist.')
-		exit(1)
+		sys.exit('This file does not exist.')
 
 	if path.suffix == '.obb':
 		print('File has .obb extension.')
