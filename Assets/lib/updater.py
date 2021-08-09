@@ -82,7 +82,6 @@ def update(version_result: VersionResult, cdnurl: str, useragent: str, client_di
 			sys.exit('The server did not give a proper response, exiting update routine.')
 
 		update_assets(version_result.version_type, cdnurl, hashes, useragent, client_directory)
-		versioncontrol.save_version_string(version_result, client_directory)
-		versioncontrol.save_hash_file(version_result.version_type, client_directory, hashes)
+		versioncontrol.update_version_data2(version_result, client_directory, hashes)
 	else:
 		print(f'{version_result.version_type.name}: Current version {oldversion} is latest.')

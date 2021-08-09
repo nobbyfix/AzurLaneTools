@@ -39,10 +39,13 @@ def load_version_string(version_type: VersionType, relative_parent_dir: Path):
 		with open(fpath, 'r') as f:
 			return f.read()
 
-def save_version_string(version_result: VersionResult, relative_parent_dir: Path):
-	fname = 'version'+version_file_suffix[version_result.version_type]+'.txt'
+def save_version_string(version_type: VersionType, relative_parent_dir: Path, content: str):
+	fname = 'version'+version_file_suffix[version_type]+'.txt'
 	with open(Path(relative_parent_dir, fname), 'w') as f:
-		f.write(version_result.version)
+		f.write(content)
+
+def save_version_string2(version_result: VersionResult, relative_parent_dir: Path):
+	save_version_string(version_result.version_type, relative_parent_dir, version_result.version)
 
 
 def load_hash_file(version_type: VersionType, relative_parent_dir: Path):
@@ -56,3 +59,11 @@ def save_hash_file(version_type: VersionType, relative_parent_dir: Path, content
 	fname = 'hashes'+version_file_suffix[version_type]+'.csv'
 	with open(Path(relative_parent_dir, fname), 'w') as f:
 		f.write(content)
+
+def update_version_data(version_type: VersionType, relative_parent_dir: Path, version_string: str, hashes: str):
+	save_version_string2(version_type, relative_parent_dir, version_string)
+	save_hash_file(version_type, relative_parent_dir, hashes)
+
+def update_version_data2(version_result: VersionResult, relative_parent_dir: Path, hashes: str):
+	save_version_string2(version_result, relative_parent_dir)
+	save_hash_file(version_result.version_type, relative_parent_dir, hashes)
