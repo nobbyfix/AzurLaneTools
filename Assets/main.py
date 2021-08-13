@@ -1,4 +1,3 @@
-import sys
 from pathlib import Path
 from argparse import ArgumentParser
 
@@ -16,21 +15,15 @@ def main(client: Client):
 		CLIENT_ASSET_DIR.mkdir(parents=True)
 
 	version_response = protobuf.get_version_response(clientconfig.gateip, clientconfig.gateport)
-	versionlist = [versioncontrol.parse_version_string(v) for v in version_response.pb.Version if v.startswith("$")]
+	versionlist = [versioncontrol.parse_version_string(v) for v in version_response.pb.version if v.startswith("$")]
 	for vresult in versionlist:
 		updater.update(vresult, clientconfig.cdnurl, userconfig.useragent, CLIENT_ASSET_DIR)
 
 if __name__ == "__main__":
 	# setup argument parser
 	parser = ArgumentParser()
-	parser.add_argument("client", metavar="CLIENT", type=str, help="client to update")
+	parser.add_argument("client", type=str, choices=Client.__members__, help="client to update")
 	args = parser.parse_args()
 
-	# parse arguments
-	clientname = args.client
-	if not clientname in Client._member_names_:
-		sys.exit(f"The client {clientname} is not supported or does not exist.")
-	client = Client[clientname]
-
 	# execute
-	main(client)
+	main(Client[args.client])
