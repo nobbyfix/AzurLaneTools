@@ -1,7 +1,8 @@
+import os
 from pathlib import Path
-from typing import Optional
+from typing import Generator, Iterable, Optional
 
-from .classes import VersionType, VersionResult
+from .classes import HashRow, VersionType, VersionResult
 
 
 version_hash_name = {
@@ -49,22 +50,33 @@ def save_version_string2(version_result: VersionResult, relative_parent_dir: Pat
 	save_version_string(version_result.version_type, relative_parent_dir, version_result.version)
 
 
-def load_hash_file(version_type: VersionType, relative_parent_dir: Path) -> Optional[str]:
+def iterate_hash_lines(hashes: str) -> Generator[tuple[str, str, str], None, None]:
+	for assetinfo in hashes.splitlines():
+		if assetinfo == '': continue
+		yield assetinfo.split(',')
+
+def parse_hash_rows(hashes: str) -> Generator[HashRow, None, None]:
+	for path, size, md5hash in iterate_hash_lines(hashes):
+		yield HashRow(path, size, md5hash)
+
+def load_hash_file(version_type: VersionType, relative_parent_dir: Path) -> Optional[Generator[HashRow, None, None]]:
 	fname = 'hashes'+version_file_suffix[version_type]+'.csv'
 	fpath = Path(relative_parent_dir, fname)
 	if fpath.exists():
 		with open(fpath, 'r') as f:
-			return f.read()
+			return parse_hash_rows(f.read())
 
-def save_hash_file(version_type: VersionType, relative_parent_dir: Path, content: str):
+def save_hash_file(version_type: VersionType, relative_parent_dir: Path, hashrows: Iterable[HashRow]):
+	rowstrings = [f"{row.filepath},{row.size},{row.md5hash}" for row in hashrows]
+	content = os.linesep.join(rowstrings)
 	fname = 'hashes'+version_file_suffix[version_type]+'.csv'
 	with open(Path(relative_parent_dir, fname), 'w') as f:
 		f.write(content)
 
-def update_version_data(version_type: VersionType, relative_parent_dir: Path, version_string: str, hashes: str):
+def update_version_data(version_type: VersionType, relative_parent_dir: Path, version_string: str, hashrows: Iterable[HashRow]):
 	save_version_string2(version_type, relative_parent_dir, version_string)
-	save_hash_file(version_type, relative_parent_dir, hashes)
+	save_hash_file(version_type, relative_parent_dir, hashrows)
 
-def update_version_data2(version_result: VersionResult, relative_parent_dir: Path, hashes: str):
+def update_version_data2(version_result: VersionResult, relative_parent_dir: Path, hashrows: Iterable[HashRow]):
 	save_version_string2(version_result, relative_parent_dir)
-	save_hash_file(version_result.version_type, relative_parent_dir, hashes)
+	save_hash_file(version_result.version_type, relative_parent_dir, hashrows)

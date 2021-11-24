@@ -4,16 +4,21 @@ from pathlib import Path
 
 
 Client = Enum('Client', 'EN CN JP KR TW')
-CompareType = Enum('CompareType', 'New Changed Deleted')
+CompareType = Enum('CompareType', 'New Changed Unchanged Deleted')
 VersionType = Enum('VersionType', 'AZL CV L2D PIC BGM')
+DownloadType = Enum('DownloadType', 'No Removed Success Failed')
+
+
+@dataclass
+class HashRow:
+	filepath: str
+	size: int
+	md5hash: str
 
 @dataclass
 class CompareResult:
-	filepath: str
-	size: int
-	size_new: int
-	md5hash: str
-	md5hash_new: str
+	current_hash: HashRow
+	new_hash: HashRow
 	compare_type: CompareType
 
 @dataclass
@@ -23,6 +28,11 @@ class VersionResult:
 	rawstring: str
 	version_type: VersionType
 
+@dataclass
+class UpdateResult:
+	compare_result: CompareResult
+	download_type: DownloadType
+	path: Path
 
 @dataclass
 class UserConfig:
