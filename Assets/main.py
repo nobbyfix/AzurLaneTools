@@ -16,7 +16,7 @@ def main(client: Client):
 	version_response = protobuf.get_version_response(clientconfig.gateip, clientconfig.gateport)
 	versionlist = [versioncontrol.parse_version_string(v) for v in version_response.pb.version if v.startswith("$")]
 	for vresult in versionlist:
-		updater.update(vresult, clientconfig.cdnurl, userconfig.useragent, CLIENT_ASSET_DIR)
+		updater.update(vresult, clientconfig.cdnurl, userconfig, CLIENT_ASSET_DIR)
 
 if __name__ == "__main__":
 	# setup argument parser
