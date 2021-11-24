@@ -1,5 +1,7 @@
 from enum import Enum
 from dataclasses import dataclass
+from pathlib import Path
+
 
 Client = Enum('Client', 'EN CN JP KR TW')
 CompareType = Enum('CompareType', 'New Changed Deleted')
@@ -29,6 +31,7 @@ class UserConfig:
 	download_filter: list
 	extract_isblacklist: bool
 	extract_filter: list
+	asset_directory: Path
 
 @dataclass
 class ClientConfig:

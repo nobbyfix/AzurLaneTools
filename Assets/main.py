@@ -10,9 +10,8 @@ def main(client: Client):
 	userconfig = config.load_user_config()
 	clientconfig = config.load_client_config(client)
 
-	CLIENT_ASSET_DIR = Path("ClientAssets", client.name)
-	if not CLIENT_ASSET_DIR.exists():
-		CLIENT_ASSET_DIR.mkdir(parents=True)
+	CLIENT_ASSET_DIR = Path(userconfig.asset_directory, client.name)
+	CLIENT_ASSET_DIR.mkdir(parents=True, exist_ok=True)
 
 	version_response = protobuf.get_version_response(clientconfig.gateip, clientconfig.gateport)
 	versionlist = [versioncontrol.parse_version_string(v) for v in version_response.pb.version if v.startswith("$")]
