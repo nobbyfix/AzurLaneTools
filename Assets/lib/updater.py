@@ -48,22 +48,22 @@ def update_assets(version_type: VersionType, cdnurl: str, newhashes: Iterable[Ha
 
 	assetbasepath = Path(client_directory, 'AssetBundles')
 	update_files = list(filter(lambda r: r.compare_type != CompareType.Unchanged, comparison_results.values()))
-	update_results = [UpdateResult(r, DownloadType.No, Path(assetbasepath, r.new_hash.filepath)) for r in filter(lambda r: r.compare_type == CompareType.Unchanged, comparison_results.values())]
+	update_results = [UpdateResult(r, DownloadType.No, BundlePath.construct(assetbasepath, r.new_hash.filepath)) for r in filter(lambda r: r.compare_type == CompareType.Unchanged, comparison_results.values())]
 
 	fileamount = len(update_files)
 	for i, result in enumerate(update_files, 1):
 		if result.compare_type in [CompareType.New, CompareType.Changed]:
 			print(f'Downloading {result.new_hash.filepath} ({i}/{fileamount}).')
-			assetpath = Path(assetbasepath, result.new_hash.filepath)
-			if download_asset(cdnurl, result.new_hash.md5hash, userconfig.useragent, assetpath):
+			assetpath = BundlePath.construct(assetbasepath, result.new_hash.filepath)
+			if download_asset(cdnurl, result.new_hash.md5hash, userconfig.useragent, assetpath.full):
 				update_results.append(UpdateResult(result, DownloadType.Success, assetpath))
 			else:
 				update_results.append(UpdateResult(result, DownloadType.Failed, assetpath))
 
 		elif result.compare_type == CompareType.Deleted:
 			print(f'Deleting {result.current_hash.filepath} ({i}/{fileamount}).')
-			assetpath = Path(assetbasepath, result.current_hash.filepath)
-			remove_asset(assetpath)
+			assetpath = BundlePath.construct(assetbasepath, result.current_hash.filepath)
+			remove_asset(assetpath.full)
 			update_results.append(UpdateResult(result, DownloadType.Removed, assetpath))
 	return update_results
 

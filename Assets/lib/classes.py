@@ -1,6 +1,7 @@
 from enum import Enum
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Union
 
 
 Client = Enum('Client', 'EN CN JP KR TW')
@@ -29,10 +30,21 @@ class VersionResult:
 	version_type: VersionType
 
 @dataclass
+class BundlePath:
+	full: Path
+	inner: Path
+
+	@staticmethod
+	def construct(parentdir: Path, inner: Union[Path, str]) -> "BundlePath":
+		inner = Path(inner)
+		fullpath = Path(parentdir, inner)
+		return BundlePath(fullpath, inner)
+
+@dataclass
 class UpdateResult:
 	compare_result: CompareResult
 	download_type: DownloadType
-	path: Path
+	path: BundlePath
 
 @dataclass
 class UserConfig:
