@@ -32,13 +32,12 @@ class VersionResult:
 @dataclass
 class BundlePath:
 	full: Path
-	inner: Path
+	inner: str
 
 	@staticmethod
 	def construct(parentdir: Path, inner: Union[Path, str]) -> "BundlePath":
-		inner = Path(inner)
 		fullpath = Path(parentdir, inner)
-		return BundlePath(fullpath, inner)
+		return BundlePath(fullpath, str(inner))
 
 @dataclass
 class UpdateResult:

@@ -1,4 +1,3 @@
-import sys
 import json
 from argparse import ArgumentParser
 from pathlib import Path
@@ -6,7 +5,7 @@ from itertools import chain
 import multiprocessing as mp
 
 from lib import imgrecon, config
-from lib.classes import Client
+from lib.classes import Client, DownloadType, VersionType
 
 
 def get_file_list(filepath: Path):
@@ -15,11 +14,10 @@ def get_file_list(filepath: Path):
 			if line == '': continue
 			yield line.replace('\n', '')
 
-def get_changed_files(parent_directory: Path):
-	return get_file_list(Path(parent_directory, 'difflog', 'diff_azl_changed.txt'))
-
-def get_new_files(parent_directory: Path):
-	return get_file_list(Path(parent_directory, 'difflog', 'diff_azl_new.txt'))
+def get_diff_files(parent_directory: Path, vtype: VersionType, dtype: DownloadType):
+	fname = f'diff_{vtype.name.lower()}_{dtype.name.lower()}.txt'
+	p = Path(parent_directory, 'difflog', fname)
+	return get_file_list(p)
 
 
 def restore_painting(image, abpath: Path, imgname: str, do_retry:bool):
@@ -65,14 +63,13 @@ def load_extractable_folders():
 
 def extract_by_client(client: Client):
 	client_directory = Path('ClientAssets', client.name)
-	changed_files = get_changed_files(client_directory)
-	new_files = get_new_files(client_directory)
+	downloaded_files = get_diff_files(client_directory, VersionType.AZL, DownloadType.Success)
 
 	extract_directory = Path('ClientExtract', client.name)
 	extractable_folder = config.load_user_config().extract_filter
 	
 	with mp.Pool(processes=mp.cpu_count()) as pool:
-		for assetpath in chain(changed_files, new_files):
+		for assetpath in downloaded_files:
 			if assetpath.split('/')[0] in extractable_folder:
 				pool.apply_async(extract_assetbundle, (Path(client_directory, 'AssetBundles'), assetpath, extract_directory,))
 
