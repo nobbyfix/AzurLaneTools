@@ -40,7 +40,7 @@ def unpack(zipfile: ZipFile, client: Client):
 
 		# read hash files from obb and current file and compare them
 		with zipfile.open('assets/hashes'+suffix+'.csv', 'r') as hashfile:
-			obbhashes = hashfile.read().decode('utf8')
+			obbhashes = versioncontrol.parse_hash_rows(hashfile.read().decode('utf8'))
 		currenthashes = versioncontrol.load_hash_file(versiontype, extract_to_folder)
 		hash_compare_results = updater.compare_hashes(currenthashes, obbhashes)
 

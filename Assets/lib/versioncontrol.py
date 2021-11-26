@@ -43,7 +43,7 @@ def load_version_string(version_type: VersionType, relative_parent_dir: Path) ->
 
 def save_version_string(version_type: VersionType, relative_parent_dir: Path, content: str):
 	fname = 'version'+version_file_suffix[version_type]+'.txt'
-	with open(Path(relative_parent_dir, fname), 'w') as f:
+	with open(Path(relative_parent_dir, fname), 'w', encoding='utf8') as f:
 		f.write(content)
 
 def save_version_string2(version_result: VersionResult, relative_parent_dir: Path):
@@ -63,7 +63,7 @@ def load_hash_file(version_type: VersionType, relative_parent_dir: Path) -> Opti
 	fname = 'hashes'+version_file_suffix[version_type]+'.csv'
 	fpath = Path(relative_parent_dir, fname)
 	if fpath.exists():
-		with open(fpath, 'r') as f:
+		with open(fpath, 'r', encoding='utf8') as f:
 			return parse_hash_rows(f.read())
 
 def save_hash_file(version_type: VersionType, relative_parent_dir: Path, hashrows: Iterable[HashRow]):
