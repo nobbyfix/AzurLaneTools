@@ -5,11 +5,11 @@
 		"sections": [
 			{
 				"comment": "",
-				"params": ["SkinID", "SkinName", "SkinNameTL", "SkinNameEN", "SkinNameCN", "SkinNameCNTL", "SkinNameJP", "SkinNameJPTL"]
+				"params": ["NoTabber", "ShipName", "SkinID", "SkinName", "SkinNameTL", "SkinNameEN", "SkinNameCN", "SkinNameCNTL", "SkinNameJP", "SkinNameJPTL"]
 			},
 			{
 				"comment": "",
-				"params": ["SkinCategory", "SkinTabName", "Left", "NoBGTabName", "NoBGLeft", "CensoredCategory", "CensoredTabName", "CensoredLeft", "Background", "SpecialBackground", "BGImage"]
+				"params": ["SkinCategory", "Background", "SpecialBackground", "BGImage", "TabType1", "SkinCategory1", "TabName1", "Left1", "TabType2", "SkinCategory2", "TabName2", "Left2", "TabType3", "SkinCategory3", "TabName3", "Left3", "TabType4", "SkinCategory4", "TabName4", "Left4", "TabType5", "SkinCategory5", "TabName5", "Left5"]
 			},
 			{
 				"comment": "",

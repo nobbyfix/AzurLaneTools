@@ -4,23 +4,23 @@
 		"comment": "",
 		"sections": [
 			{
-				"comment": "",
+				"comment": "<!-- General Information -->",
 				"params": ["ctID", "Title", "Introduction", "Requirements", "ClearReward", "3StarReward"]
 			},
 			{
-				"comment": "",
+				"comment": "<!-- Enemy Fleet Information -->",
 				"params": ["MobLevel", "SirenLevel", "MobExp1", "MobExp2", "MobExp3", "MobExpSiren", "MobSpawnOrder", "EliteSpawnOrder", "SirenSpawnOrder", "Boss", "BossLevel", "BossExp"]
 			},
 			{
-				"comment": "",
-				"params": ["BossBattleReq", "BossBattleClear", "Star1", "Star2", "Star3", "SuggestedAirSupremacy", "ActualAirSupremacy"]
+				"comment": "<!-- Stage Information -->",
+				"params": ["BossBattleReq", "BossBattleClear", "Star1", "Star2", "Star3", "AvoidRequire", "SuggestedAirSupremacy", "ActualAirSupremacy", "OilCapMob", "OilCapBoss", "OilCapSub"]
 			},
 			{
-				"comment": "",
+				"comment": "<!-- Hardmode Restrictions -->",
 				"params": ["Fleet1", "Fleet2", "StatRestrictions"]
 			},
 			{
-				"comment": "",
+				"comment": "<!-- Stage Drop Information, Node Map and Notes -->",
 				"params": ["MapDrops", "EquipmentDrops", "ShipDrops", "PreviewFile", "NodeMap", "Notes"]
 			}
 		]

@@ -75,9 +75,11 @@
 
 	"Strengthening Unit S1": "AllSUnit",
 	"Strengthening Unit S2": "AllSUnit2",
-	"Special Strengthening Unit S2": "AllSUnit2D",
+	"Special Strengthening Unit S2": "AllSUnit2",
 	"Strengthening Unit S3": "AllSUnit3",
-	"Special Strengthening Unit S3": "AllSUnit3D",
+	"Special Strengthening Unit S3": "AllSUnit3",
+	"Strengthening Unit S4": "AllSUnit4",
+	"Special Strengthening Unit S4": "AllSUnit4",
 	"Random Blueprint": "UnknownSUnit",
 	
 	"Blueprint - Neptune": "HMS_NeptuneSUnit",
@@ -99,16 +101,20 @@
 	"Blueprint - Champagne": "ChampagneSUnit",
 	
 	"Cognitive Chips": "Moduleicon",
+	"Cognitive Datapack": "Cognitive Datapack",
+	"Cognitive Array": "Cognitive Array",
 	"Coins": "Coinicon",
 	"Oil": "Oilicon",
 	"Core Data": "Core Data",
 	"Wisdom Cube": "cube",
+	"Decor Tokens": "Furniture coin",
 
 	"Rare Cat Box": "Cat Box Rare",
 	"Elite Cat Box": "Cat Box Elite",
 	"Super Rare Cat Box": "Cat Box Super Rare",
 
 	"Oxy-cola": "Food1",
+	"Candy Cane": "FoodChristmas",
 	
 	"Sakura Amulets": "SakuraPt",
 	"Miniature Crowns": "CrownPt",
@@ -116,5 +122,9 @@
 	"Universe Badge": "UniverseBadgePt",
 	"Gear Skin Box (Shining Stars)": "appearanceboxjichang",
 	"Venus Points": "DOAPt",
-	"Gear Skin Box (Venus Vacation)": "appearanceboxdoa"
+	"Gear Skin Box (Venus Vacation)": "appearanceboxdoa",
+	"Arcana Cube": "CubePt",
+	"Symbol of Renaissance": "RenaissancePt",
+	"Involuted Seal": "InvolutedSealPt",
+	"Silver Wing Badge": "SilverWingPt"
 }

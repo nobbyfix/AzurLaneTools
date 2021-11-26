@@ -1,6 +1,7 @@
 from argparse import ArgumentParser
-from AzurLane import Client
-import WikiHelper, Utility
+
+from lib import ALJsonAPI, Client, WikiHelper, Utility
+
 
 EQUIPMENTTYPE_USAGE = {
 	1: '{{DD}} DD Main Gun',
@@ -21,11 +22,12 @@ EQUIPMENTTYPE_USAGE = {
 #	17: 'Helicopter'
 }
 
-JsonAPI = Utility.defaultJsonAPI()
+
+api = ALJsonAPI()
 
 def equipment_skin(client, eqid):
-	equip_skin_template = JsonAPI.load_sharecfg('equip_skin_template', client)
-	eqskin = equip_skin_template.get(str(eqid))
+	equip_skin_template = api.get_sharecfgmodule('equip_skin_template')
+	eqskin = equip_skin_template.load_client(eqid, client)
 	if not eqskin: raise ValueError(f'Equipment skinid {eqid} does not exist.')
 
 	name = eqskin['name'].strip()
@@ -39,8 +41,8 @@ def equipment_theme_skinlist(client, skinids:list):
 	return '\n'.join(theme_skins)
 
 def equipment_theme(client, themeid):
-	equip_skin_theme_template = JsonAPI.load_sharecfg('equip_skin_theme_template', client)
-	theme = equip_skin_theme_template.get(str(themeid))
+	equip_skin_theme_template = api.get_sharecfgmodule('equip_skin_theme_template')
+	theme = equip_skin_theme_template.load_client(themeid, client)
 	if not theme: raise ValueError(f'Equipment theme {themeid} does not exist.')
 	
 	themename = theme['name'].strip()
@@ -56,7 +58,7 @@ def main():
 	
 	client = Client[args.client]
 	themes = [equipment_theme(client, themeid) for themeid in args.themeids]
-	Utility.output(args.file, '\n'.join(themes))
+	Utility.output('\n'.join(themes))
 
 if __name__ == "__main__":
 	main()

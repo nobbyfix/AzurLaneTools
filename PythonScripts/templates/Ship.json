@@ -26,11 +26,15 @@
 					},
 					{
 						"comment": "<!-- Level 100 -->",
-						"params": ["HealthMax", "FireMax", "AAMax", "TorpMax", "AirMax", "ReloadMax", "EvadeMax", "ConsumptionMax", "ASWMax", "AccMax", "OxygenMax", "AmmoMax", "RangeMax"]
+						"params": ["HealthMax", "FireMax", "AAMax", "TorpMax", "AirMax", "ReloadMax", "EvadeMax", "ConsumptionMax", "ASWMax", "AccMax"]
 					},
 					{
 						"comment": "<!-- Level 120 -->",
-						"params": ["Health120", "Fire120", "AA120", "Torp120", "Air120", "Reload120", "Evade120", "Consumption120", "ASW120", "Acc120", "Oxygen120", "Ammo120", "Range120"]
+						"params": ["Health120", "Fire120", "AA120", "Torp120", "Air120", "Reload120", "Evade120", "ASW120", "Acc120"]
+					},
+					{
+						"comment": "<!-- Level 125 -->",
+						"params": ["Health125", "Fire125", "AA125", "Torp125", "Air125", "Reload125", "Evade125", "ASW125", "Acc125"]
 					},
 					{
 						"comment": "<!-- Level 100 Retrofit -->",
@@ -38,7 +42,11 @@
 					},
 					{
 						"comment": "<!-- Level 120 Retrofit -->",
-						"params": ["HealthKai120", "FireKai120", "AAKai120", "TorpKai120", "AirKai120", "ReloadKai120", "EvadeKai120", "ConsumptionKai120", "ASWKai120", "AccKai120", "OxygenKai120", "AmmoKai120", "RangeKai120"]
+						"params": ["HealthKai120", "FireKai120", "AAKai120", "TorpKai120", "AirKai120", "ReloadKai120", "EvadeKai120", "ASWKai120", "AccKai120"]
+					},
+					{
+						"comment": "<!-- Level 125 Retrofit -->",
+						"params": ["HealthKai125", "FireKai125", "AAKai125", "TorpKai125", "AirKai125", "ReloadKai125", "EvadeKai125", "ASWKai125", "AccKai125"]
 					}
 				]
 			},
@@ -455,6 +463,36 @@
 		"Acc120": {
 			"type": "keep"
 		},
+		"Health125": {
+			"type": "keep"
+		},
+		"Fire125": {
+			"type": "keep"
+		},
+		"AA125": {
+			"type": "keep"
+		},
+		"Torp125": {
+			"type": "keep"
+		},
+		"Air125": {
+			"type": "keep"
+		},
+		"Reload125": {
+			"type": "keep"
+		},
+		"Evade125": {
+			"type": "keep"
+		},
+		"Consumption125": {
+			"type": "keep"
+		},
+		"ASW125": {
+			"type": "keep"
+		},
+		"Acc125": {
+			"type": "keep"
+		},
 		"HealthKai": {
 			"type": "dependency",
 			"dependency": {
@@ -631,6 +669,97 @@
 			}
 		},
 		"RangeKai120": {
+			"type": "dependency",
+			"dependency": {
+				"type": "keep_empty",
+				"dependent_params": ["Remodel"]
+			}
+		},
+		"HealthKai125": {
+			"type": "dependency",
+			"dependency": {
+				"type": "keep_empty",
+				"dependent_params": ["Remodel"]
+			}
+		},
+		"FireKai125": {
+			"type": "dependency",
+			"dependency": {
+				"type": "keep_empty",
+				"dependent_params": ["Remodel"]
+			}
+		},
+		"AAKai125": {
+			"type": "dependency",
+			"dependency": {
+				"type": "keep_empty",
+				"dependent_params": ["Remodel"]
+			}
+		},
+		"TorpKai125": {
+			"type": "dependency",
+			"dependency": {
+				"type": "keep_empty",
+				"dependent_params": ["Remodel"]
+			}
+		},
+		"AirKai125": {
+			"type": "dependency",
+			"dependency": {
+				"type": "keep_empty",
+				"dependent_params": ["Remodel"]
+			}
+		},
+		"ReloadKai125": {
+			"type": "dependency",
+			"dependency": {
+				"type": "keep_empty",
+				"dependent_params": ["Remodel"]
+			}
+		},
+		"EvadeKai125": {
+			"type": "dependency",
+			"dependency": {
+				"type": "keep_empty",
+				"dependent_params": ["Remodel"]
+			}
+		},
+		"ConsumptionKai125": {
+			"type": "dependency",
+			"dependency": {
+				"type": "keep_empty",
+				"dependent_params": ["Remodel"]
+			}
+		},
+		"ASWKai125": {
+			"type": "dependency",
+			"dependency": {
+				"type": "keep_empty",
+				"dependent_params": ["Remodel"]
+			}
+		},
+		"AccKai125": {
+			"type": "dependency",
+			"dependency": {
+				"type": "keep_empty",
+				"dependent_params": ["Remodel"]
+			}
+		},
+		"OxygenKai125": {
+			"type": "dependency",
+			"dependency": {
+				"type": "keep_empty",
+				"dependent_params": ["Remodel"]
+			}
+		},
+		"AmmoKai125": {
+			"type": "dependency",
+			"dependency": {
+				"type": "keep_empty",
+				"dependent_params": ["Remodel"]
+			}
+		},
+		"RangeKai125": {
 			"type": "dependency",
 			"dependency": {
 				"type": "keep_empty",

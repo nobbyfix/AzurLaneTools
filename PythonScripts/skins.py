@@ -1,25 +1,33 @@
 from collections import Counter
 from itertools import chain
+from pathlib import Path
 from time import sleep
-import mwparserfromhell
-import Utility, WikiHelper
 
-JsonAPI = Utility.defaultJsonAPI()
-ship_skin_template = JsonAPI.load_multi_sharecfg('ship_skin_template', JsonAPI.ALL_CLIENTS)
-shop_template = JsonAPI.load_multi_sharecfg('shop_template', JsonAPI.ALL_CLIENTS)
-ship_converter = JsonAPI.converter
+import mwparserfromhell
+
+from lib import ALJsonAPI, Client, WikiHelper, Constants, Utility, DEFAULT_CLIENTS
+from lib.converter import ships
+
+
+api = ALJsonAPI()
+ship_skin_template = api.get_sharecfgmodule("ship_skin_template")
+shop_template = api.get_sharecfgmodule("shop_template")
+ship_converter = ships.load_converter(Constants.SHIPID_CONVERT_CACHE_PATH)
+
 wikiclient = WikiHelper.WikiClient().login()
 t_shipskin = WikiHelper.MultilineTemplate('ShipSkin')
 t_shipskin0 = WikiHelper.MultilineTemplate('ShipSkin0')
 
+
 # get all skinids from all versions
 skinids = dict()
-for client_data in ship_skin_template.values():
-	for groupid, shipskinids in client_data['get_id_list_by_ship_group'].items():
+for client in Client:
+	for groupid, shipskinids in ship_skin_template._load("get_id_list_by_ship_group", client).items():
 		if groupid in skinids:
 			skinids[groupid].update(shipskinids)
 		else:
 			skinids[groupid] = set(shipskinids)
+
 
 def game_single_skin(fullid:int) -> dict:
 	"""Returns a dict containing ONLY the important information of a single skin.
@@ -35,8 +43,8 @@ def game_single_skin(fullid:int) -> dict:
 	live2d_counter = dict()
 	cost_counter = dict()
 
-	for client in ship_skin_template: # iterate through all available clients
-		gameskindata = ship_skin_template[client].get(str(fullid))
+	for client in DEFAULT_CLIENTS:
+		gameskindata = ship_skin_template.load_client(fullid, client)
 		if not gameskindata: continue # continue with next client if this one does not have the skin
 
 		live2d_counter[client.name] = '1' if 1 in gameskindata['tag'] else None
@@ -44,15 +52,15 @@ def game_single_skin(fullid:int) -> dict:
 		# the following values are always not set for retrofit and default skins
 		if fullid % 10 in {0, 9}: continue
 
-		skin_ret['SkinName'+client.name] = JsonAPI.replace_namecode(gameskindata['name'], client).strip()
+		skin_ret['SkinName'+client.name] = api.replace_namecode(gameskindata['name'], client)
 		background_counter[client.name] = gameskindata['bg']
 		sp_background_counter[client.name] = gameskindata['bg_sp']
 		
 		# get shop data
 		shopid = gameskindata['shop_id']
 		if shopid != 0:
-			shopitem = shop_template[client].get(str(shopid))
-			if shopitem != None:
+			shopitem = shop_template.load_client(shopid, client)
+			if shopitem is not None:
 				cost_counter[client.name] = shopitem['resource_num']
 				if not shopitem['time'] == 'always':
 					skin_ret['Limited'+client.name] = '1'
@@ -77,7 +85,7 @@ def game_single_skin(fullid:int) -> dict:
 	if live2d_counter:
 		counted_live2d = Counter(live2d_counter.values()).most_common()
 		if len(counted_live2d) > 1: print(f'{fullid} has differing live2d info: {live2d_counter}')
-		if (live2d := counted_live2d[0][0]) != None: skin_ret['Live2D'] = live2d
+		if (live2d := counted_live2d[0][0]) is not None: skin_ret['Live2D'] = live2d
 
 	# cost has 0 as its empty value
 	if cost_counter:
@@ -113,7 +121,7 @@ def wiki_skins(shipname:str, gallerypage=None) -> dict:
 	:param shipname: name of the ship
 	:param gallerypage: if the gallerypage if alraedy loaded, it can be passed over
 	"""
-	if gallerypage == None: gallerypage = wikiclient.execute(wikiclient.mwclient.pages.get, shipname+'/Gallery')
+	if gallerypage is None: gallerypage = wikiclient.execute(wikiclient.mwclient.pages.get, shipname+'/Gallery')
 	if not gallerypage.exists: return
 
 	skins = dict()
@@ -125,12 +133,15 @@ def wiki_skins(shipname:str, gallerypage=None) -> dict:
 		skinid_num = int(parsed_template.get('SkinID'))
 		skins[skinid_num] = parsed_template
 	
-	# search for additional art
+	# search for additional art/artwork
 	additional_art = '' 
 	found_addart = False
 	for node in mwparser.nodes:
-		if 'additional art' in str(node.lower()): found_addart = True
-		if found_addart: additional_art += str(node)
+		nodename = str(node.lower())
+		if 'additional art' in nodename or 'artwork' in nodename:
+			found_addart = True
+		if found_addart:
+			additional_art += str(node)
 	return skins, additional_art
 
 
@@ -178,7 +189,7 @@ def update_gallery_page(shipname:str, save_to_file:bool=False, default_skincateg
 
 	if save_to_file:
 		#save wikitext to file
-		Utility.output('skin_gallery', wikitext)
+		Utility.output(wikitext, Path("outout", "skins", shipname + ".wikitext"))
 		sleep(1)
 	else:
 		# update gallerypage on the wiki
@@ -187,37 +198,24 @@ def update_gallery_page(shipname:str, save_to_file:bool=False, default_skincateg
 		sleep(2)
 	return True
 
+
 def main():
-	mode = input('Execute (all/test/single/list): ')
-	if mode == 'test':
-		while True:
-			shipname = input('Shipname: ')
-			success = update_gallery_page(shipname, True)
-			if not success: print('An error occured.')
-	elif mode == 'single':
-		shipname = input('Shipname: ')
-		defcat = input('Default Category: ')
+	_MANUAL_OVERRIDES = {
+		"fuxu": ("Foch", ""),
+		"fuxu_2": ("Foch", "Casual"),
+		"ougen_5": ("Prinz Eugen", "RaceQueen"),
+		"qiye_7": ("Enterprise", "RaceQueen"),
+	}
+
+	ships = {}
+	for name, cat in _MANUAL_OVERRIDES.values():
+		if not name in ships or cat:
+			ships[name] = cat
+
+	for shipname, defcat in ships.items():
 		print(f'Updating {shipname}...')
-		success = update_gallery_page(shipname, default_skincategory=defcat)
+		success = update_gallery_page(shipname, default_skincategory=defcat, save_to_file=True)
 		if not success: print('An error occured.')
-	elif mode == 'list':
-		amount = input('Amount to update: ')
-		updates = [(input('Shipname: '), input('Default Category: ')) for _ in range(int(amount))]
-		for shipname, defcat in updates:
-			print(f'Updating {shipname}...')
-			success = update_gallery_page(shipname, default_skincategory=defcat)
-			if not success: print('An error occured.')
-	elif mode == 'all':
-		print('Do you really want to update all gallery pages?')
-		confirm = input('Type "y" to confirm: ')
-		if not confirm == 'y': return
-		print('All gallery pages will be update now.')
-		shipnames = ship_converter.get_shipnames()
-		for shipname in shipnames:
-			print(f'Updating {shipname}...')
-			success = update_gallery_page(shipnames, False)
-			if success: print(f'{shipname} successfully updated.')
-			else: print(f'An error occured while updating {shipname}.')
 
 if __name__ == "__main__":
 	main()
