@@ -4,8 +4,8 @@ from argparse import ArgumentParser
 from zipfile import ZipFile
 from pathlib import Path
 
-from lib import versioncontrol, updater
-from lib.classes import Client, CompareType
+from lib import versioncontrol, updater, config
+from lib.classes import BundlePath, Client, CompareType, DownloadType, UpdateResult
 
 
 appnames = {
@@ -17,10 +17,12 @@ appnames = {
 
 
 def unpack(zipfile: ZipFile, client: Client):
-	print('Unpacking archive...')
-	extract_to_folder = Path('ClientAssets', client.name)
-	if not extract_to_folder.exists(): extract_to_folder.mkdir(parents=True)
+	# load config data from files
+	userconfig = config.load_user_config()
+	CLIENT_ASSET_DIR = Path(userconfig.asset_directory, client.name)
+	CLIENT_ASSET_DIR.mkdir(parents=True, exist_ok=True)
 
+	print('Unpacking archive...')
 	for versiontype, suffix in versioncontrol.version_file_suffix.items():
 		versionfname = 'version'+suffix+'.txt'
 		if not 'assets/'+versionfname in zipfile.namelist():
@@ -33,7 +35,7 @@ def unpack(zipfile: ZipFile, client: Client):
 
 		# if a version file already exists, compare the versions
 		# if the obbversion is smaller (older), don't extract data from obb
-		currentversion = versioncontrol.load_version_string(versiontype, extract_to_folder)
+		currentversion = versioncontrol.load_version_string(versiontype, CLIENT_ASSET_DIR)
 		if currentversion and tuple(obbversion.split('.')) < tuple(currentversion.split('.')):
 			print(f'{versiontype.name}: Current version {currentversion} is same or newer than obb version {obbversion}.')
 			continue
@@ -41,34 +43,44 @@ def unpack(zipfile: ZipFile, client: Client):
 		# read hash files from obb and current file and compare them
 		with zipfile.open('assets/hashes'+suffix+'.csv', 'r') as hashfile:
 			obbhashes = versioncontrol.parse_hash_rows(hashfile.read().decode('utf8'))
-		currenthashes = versioncontrol.load_hash_file(versiontype, extract_to_folder)
-		hash_compare_results = updater.compare_hashes(currenthashes, obbhashes)
+		currenthashes = versioncontrol.load_hash_file(versiontype, CLIENT_ASSET_DIR)
+		comparison_results = updater.compare_hashes(currenthashes, obbhashes)
 
 		# extract and delete files
-		abpath = Path(extract_to_folder, 'AssetBundles')
-		version_diff_output = {t: [] for t in CompareType}
-		fileamount = len(hash_compare_results.values())
-		for i, result in enumerate(hash_compare_results.values(), 1):
-			version_diff_output[result.compare_type].append(result.filepath)
-			assetpath = Path(abpath, result.filepath)
+		assetbasepath = Path(CLIENT_ASSET_DIR, 'AssetBundles')
+		update_files = list(filter(lambda r: r.compare_type != CompareType.Unchanged, comparison_results.values()))
+		update_results = [UpdateResult(r, DownloadType.No, BundlePath.construct(assetbasepath, r.new_hash.filepath)) for r in filter(lambda r: r.compare_type == CompareType.Unchanged, comparison_results.values())]
+
+		fileamount = len(update_files)
+		for i, result in enumerate(update_files, 1):
 			if result.compare_type in [CompareType.New, CompareType.Changed]:
-				print(f'Saving {result.filepath} ({i}/{fileamount}).')
-				extract_asset(zipfile, result.filepath, assetpath)
+				print(f'Saving {result.new_hash.filepath} ({i}/{fileamount}).')
+				assetpath = BundlePath.construct(assetbasepath, result.new_hash.filepath)
+				extract_asset(zipfile, assetpath.inner, assetpath.full)
+				update_results.append(UpdateResult(result, DownloadType.Success if assetpath.full.exists() else DownloadType.Failed, assetpath))
 			elif result.compare_type == CompareType.Deleted:
-				print(f'Deleting {result.filepath} ({i}/{fileamount}).')
-				updater.remove_asset(assetpath)
+				print(f'Deleting {result.current_hash.filepath} ({i}/{fileamount}).')
+				assetpath = BundlePath.construct(assetbasepath, result.current_hash.filepath)
+				updater.remove_asset(assetpath.full)
+				update_results.append(UpdateResult(result, DownloadType.Removed, assetpath))
 
-		# write difflog files
-		for comp_type, filepaths in version_diff_output.items():
-			fileoutpath = Path(extract_to_folder, 'difflog', f'diff_{versiontype.name.lower()}_{comp_type.name.lower()}.txt')
+		# update version string and hashes
+		versioncontrol.update_version_data(versiontype, CLIENT_ASSET_DIR, obbversion, obbhashes)
+
+		# create difflog
+		for dtype in [DownloadType.Success, DownloadType.Removed, DownloadType.Failed]:
+			fileoutpath = Path(CLIENT_ASSET_DIR, 'difflog', f'diff_{versiontype.name.lower()}_{dtype.name.lower()}.txt')
 			fileoutpath.parent.mkdir(exist_ok=True)
-			with open(fileoutpath, 'w', encoding='utf8') as f:
-				f.write('\n'.join(filepaths))
 
-		# update local version and hashfile
-		versioncontrol.update_version_data(versiontype, extract_to_folder, obbversion, obbhashes)
+			filtered_results = filter(lambda asset: asset.download_type == dtype, update_results)
+			with open(fileoutpath, 'w', encoding='utf8') as f:
+				f.write('\n'.join([res.path.inner for res in filtered_results]))
+
+		return update_results
+
 
 def extract_asset(zipfile: ZipFile, filepath: str, target: Path):
+	target.parent.mkdir(exist_ok=True, parents=True)
 	with zipfile.open('assets/AssetBundles/'+filepath, 'r') as zf, open(target, 'wb') as f:
 		shutil.copyfileobj(zf, f)
 
