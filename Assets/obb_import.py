@@ -65,7 +65,13 @@ def unpack(zipfile: ZipFile, client: Client):
 				update_results.append(UpdateResult(result, DownloadType.Removed, assetpath))
 
 		# update version string and hashes
-		versioncontrol.update_version_data(versiontype, CLIENT_ASSET_DIR, obbversion, obbhashes)
+		hashes_updated = []
+		for update_result in update_results:
+			if update_result.download_type in [DownloadType.Success, DownloadType.No]:
+				hashes_updated.append(update_result.compare_result.new_hash)
+			elif update_result.download_type == DownloadType.Failed:
+				hashes_updated.append(update_result.compare_result.current_hash)
+		versioncontrol.update_version_data(versiontype, CLIENT_ASSET_DIR, obbversion, hashes_updated)
 
 		# create difflog
 		for dtype in [DownloadType.Success, DownloadType.Removed, DownloadType.Failed]:
