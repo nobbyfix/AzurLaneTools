@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 from typing import Generator, Iterable, Optional
 
-from .classes import HashRow, VersionType, VersionResult
+from .classes import DownloadType, HashRow, UpdateResult, VersionType, VersionResult
 
 
 version_hash_name = {
@@ -80,3 +80,13 @@ def update_version_data(version_type: VersionType, relative_parent_dir: Path, ve
 def update_version_data2(version_result: VersionResult, relative_parent_dir: Path, hashrows: Iterable[HashRow]):
 	save_version_string2(version_result, relative_parent_dir)
 	save_hash_file(version_result.version_type, relative_parent_dir, hashrows)
+
+
+def save_difflog(version_type: VersionType, update_results: list[UpdateResult], relative_parent_dir: Path):
+	for dtype in [DownloadType.Success, DownloadType.Removed, DownloadType.Failed]:
+		fileoutpath = Path(relative_parent_dir, 'difflog', f'diff_{version_type.name.lower()}_{dtype.name.lower()}.txt')
+		fileoutpath.parent.mkdir(parents=True, exist_ok=True)
+
+		filtered_results = filter(lambda asset: asset.download_type == dtype, update_results)
+		with open(fileoutpath, 'w', encoding='utf8') as f:
+			f.write('\n'.join([res.path.inner for res in filtered_results]))

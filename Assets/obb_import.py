@@ -64,24 +64,10 @@ def unpack(zipfile: ZipFile, client: Client):
 				updater.remove_asset(assetpath.full)
 				update_results.append(UpdateResult(result, DownloadType.Removed, assetpath))
 
-		# update version string and hashes
-		hashes_updated = []
-		for update_result in update_results:
-			if update_result.download_type in [DownloadType.Success, DownloadType.No]:
-				hashes_updated.append(update_result.compare_result.new_hash)
-			elif update_result.download_type == DownloadType.Failed:
-				hashes_updated.append(update_result.compare_result.current_hash)
+		# update version string, hashes and difflog
+		hashes_updated = updater.filter_hashes(update_results)
 		versioncontrol.update_version_data(versiontype, CLIENT_ASSET_DIR, obbversion, hashes_updated)
-
-		# create difflog
-		for dtype in [DownloadType.Success, DownloadType.Removed, DownloadType.Failed]:
-			fileoutpath = Path(CLIENT_ASSET_DIR, 'difflog', f'diff_{versiontype.name.lower()}_{dtype.name.lower()}.txt')
-			fileoutpath.parent.mkdir(exist_ok=True)
-
-			filtered_results = filter(lambda asset: asset.download_type == dtype, update_results)
-			with open(fileoutpath, 'w', encoding='utf8') as f:
-				f.write('\n'.join([res.path.inner for res in filtered_results]))
-
+		versioncontrol.save_difflog(versiontype, update_results, CLIENT_ASSET_DIR)
 		return update_results
 
 

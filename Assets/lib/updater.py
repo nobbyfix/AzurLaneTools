@@ -82,6 +82,15 @@ def download_hashes(version_result: VersionResult, cdnurl: str, userconfig: User
 
 	return filter(_filter, versioncontrol.parse_hash_rows(hashes))
 
+def filter_hashes(update_results: list[UpdateResult]) -> list[HashRow]:
+	hashes_updated = []
+	for update_result in update_results:
+		if update_result.download_type in [DownloadType.Success, DownloadType.No]:
+			hashes_updated.append(update_result.compare_result.new_hash)
+		elif update_result.download_type == DownloadType.Failed:
+			hashes_updated.append(update_result.compare_result.current_hash)
+	return hashes_updated
+
 def update(version_result: VersionResult, cdnurl: str, userconfig: UserConfig, client_directory: Path) -> list[UpdateResult]:
 	oldversion = versioncontrol.load_version_string(version_result.version_type, client_directory)
 	if oldversion != version_result.version:
@@ -89,12 +98,7 @@ def update(version_result: VersionResult, cdnurl: str, userconfig: UserConfig, c
 		hashes = download_hashes(version_result, cdnurl, userconfig)
 		update_results = update_assets(version_result.version_type, cdnurl, hashes, userconfig, client_directory)
 
-		hashes_updated = []
-		for update_result in update_results:
-			if update_result.download_type in [DownloadType.Success, DownloadType.No]:
-				hashes_updated.append(update_result.compare_result.new_hash)
-			elif update_result.download_type == DownloadType.Failed:
-				hashes_updated.append(update_result.compare_result.current_hash)
+		hashes_updated = filter_hashes(update_results)
 		versioncontrol.update_version_data2(version_result, client_directory, hashes_updated)
 		return update_results
 	else:

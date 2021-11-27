@@ -1,7 +1,6 @@
 import json
 from argparse import ArgumentParser
 from pathlib import Path
-from itertools import chain
 import multiprocessing as mp
 
 from lib import imgrecon, config
