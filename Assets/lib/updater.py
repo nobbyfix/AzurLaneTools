@@ -1,4 +1,5 @@
 import sys
+import traceback
 from pathlib import Path
 from typing import Iterable, Optional
 
@@ -7,15 +8,20 @@ from .classes import *
 
 
 def download_asset(cdnurl: str, filehash: str, useragent: str, save_destination: Path) -> Optional[bytes]:
-	assetbinary = downloader.download_asset(cdnurl, filehash, useragent)
-	if not assetbinary:
-		print(f'ERROR: Cound not download asset {filehash} to {save_destination}.')
-		return False
+	try:
+		assetbinary = downloader.download_asset(cdnurl, filehash, useragent)
+		if not assetbinary:
+			print(f"ERROR: Received asset '{filehash}' with target '{save_destination}' is empty.")
+			return False
 
-	save_destination.parent.mkdir(parents=True, exist_ok=True)
-	with open(save_destination, 'wb') as f:
-		f.write(assetbinary)
-	return assetbinary
+		save_destination.parent.mkdir(parents=True, exist_ok=True)
+		with open(save_destination, 'wb') as f:
+			f.write(assetbinary)
+		return assetbinary
+	except Exception as e:
+		print(f"ERROR: An error occured while downloading '{filehash}' to '{save_destination}'.")
+		traceback.print_exception(e, e, e.__traceback__)
+		return False
 
 def remove_asset(filepath: Path):
 	if filepath.exists():
@@ -46,14 +52,14 @@ def update_assets(version_type: VersionType, cdnurl: str, newhashes: Iterable[Ha
 	oldhashes = versioncontrol.load_hash_file(version_type, client_directory)
 	comparison_results = compare_hashes(oldhashes, newhashes)
 
-	assetbasepath = Path(client_directory, 'AssetBundles')
+	assetbasepath = Path(client_directory, "AssetBundles")
 	update_files = list(filter(lambda r: r.compare_type != CompareType.Unchanged, comparison_results.values()))
 	update_results = [UpdateResult(r, DownloadType.No, BundlePath.construct(assetbasepath, r.new_hash.filepath)) for r in filter(lambda r: r.compare_type == CompareType.Unchanged, comparison_results.values())]
 
 	fileamount = len(update_files)
 	for i, result in enumerate(update_files, 1):
 		if result.compare_type in [CompareType.New, CompareType.Changed]:
-			print(f'Downloading {result.new_hash.filepath} ({i}/{fileamount}).')
+			print(f"Downloading {result.new_hash.filepath} ({i}/{fileamount}).")
 			assetpath = BundlePath.construct(assetbasepath, result.new_hash.filepath)
 			if download_asset(cdnurl, result.new_hash.md5hash, userconfig.useragent, assetpath.full):
 				update_results.append(UpdateResult(result, DownloadType.Success, assetpath))
@@ -61,7 +67,7 @@ def update_assets(version_type: VersionType, cdnurl: str, newhashes: Iterable[Ha
 				update_results.append(UpdateResult(result, DownloadType.Failed, assetpath))
 
 		elif result.compare_type == CompareType.Deleted:
-			print(f'Deleting {result.current_hash.filepath} ({i}/{fileamount}).')
+			print(f"Deleting {result.current_hash.filepath} ({i}/{fileamount}).")
 			assetpath = BundlePath.construct(assetbasepath, result.current_hash.filepath)
 			remove_asset(assetpath.full)
 			update_results.append(UpdateResult(result, DownloadType.Removed, assetpath))
@@ -70,7 +76,7 @@ def update_assets(version_type: VersionType, cdnurl: str, newhashes: Iterable[Ha
 def download_hashes(version_result: VersionResult, cdnurl: str, userconfig: UserConfig):
 	hashes = downloader.download_hashes(cdnurl, version_result.rawstring, userconfig.useragent)
 	if not hashes:
-		sys.exit('The server did not give a proper response, exiting update routine.')
+		sys.exit("The server did not give a proper response, exiting update routine.")
 
 	# hash filter function
 	def _filter(row: HashRow):
@@ -94,7 +100,7 @@ def filter_hashes(update_results: list[UpdateResult]) -> list[HashRow]:
 def update(version_result: VersionResult, cdnurl: str, userconfig: UserConfig, client_directory: Path) -> list[UpdateResult]:
 	oldversion = versioncontrol.load_version_string(version_result.version_type, client_directory)
 	if oldversion != version_result.version:
-		print(f'{version_result.version_type.name}: Current version {oldversion} is older than latest version {version_result.version}.')
+		print(f"{version_result.version_type.name}: Current version {oldversion} is older than latest version {version_result.version}.")
 		hashes = download_hashes(version_result, cdnurl, userconfig)
 		update_results = update_assets(version_result.version_type, cdnurl, hashes, userconfig, client_directory)
 
@@ -102,4 +108,4 @@ def update(version_result: VersionResult, cdnurl: str, userconfig: UserConfig, c
 		versioncontrol.update_version_data2(version_result, client_directory, hashes_updated)
 		return update_results
 	else:
-		print(f'{version_result.version_type.name}: Current version {oldversion} is latest.')
+		print(f"{version_result.version_type.name}: Current version {oldversion} is latest.")
