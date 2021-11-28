@@ -1,13 +1,13 @@
 import sys
 import traceback
 from pathlib import Path
-from typing import Iterable, Optional
+from typing import Iterable, Optional, Union
 
 from . import downloader, versioncontrol
 from .classes import *
 
 
-def download_asset(cdnurl: str, filehash: str, useragent: str, save_destination: Path) -> Optional[bytes]:
+def download_asset(cdnurl: str, filehash: str, useragent: str, save_destination: Path) -> Optional[Union[bytes, bool]]:
 	try:
 		assetbinary = downloader.download_asset(cdnurl, filehash, useragent)
 		if not assetbinary:
@@ -31,12 +31,9 @@ def remove_asset(filepath: Path):
 
 
 def compare_hashes(oldhashes: Iterable[HashRow], newhashes: Iterable[HashRow]) -> dict[str, CompareResult]:
-	results = dict()
-	for hashrow in newhashes:
-		results[hashrow.filepath] = CompareResult(None, hashrow, CompareType.New)
-
+	results = {row.filepath: CompareResult(None, row, CompareType.New) for row in newhashes}
 	for hashrow in oldhashes or []:
-		res: CompareResult = results.get(hashrow.filepath)
+		res = results.get(hashrow.filepath)
 		if res is None:
 			results[hashrow.filepath] = CompareResult(hashrow, None, CompareType.Deleted)
 		elif hashrow == res.new_hash:
@@ -92,9 +89,20 @@ def filter_hashes(update_results: list[UpdateResult]) -> list[HashRow]:
 	hashes_updated = []
 	for update_result in update_results:
 		if update_result.download_type in [DownloadType.Success, DownloadType.NoChange]:
-			hashes_updated.append(update_result.compare_result.new_hash)
+			hashrow = update_result.compare_result.new_hash
 		elif update_result.download_type == DownloadType.Failed:
-			hashes_updated.append(update_result.compare_result.current_hash)
+			hashrow = update_result.compare_result.current_hash
+			if not hashrow:
+				continue
+		else:
+			continue
+
+		# some error checking, although it should not be needed anymore
+		if hashrow:
+			hashes_updated.append(hashrow)
+		else:
+			print("WARN: Empty hashrow detected while it should not have been empty. Debug info below.")
+			print(update_result)
 	return hashes_updated
 
 def update(version_result: VersionResult, cdnurl: str, userconfig: UserConfig, client_directory: Path) -> list[UpdateResult]:

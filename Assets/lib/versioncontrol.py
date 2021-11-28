@@ -1,4 +1,3 @@
-import os
 from pathlib import Path
 from typing import Generator, Iterable, Optional
 
@@ -67,8 +66,8 @@ def load_hash_file(version_type: VersionType, relative_parent_dir: Path) -> Opti
 			return parse_hash_rows(f.read())
 
 def save_hash_file(version_type: VersionType, relative_parent_dir: Path, hashrows: Iterable[HashRow]):
-	rowstrings = [f"{row.filepath},{row.size},{row.md5hash}" for row in hashrows]
-	content = os.linesep.join(rowstrings)
+	rowstrings = [f"{row.filepath},{row.size},{row.md5hash}" for row in hashrows if row]
+	content = '\n'.join(rowstrings)
 	fname = 'hashes'+version_file_suffix[version_type]+'.csv'
 	with open(Path(relative_parent_dir, fname), 'w') as f:
 		f.write(content)
