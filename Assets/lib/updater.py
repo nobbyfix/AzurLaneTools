@@ -54,7 +54,7 @@ def update_assets(version_type: VersionType, cdnurl: str, newhashes: Iterable[Ha
 
 	assetbasepath = Path(client_directory, "AssetBundles")
 	update_files = list(filter(lambda r: r.compare_type != CompareType.Unchanged, comparison_results.values()))
-	update_results = [UpdateResult(r, DownloadType.No, BundlePath.construct(assetbasepath, r.new_hash.filepath)) for r in filter(lambda r: r.compare_type == CompareType.Unchanged, comparison_results.values())]
+	update_results = [UpdateResult(r, DownloadType.NoChange, BundlePath.construct(assetbasepath, r.new_hash.filepath)) for r in filter(lambda r: r.compare_type == CompareType.Unchanged, comparison_results.values())]
 
 	fileamount = len(update_files)
 	for i, result in enumerate(update_files, 1):
@@ -91,7 +91,7 @@ def download_hashes(version_result: VersionResult, cdnurl: str, userconfig: User
 def filter_hashes(update_results: list[UpdateResult]) -> list[HashRow]:
 	hashes_updated = []
 	for update_result in update_results:
-		if update_result.download_type in [DownloadType.Success, DownloadType.No]:
+		if update_result.download_type in [DownloadType.Success, DownloadType.NoChange]:
 			hashes_updated.append(update_result.compare_result.new_hash)
 		elif update_result.download_type == DownloadType.Failed:
 			hashes_updated.append(update_result.compare_result.current_hash)

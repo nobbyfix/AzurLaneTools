@@ -7,7 +7,7 @@ from typing import Union
 Client = Enum('Client', 'EN CN JP KR TW')
 CompareType = Enum('CompareType', 'New Changed Unchanged Deleted')
 VersionType = Enum('VersionType', 'AZL CV L2D PIC BGM')
-DownloadType = Enum('DownloadType', 'No Removed Success Failed')
+DownloadType = Enum('DownloadType', 'NoChange Removed Success Failed')
 
 
 @dataclass

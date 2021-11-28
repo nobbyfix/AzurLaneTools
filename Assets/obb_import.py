@@ -49,7 +49,7 @@ def unpack(zipfile: ZipFile, client: Client):
 		# extract and delete files
 		assetbasepath = Path(CLIENT_ASSET_DIR, 'AssetBundles')
 		update_files = list(filter(lambda r: r.compare_type != CompareType.Unchanged, comparison_results.values()))
-		update_results = [UpdateResult(r, DownloadType.No, BundlePath.construct(assetbasepath, r.new_hash.filepath)) for r in filter(lambda r: r.compare_type == CompareType.Unchanged, comparison_results.values())]
+		update_results = [UpdateResult(r, DownloadType.NoChange, BundlePath.construct(assetbasepath, r.new_hash.filepath)) for r in filter(lambda r: r.compare_type == CompareType.Unchanged, comparison_results.values())]
 
 		fileamount = len(update_files)
 		for i, result in enumerate(update_files, 1):
