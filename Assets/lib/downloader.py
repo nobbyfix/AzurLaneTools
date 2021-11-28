@@ -1,24 +1,23 @@
 import requests
 
 
-def download_hashes(cdnurl, versionhash, useragent):
+def request(error_msg: str, *args, **kwargs):
 	while True:
 		try:
-			response = requests.get(f'{cdnurl}/android/hash/{versionhash}', headers={'user-agent': useragent}, timeout=30)
+			response = requests.get(*args, **kwargs)
 			break
 		except TimeoutError:
-			print("Hash request timed out, retrying.")
+			print(error_msg)
 
 	if response.status_code == 200:
+		return response
+
+def download_hashes(cdnurl, versionhash, useragent):
+	if response := request("Hash request timed out, retrying.",
+							f"{cdnurl}/android/hash/{versionhash}", headers={"user-agent": useragent}, timeout=30):
 		return response.text
 
 def download_asset(cdnurl, filehash, useragent):
-	while True:
-		try:
-			response = requests.get(f'{cdnurl}/android/resource/{filehash}', headers={'user-agent': useragent}, timeout=20)
-			break
-		except TimeoutError:
-			print("Asset request timed out, retrying.")
-
-	if response.status_code == 200:
+	if response := request("Asset request timed out, retrying.",
+							f"{cdnurl}/android/resource/{filehash}", headers={"user-agent": useragent}, timeout=20):
 		return response.content
