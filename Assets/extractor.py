@@ -63,10 +63,14 @@ def extract_by_client(client: Client):
 	extract_directory = Path(userconfig.extract_directory, client.name)
 	downloaded_files = get_diff_files(client_directory, VersionType.AZL, DownloadType.Success)
 
-	with mp.Pool(processes=mp.cpu_count()) as pool:
-		for assetpath in downloaded_files:
-			if assetpath.split('/')[0] in userconfig.extract_filter:
-				pool.apply_async(extract_assetbundle, (Path(client_directory, 'AssetBundles'), assetpath, extract_directory,))
+	def _filter(assetpath: str):
+		if assetpath.split('/')[0] in userconfig.extract_filter:
+			return (not userconfig.extract_isblacklist)
+		return userconfig.extract_isblacklist
+
+	with mp.Pool(processes=mp.cpu_count()-1) as pool:
+		for assetpath in filter(_filter, downloaded_files):
+			pool.apply_async(extract_assetbundle, (Path(client_directory, 'AssetBundles'), assetpath, extract_directory,))
 
 		# explicitly join pool
 		# this causes the pool to wait for all asnyc tasks to complete
@@ -82,7 +86,7 @@ def extract_single_assetbundle(client: Client, assetpath: str):
 if __name__ == "__main__":
 	# setup argument parser
 	parser = ArgumentParser(description="Extracts image assets as pngs.",
-		epilog="If '--file' is not set, all files from the latest update will be extracted.")
+		epilog="If '-f/--filepath' is not set, all files from the latest update will be extracted.")
 	parser.add_argument("client", metavar="CLIENT", type=str, choices=Client._member_names_, help="client to extract files of")
 	parser.add_argument("-f", "--filepath", type=str, help="Path to the file to extract only this single file")
 	args = parser.parse_args()
