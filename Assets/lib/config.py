@@ -29,6 +29,7 @@ def load_user_config() -> UserConfig:
 			extract_isblacklist=yamlconfig['extract-folder-listtype'] == 'blacklist',
 			extract_filter=yamlconfig['extract-folder-list'],
 			asset_directory=yamlconfig['asset-directory'],
+			extract_directory=yamlconfig['extract-directory'],
 		)
 	except KeyError:
 		sys.exit("There is an error inside the userconfig file. Delete it or change the wrong values.")

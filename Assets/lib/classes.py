@@ -53,6 +53,7 @@ class UserConfig:
 	extract_isblacklist: bool
 	extract_filter: list
 	asset_directory: Path
+	extract_directory: Path
 
 @dataclass
 class ClientConfig:

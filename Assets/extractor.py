@@ -2,24 +2,25 @@ import json
 from argparse import ArgumentParser
 from pathlib import Path
 import multiprocessing as mp
+from typing import Generator
 
 from lib import imgrecon, config
 from lib.classes import Client, DownloadType, VersionType
 
 
-def get_file_list(filepath: Path):
+def get_file_list(filepath: Path) -> Generator[str, None, None]:
 	with open(filepath, 'r', encoding='utf8') as f:
 		for line in f.readlines():
 			if line == '': continue
 			yield line.replace('\n', '')
 
-def get_diff_files(parent_directory: Path, vtype: VersionType, dtype: DownloadType):
+def get_diff_files(parent_directory: Path, vtype: VersionType, dtype: DownloadType) -> Generator[str, None, None]:
 	fname = f'diff_{vtype.name.lower()}_{dtype.name.lower()}.txt'
 	p = Path(parent_directory, 'difflog', fname)
 	return get_file_list(p)
 
 
-def restore_painting(image, abpath: Path, imgname: str, do_retry:bool):
+def restore_painting(image, abpath: Path, imgname: str, do_retry: bool):
 	mesh = imgrecon.load_mesh(str(abpath), imgname+'-mesh')
 	if mesh is not None:
 		return imgrecon.recon(image, mesh)
@@ -56,20 +57,15 @@ def extract_assetbundle(rootfolder: Path, filepath: str, targetfolder: Path):
 		return target
 
 
-def load_extractable_folders():
-	with open(Path('config', 'extract_config.json'), 'r') as f:
-		return json.load(f)['extractable_folder']
-
 def extract_by_client(client: Client):
-	client_directory = Path('ClientAssets', client.name)
+	userconfig = config.load_user_config()
+	client_directory = Path(userconfig.asset_directory, client.name)
+	extract_directory = Path(userconfig.extract_directory, client.name)
 	downloaded_files = get_diff_files(client_directory, VersionType.AZL, DownloadType.Success)
 
-	extract_directory = Path('ClientExtract', client.name)
-	extractable_folder = config.load_user_config().extract_filter
-	
 	with mp.Pool(processes=mp.cpu_count()) as pool:
 		for assetpath in downloaded_files:
-			if assetpath.split('/')[0] in extractable_folder:
+			if assetpath.split('/')[0] in userconfig.extract_filter:
 				pool.apply_async(extract_assetbundle, (Path(client_directory, 'AssetBundles'), assetpath, extract_directory,))
 
 		# explicitly join pool
@@ -78,8 +74,9 @@ def extract_by_client(client: Client):
 		pool.join()
 
 def extract_single_assetbundle(client: Client, assetpath: str):
-	client_directory = Path('ClientAssets', client.name, 'AssetBundles')
-	extract_directory = Path('ClientExtract', client.name)
+	userconfig = config.load_user_config()
+	client_directory = Path(userconfig.asset_directory, client.name, 'AssetBundles')
+	extract_directory = Path(userconfig.extract_directory, client.name)
 	return extract_assetbundle(client_directory, assetpath, extract_directory)
 
 if __name__ == "__main__":

@@ -1,4 +1,5 @@
 asset-directory: ClientAssets
+extract-directory: ClientExtract
 # set to blacklist or whitelist
 download-folder-listtype: blacklist
 extract-folder-listtype: whitelist
