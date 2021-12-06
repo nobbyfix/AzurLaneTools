@@ -73,7 +73,7 @@ def save_hash_file(version_type: VersionType, relative_parent_dir: Path, hashrow
 		f.write(content)
 
 def update_version_data(version_type: VersionType, relative_parent_dir: Path, version_string: str, hashrows: Iterable[HashRow]):
-	save_version_string2(version_type, relative_parent_dir, version_string)
+	save_version_string(version_type, relative_parent_dir, version_string)
 	save_hash_file(version_type, relative_parent_dir, hashrows)
 
 def update_version_data2(version_result: VersionResult, relative_parent_dir: Path, hashrows: Iterable[HashRow]):
