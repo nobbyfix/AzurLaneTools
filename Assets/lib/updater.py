@@ -105,15 +105,20 @@ def filter_hashes(update_results: list[UpdateResult]) -> list[HashRow]:
 			print(update_result)
 	return hashes_updated
 
-def update(version_result: VersionResult, cdnurl: str, userconfig: UserConfig, client_directory: Path) -> list[UpdateResult]:
-	oldversion = versioncontrol.load_version_string(version_result.version_type, client_directory)
-	if oldversion != version_result.version:
-		print(f"{version_result.version_type.name}: Current version {oldversion} is older than latest version {version_result.version}.")
-		hashes = download_hashes(version_result, cdnurl, userconfig)
-		update_results = update_assets(version_result.version_type, cdnurl, hashes, userconfig, client_directory)
+def _update(version_result: VersionResult, cdnurl: str, userconfig: UserConfig, client_directory: Path) -> list[UpdateResult]:
+	hashes = download_hashes(version_result, cdnurl, userconfig)
+	update_results = update_assets(version_result.version_type, cdnurl, hashes, userconfig, client_directory)
 
-		hashes_updated = filter_hashes(update_results)
-		versioncontrol.update_version_data2(version_result, client_directory, hashes_updated)
-		return update_results
-	else:
+	hashes_updated = filter_hashes(update_results)
+	versioncontrol.update_version_data2(version_result, client_directory, hashes_updated)
+	return update_results
+
+def update(version_result: VersionResult, cdnurl: str, userconfig: UserConfig, client_directory: Path, force_refresh: bool) -> list[UpdateResult]:
+	oldversion = versioncontrol.load_version_string(version_result.version_type, client_directory)
+	if oldversion == version_result.version:
 		print(f"{version_result.version_type.name}: Current version {oldversion} is latest.")
+		if force_refresh:
+			return _update(version_result, cdnurl, userconfig, client_directory)
+	else:
+		print(f"{version_result.version_type.name}: Current version {oldversion} is older than latest version {version_result.version}.")
+		return _update(version_result, cdnurl, userconfig, client_directory)
