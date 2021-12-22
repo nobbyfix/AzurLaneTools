@@ -56,7 +56,7 @@ def iterate_hash_lines(hashes: str) -> Generator[tuple[str, str, str], None, Non
 
 def parse_hash_rows(hashes: str) -> Generator[HashRow, None, None]:
 	for path, size, md5hash in iterate_hash_lines(hashes):
-		yield HashRow(path, size, md5hash)
+		yield HashRow(path, int(size), md5hash)
 
 def load_hash_file(version_type: VersionType, relative_parent_dir: Path) -> Optional[Generator[HashRow, None, None]]:
 	fname = 'hashes'+version_file_suffix[version_type]+'.csv'
