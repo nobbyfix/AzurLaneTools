@@ -45,10 +45,7 @@ def compare_hashes(oldhashes: Iterable[HashRow], newhashes: Iterable[HashRow]) -
 	return results
 
 
-def update_assets(version_type: VersionType, cdnurl: str, newhashes: Iterable[HashRow], userconfig: UserConfig, client_directory: Path) -> list[UpdateResult]:
-	oldhashes = versioncontrol.load_hash_file(version_type, client_directory)
-	comparison_results = compare_hashes(oldhashes, newhashes)
-
+def update_assets(cdnurl: str, comparison_results: dict[str, CompareResult], userconfig: UserConfig, client_directory: Path) -> list[UpdateResult]:
 	assetbasepath = Path(client_directory, "AssetBundles")
 	update_files = list(filter(lambda r: r.compare_type != CompareType.Unchanged, comparison_results.values()))
 	update_results = [UpdateResult(r, DownloadType.NoChange, BundlePath.construct(assetbasepath, r.new_hash.filepath)) for r in filter(lambda r: r.compare_type == CompareType.Unchanged, comparison_results.values())]
@@ -106,8 +103,11 @@ def filter_hashes(update_results: list[UpdateResult]) -> list[HashRow]:
 	return hashes_updated
 
 def _update(version_result: VersionResult, cdnurl: str, userconfig: UserConfig, client_directory: Path) -> list[UpdateResult]:
-	hashes = download_hashes(version_result, cdnurl, userconfig)
-	update_results = update_assets(version_result.version_type, cdnurl, hashes, userconfig, client_directory)
+	newhashes = download_hashes(version_result, cdnurl, userconfig)
+	oldhashes = versioncontrol.load_hash_file(version_result.version_type, client_directory)
+	comparison_results = compare_hashes(oldhashes, newhashes)
+
+	update_results = update_assets(cdnurl, comparison_results, userconfig, client_directory)
 
 	hashes_updated = filter_hashes(update_results)
 	versioncontrol.update_version_data2(version_result, client_directory, hashes_updated)

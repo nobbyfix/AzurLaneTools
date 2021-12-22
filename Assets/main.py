@@ -1,7 +1,7 @@
 import argparse
 from pathlib import Path
 
-from lib import config, protobuf, versioncontrol, updater
+from lib import config, protobuf, versioncontrol, updater, repair
 from lib.classes import Client
 
 
@@ -12,6 +12,9 @@ def main(args):
 
 	CLIENT_ASSET_DIR = Path(userconfig.asset_directory, args.client.name)
 	CLIENT_ASSET_DIR.mkdir(parents=True, exist_ok=True)
+
+	if args.repair:
+		repair.repair(clientconfig.cdnurl, userconfig, CLIENT_ASSET_DIR)
 
 	if args.force_refresh:
 		print("All asset types will be checked for different hashes.")
@@ -30,6 +33,8 @@ if __name__ == "__main__":
 		help="client to update")
 	parser.add_argument("--force-refresh", type=bool, default=False, action=argparse.BooleanOptionalAction,
 		help="compares asset hashes even when the version file is up to date")
+	parser.add_argument("--repair", type=bool, default=False, action=argparse.BooleanOptionalAction,
+		help="checks all present files")
 	args = parser.parse_args()
 
 	args.client = Client[args.client]
