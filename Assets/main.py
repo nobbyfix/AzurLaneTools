@@ -5,21 +5,21 @@ from lib import config, protobuf, versioncontrol, updater
 from lib.classes import Client
 
 
-def main(client: Client, force_refresh: bool = False):
+def main(args):
 	# load config data from files
 	userconfig = config.load_user_config()
-	clientconfig = config.load_client_config(client)
+	clientconfig = config.load_client_config(args.client)
 
-	CLIENT_ASSET_DIR = Path(userconfig.asset_directory, client.name)
+	CLIENT_ASSET_DIR = Path(userconfig.asset_directory, args.client.name)
 	CLIENT_ASSET_DIR.mkdir(parents=True, exist_ok=True)
 
-	if force_refresh:
+	if args.force_refresh:
 		print("All asset types will be checked for different hashes.")
 
 	version_response = protobuf.get_version_response(clientconfig.gateip, clientconfig.gateport)
 	versionlist = [versioncontrol.parse_version_string(v) for v in version_response.pb.version if v.startswith("$")]
 	for vresult in versionlist:
-		if update_assets := updater.update(vresult, clientconfig.cdnurl, userconfig, CLIENT_ASSET_DIR, force_refresh):
+		if update_assets := updater.update(vresult, clientconfig.cdnurl, userconfig, CLIENT_ASSET_DIR, args.force_refresh):
 			versioncontrol.save_difflog(vresult.version_type, update_assets, CLIENT_ASSET_DIR)
 
 
@@ -32,5 +32,5 @@ if __name__ == "__main__":
 		help="compares asset hashes even when the version file is up to date")
 	args = parser.parse_args()
 
-	# execute
-	main(Client[args.client], args.force_refresh)
+	args.client = Client[args.client]
+	main(args)
