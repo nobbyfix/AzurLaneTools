@@ -5,7 +5,7 @@
 		"sections": [
 			{
 				"comment": "",
-				"params": ["NoTabber", "ShipName", "SkinID", "SpecialBackground", "BGImage", "TabType1", "SkinCategory1", "TabName1", "Left1", "TabType2", "SkinCategory2", "TabName2", "Left2", "TabType3", "SkinCategory3", "TabName3", "Left3", "TabType4", "SkinCategory4", "TabName4", "Left4", "TabType5", "SkinCategory5", "TabName5", "Left5", "Live2D", "Faces"]
+				"params": ["NoTabber", "ShipName", "SkinID", "SpecialBackground", "BGImage", "TabType1", "SkinCategory1", "TabName1", "Left1", "TabType2", "SkinCategory2", "TabName2", "Left2", "TabType3", "SkinCategory3", "TabName3", "Left3", "TabType4", "SkinCategory4", "TabName4", "Left4", "TabType5", "SkinCategory5", "TabName5", "Left5", "Live2D", "Music", "Faces"]
 			}
 		]
 	},

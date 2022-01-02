@@ -53,7 +53,6 @@ def main():
 	parser = ArgumentParser()
 	parser.add_argument('themeids', metavar='INDEX', type=int, nargs='+', help='a list of indexes from sharecfg/equip_skin_theme_template')
 	parser.add_argument('-c', '--client', required=True, help='client to gather information from')
-	parser.add_argument('-f', '--file', metavar='FILENAME', default='equipskin', type=str, help='file to save to, default is "equipskin"')
 	args = parser.parse_args()
 	
 	client = Client[args.client]
