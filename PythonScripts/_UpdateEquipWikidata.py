@@ -27,8 +27,11 @@ def download_equip_data():
 			return all_entires
 
 
-if __name__ == "__main__":
+def main():
 	cache_fp = Constants.EQUIP_WIKIDATA_PATH
 	equipdata = download_equip_data()
 	with open(cache_fp, "w", encoding="utf8") as file:
 		json.dump(equipdata, file)
+
+if __name__ == "__main__":
+	main()

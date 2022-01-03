@@ -83,7 +83,8 @@ def extract_single_assetbundle(client: Client, assetpath: str):
 	extract_directory = Path(userconfig.extract_directory, client.name)
 	return extract_assetbundle(client_directory, assetpath, extract_directory)
 
-if __name__ == "__main__":
+
+def main():
 	# setup argument parser
 	parser = ArgumentParser(description="Extracts image assets as pngs.",
 		epilog="If '-f/--filepath' is not set, all files from the latest update will be extracted.")
@@ -97,3 +98,6 @@ if __name__ == "__main__":
 		extract_single_assetbundle(client, filepath)
 	else:	
 		extract_by_client(client)
+
+if __name__ == "__main__":
+	main()

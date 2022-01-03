@@ -100,7 +100,8 @@ def convert_new_files(override_commit: str = None):
 		repo_json.git.commit("-m", f"{client.name} {version}", "--allow-empty")
 	repo_json.remotes.origin.push()
 
-if __name__ == "__main__":
+
+def main():
 	parser = ArgumentParser()
 	parser.add_argument("-c", "--commit-sha", type=str, help="commit sha from which to start converting")
 	args = parser.parse_args()
@@ -109,3 +110,6 @@ if __name__ == "__main__":
 		convert_new_files(sha)
 	else:
 		convert_new_files()
+
+if __name__ == "__main__":
+	main()

@@ -5,7 +5,7 @@ from lib import config, protobuf, versioncontrol, updater, repair
 from lib.classes import Client
 
 
-def main(args):
+def execute(args):
 	# load config data from files
 	userconfig = config.load_user_config()
 	clientconfig = config.load_client_config(args.client)
@@ -26,7 +26,7 @@ def main(args):
 			versioncontrol.save_difflog(vresult.version_type, update_assets, CLIENT_ASSET_DIR)
 
 
-if __name__ == "__main__":
+def main():
 	# setup argument parser
 	parser = argparse.ArgumentParser()
 	parser.add_argument("client", type=str, choices=Client.__members__,
@@ -38,4 +38,7 @@ if __name__ == "__main__":
 	args = parser.parse_args()
 
 	args.client = Client[args.client]
-	main(args)
+	execute(args)
+
+if __name__ == "__main__":
+	main()

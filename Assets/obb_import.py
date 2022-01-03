@@ -107,8 +107,12 @@ def main(path: Path):
 	else:
 		sys.exit(f'Unknown file extesion "{path.suffix}".')
 
-if __name__ == "__main__":
+
+def main():
 	parser = ArgumentParser()
 	parser.add_argument('file', nargs=1, help='obb/apk file to extract')
 	args = parser.parse_args()
 	main(Path(args.file[0]))
+
+if __name__ == "__main__":
+	main()

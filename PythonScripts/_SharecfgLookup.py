@@ -1,7 +1,7 @@
 from lib import Client, ALJsonAPI
 
 
-if __name__ == "__main__":
+def main():
 	api = ALJsonAPI()
 
 	while True:
@@ -31,3 +31,6 @@ if __name__ == "__main__":
 				print(module.load_first(dataid, Client)._json)
 		except:
 			print("FAILED: Maybe the module does not have this id?")
+
+if __name__ == "__main__":
+	main()

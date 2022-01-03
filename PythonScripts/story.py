@@ -99,7 +99,7 @@ tabber_name = {
 	Client.JP: "Japanese",
 }
 
-if __name__ == "__main__":
+def main():
 	MEMORY_ID = 203
 	TITLE = "The Flame-Touched Dagger"
 
@@ -115,5 +115,7 @@ if __name__ == "__main__":
 		f"[[Category:Memories|{TITLE}]]",
 		f"[[Category:Major Event Memories|{TITLE}]]",
 	]
-
 	Utility.output("\n".join(wikitext))
+
+if __name__ == "__main__":
+	main()

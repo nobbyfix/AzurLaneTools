@@ -74,7 +74,7 @@ def upload_file(wikiclient: WikiHelper.WikiClient, filepath: Path):
 			result = do_upload(wikiclient, open(filepath, 'rb'), filename=filepath.name, ignore=True)
 
 
-if __name__ == "__main__":
+def main():
 	wikiclient = WikiHelper.WikiClient().login()
 	args = sys.argv[1:]
 
@@ -89,3 +89,6 @@ if __name__ == "__main__":
 				upload_file(wikiclient, fp)
 		else:
 			upload_file(wikiclient, argpath)
+
+if __name__ == "__main__":
+	main()
