@@ -1,3 +1,4 @@
+#!/usr/bin/env python3.9
 from argparse import ArgumentParser
 from pathlib import Path
 import multiprocessing as mp
@@ -87,8 +88,10 @@ def main():
 	# setup argument parser
 	parser = ArgumentParser(description="Extracts image assets as pngs.",
 		epilog="If '-f/--filepath' is not set, all files from the latest update will be extracted.")
-	parser.add_argument("client", metavar="CLIENT", type=str, choices=Client._member_names_, help="client to extract files of")
-	parser.add_argument("-f", "--filepath", type=str, help="Path to the file to extract only this single file")
+	parser.add_argument("client", type=str, choices=Client.__members__,
+		help="client to extract files of")
+	parser.add_argument("-f", "--filepath", type=str,
+		help="Path to the file to extract only this single file")
 	args = parser.parse_args()
 
 	# parse arguments and execute
