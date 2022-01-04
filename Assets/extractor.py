@@ -1,4 +1,3 @@
-import json
 from argparse import ArgumentParser
 from pathlib import Path
 import multiprocessing as mp

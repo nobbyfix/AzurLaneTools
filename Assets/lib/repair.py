@@ -2,8 +2,8 @@ import hashlib
 import itertools
 from pathlib import Path
 from typing import Generator
-from lib import updater, versioncontrol
 
+from lib import updater, versioncontrol
 from lib.classes import HashRow, UserConfig, VersionType
 
 
