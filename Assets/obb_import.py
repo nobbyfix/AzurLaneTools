@@ -91,7 +91,8 @@ def extract_obb(path: Path):
 def extract_apk():
 	raise NotImplementedError("Extract the obb manually from the xapk and use obb_import on that file.")
 
-def main(path: Path):
+
+def extract(path: Path):
 	if not path.exists():
 		sys.exit('This file does not exist.')
 
@@ -113,7 +114,7 @@ def main():
 	parser = ArgumentParser()
 	parser.add_argument('file', nargs=1, help='obb/apk file to extract')
 	args = parser.parse_args()
-	main(Path(args.file[0]))
+	extract(Path(args.file[0]))
 
 if __name__ == "__main__":
 	main()
