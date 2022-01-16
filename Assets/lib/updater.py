@@ -10,7 +10,10 @@ from .classes import *
 def download_asset(cdnurl: str, filehash: str, useragent: str, save_destination: Path, size: int) -> Optional[Union[bytes, bool]]:
 	try:
 		assetbinary = downloader.download_asset(cdnurl, filehash, useragent)
-		if len(assetbinary) != size:
+		if assetbinary is None:
+			print(f"ERROR: No response for asset '{filehash}' with target '{save_destination}'.")
+			return False
+		elif len(assetbinary) != size:
 			print(f"ERROR: Received asset '{filehash}' with target '{save_destination}' has wrong size ({len(assetbinary)}/{size}).")
 			return False
 
