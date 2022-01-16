@@ -7,11 +7,11 @@ from . import downloader, versioncontrol
 from .classes import *
 
 
-def download_asset(cdnurl: str, filehash: str, useragent: str, save_destination: Path) -> Optional[Union[bytes, bool]]:
+def download_asset(cdnurl: str, filehash: str, useragent: str, save_destination: Path, size: int) -> Optional[Union[bytes, bool]]:
 	try:
 		assetbinary = downloader.download_asset(cdnurl, filehash, useragent)
-		if not assetbinary:
-			print(f"ERROR: Received asset '{filehash}' with target '{save_destination}' is empty.")
+		if len(assetbinary) != size:
+			print(f"ERROR: Received asset '{filehash}' with target '{save_destination}' has wrong size ({len(assetbinary)}/{size}).")
 			return False
 
 		save_destination.parent.mkdir(parents=True, exist_ok=True)
@@ -55,7 +55,7 @@ def update_assets(cdnurl: str, comparison_results: dict[str, CompareResult], use
 		if result.compare_type in [CompareType.New, CompareType.Changed]:
 			print(f"Downloading {result.new_hash.filepath} ({i}/{fileamount}).")
 			assetpath = BundlePath.construct(assetbasepath, result.new_hash.filepath)
-			if download_asset(cdnurl, result.new_hash.md5hash, userconfig.useragent, assetpath.full):
+			if download_asset(cdnurl, result.new_hash.md5hash, userconfig.useragent, assetpath.full, result.new_hash.size):
 				update_results.append(UpdateResult(result, DownloadType.Success, assetpath))
 			else:
 				update_results.append(UpdateResult(result, DownloadType.Failed, assetpath))
