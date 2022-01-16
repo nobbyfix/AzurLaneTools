@@ -1,6 +1,7 @@
 import re
 import json
 from pathlib import Path
+from argparse import ArgumentParser
 from typing import Union
 
 from lib import Client, ALJsonAPI, WikiHelper, Utility, DEFAULT_CLIENTS
@@ -15,21 +16,20 @@ STORY_TEMPLATE = WikiHelper.MultilineTemplate('Story')
 with open(Path('data', 'ship_painting_convert.json'), 'r', encoding='utf8') as f:
 	SHIP_PAINTING_NAMES = json.load(f)
 
+tabber_name = {
+	Client.EN: "English",
+	Client.CN: "Chinese",
+	Client.JP: "Japanese",
+}
+
 
 HTML_TAG = re.compile(r"<[^>]*>")
-def sanitize(v:str) -> str:
+def sanitize(v: str) -> str:
 	return HTML_TAG.sub("", v).strip()
 
 def actor(atype, name, skincat, nameoverride, skinname):
 	res = f"{atype}:{name}/{skincat}:{nameoverride}:{skinname}"
 	return res.strip(":").strip("/").strip(":")
-
-non_commander_tags = [
-	"flashin",
-	"flashN",
-]
-def is_commander(story_segment):
-	return story_segment.keys().isdisjoint(non_commander_tags)
 
 def story(storyname: str, client: Client):
 	lines_result = []
@@ -53,9 +53,6 @@ def story(storyname: str, client: Client):
 					else:
 						actorstr = "O:"+actor_skindata['name'].strip()
 				else: raise NotImplementedError('Unsupported ActorID')
-			#else:
-			#	if is_commander(story_segment):
-			#		actorstr = "O:Commander"
 
 			optionstr = ''
 			if 'optionFlag' in story_segment:
@@ -87,26 +84,21 @@ def memory(memoryid: Union[int, str], client: Client):
 	template_params['Language'] += "\n | "+story_lines
 	return STORY_TEMPLATE.fill(template_params)
 
-def memories(memory_groupid: Union[int, str], client: Client):
-	memory_groupdata = memory_group.load_client(memory_groupid, client)
-	memory_collection = [f'Chapter {i}=\n'+memory(memoryid, client) for i, memoryid in enumerate(memory_groupdata['memories'], 1)]
-	return "<tabber>\n"+"\n|-|\n".join(memory_collection)+"\n</tabber>"
+def memorygroup(memorygroup_id: Union[int, str], client: Client):
+	memorygroup_data = memory_group.load_client(memorygroup_id, client)
+	memory_collection = [f'Chapter {i}=\n'+memory(memoryid, client) for i, memoryid in enumerate(memorygroup_data['memories'], 1)]
+	return tabber_name[client] + " Story=\n<tabber>\n" + "\n|-|\n".join(memory_collection) + "\n</tabber>"
 
-
-tabber_name = {
-	Client.EN: "English",
-	Client.CN: "Chinese",
-	Client.JP: "Japanese",
-}
 
 def main():
-	MEMORY_ID = 203
-	TITLE = "The Flame-Touched Dagger"
+	parser = ArgumentParser()
+	parser.add_argument('memoryid', metavar='INDEX', type=int,
+						help='an index from sharecfg/memory_template')
+	args = parser.parse_args()
 
-	clients_result = []
-	for client in DEFAULT_CLIENTS:
-		clients_result.append(tabber_name[client]+" Story=\n"+memories(MEMORY_ID, client))
-	
+	TITLE = "Tower of Transcendence"
+	clients_result = [memorygroup(args.memoryid, client) for client in DEFAULT_CLIENTS]
+
 	wikitext = [
 		"{{#tag:tabber|",
 		"\n{{!}}-{{!}}\n".join(clients_result),
