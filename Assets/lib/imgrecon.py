@@ -1,5 +1,6 @@
 import re
 from UnityPy import AssetsManager
+from UnityPy.enums import ClassIDType
 from PIL import Image
 
 
@@ -23,7 +24,7 @@ def recon(src, mesh):
 def load_mesh(filepath, require_name=None):
 	am = AssetsManager(filepath)
 	for obj in am.objects:
-		if obj.type == "Mesh":
+		if obj.type == ClassIDType.Mesh:
 			objdata = obj.read()
 			if require_name and require_name != objdata.name:
 				continue
@@ -33,5 +34,5 @@ def load_mesh(filepath, require_name=None):
 def load_images(filepath: str):
 	am = AssetsManager(filepath)
 	for obj in am.objects:
-		if obj.type == "Texture2D":
+		if obj.type == ClassIDType.Texture2D:
 			yield obj.read()
