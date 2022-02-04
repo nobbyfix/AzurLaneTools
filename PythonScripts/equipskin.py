@@ -1,6 +1,8 @@
 from argparse import ArgumentParser
+from typing import Union
 
 from lib import ALJsonAPI, Client, WikiHelper, Utility
+from lib.apiclasses import BackyardTheme
 
 
 EQUIPMENTTYPE_USAGE = {
@@ -36,28 +38,44 @@ def equipment_skin(client, eqid):
 	usages = [EQUIPMENTTYPE_USAGE[eqtype] for eqtype in eqskin['equip_type'] if eqtype in EQUIPMENTTYPE_USAGE]
 	return WikiHelper.simple_template('EquipSkinRow', [name, icon, desc, '<br>'.join(usages)])
 
-def equipment_theme_skinlist(client, skinids:list):
+def equipment_theme_skinlist(client, skinids: list):
 	theme_skins = [equipment_skin(client, eqskinid) for eqskinid in skinids]
 	return '\n'.join(theme_skins)
 
-def equipment_theme(client, themeid):
+def equipment_theme(client, theme: BackyardTheme) -> str:
+	skinlist = equipment_theme_skinlist(client, theme['ids'])
+	return WikiHelper.simple_template('EquipSkinHeader', [theme.name])+'\n'+skinlist+'\n|}'
+
+def get_theme_from_id(client: Client, themeid: Union[str, int]) -> BackyardTheme:
 	equip_skin_theme_template = api.get_sharecfgmodule('equip_skin_theme_template')
 	theme = equip_skin_theme_template.load_client(themeid, client)
-	if not theme: raise ValueError(f'Equipment theme {themeid} does not exist.')
-	
-	themename = theme['name'].strip()
-	skinlist = equipment_theme_skinlist(client, theme['ids'])
-	return WikiHelper.simple_template('EquipSkinHeader', [themename])+'\n'+skinlist+'\n|}'
+	if not theme:
+		raise ValueError(f'Equipment theme {themeid} does not exist.')
+	return theme
+
+def get_theme_from_name(client: Client, themename: str) -> BackyardTheme:
+	equip_skin_theme_template = api.get_sharecfgmodule('equip_skin_theme_template')
+	for theme in equip_skin_theme_template.all_client(client):
+		if theme.name == themename:
+			return theme
+	raise ValueError(f"Equipment theme with name '{themename}' does not exist.")
 
 def main():
 	parser = ArgumentParser()
-	parser.add_argument('themeids', metavar='INDEX', type=int, nargs='+', help='a list of indexes from sharecfg/equip_skin_theme_template')
+	parser.add_argument('-i', '--themeids', type=int, nargs='*',
+		help='a list of indexes from sharecfg/equip_skin_theme_template')
+	parser.add_argument('-n', '--themenames', type=str, nargs='*',
+		help='a list of names of themes from sharecfg/equip_skin_theme_template')
 	parser.add_argument('-c', '--client', required=True, help='client to gather information from')
 	args = parser.parse_args()
-	
+
 	client = Client[args.client]
-	themes = [equipment_theme(client, themeid) for themeid in args.themeids]
-	Utility.output('\n'.join(themes))
+
+	themes = [get_theme_from_id(client, themeid) for themeid in args.themeids]
+	themes.extend([get_theme_from_name(client, themename) for themename in args.themenames])
+
+	formatted_themes = [equipment_theme(client, theme) for theme in themes]
+	Utility.output('\n'.join(formatted_themes))
 
 if __name__ == "__main__":
 	main()

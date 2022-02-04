@@ -1,6 +1,6 @@
 from collections import Counter
 from argparse import ArgumentParser
-from typing import Iterable, Union
+from typing import Iterable
 
 from lib import ALJsonAPI, Client, WikiHelper, Utility
 from lib.apiclasses import Furniture
@@ -66,9 +66,7 @@ def furniture_item_template(furn: Furniture):
 class FurnitureQuery:
 	api: ALJsonAPI
 
-	def __init__(self, api: ALJsonAPI = None) -> None:
-		if not api:
-			api = ALJsonAPI()
+	def __init__(self, api: ALJsonAPI) -> None:
 		self.api = api
 
 	def get_theme(self, themeid: int, clients: Iterable[Client]):
@@ -104,11 +102,19 @@ class FurnitureQuery:
 		wikitext.append("|}")
 		return "\n".join(wikitext)
 
+	def get_themeid_from_name(self, name: str, clients: Iterable[Client]) -> int:
+		backyard_theme_template = self.api.get_sharecfgmodule("backyard_theme_template")
+		for theme in backyard_theme_template.load_all(clients):
+			if theme.name == name:
+				return theme.id
+
 
 def main():
 	parser = ArgumentParser()
-	parser.add_argument("themeid", metavar="INDEX", type=int, nargs=1,
+	parser.add_argument("-i", "--id", type=int,
 						help="an index from sharecfg/backyard_theme_template")
+	parser.add_argument("-n", "--name", type=str,
+						help="a theme name from sharecfg/backyard_theme_template")
 	parser.add_argument("-c", "--client", nargs='*', choices=Client.__members__,
 						help="client to gather information from")
 	args = parser.parse_args()
@@ -116,8 +122,17 @@ def main():
 	clients = Client
 	if args.client:
 		clients = [Client[c] for c in args.client]
+	
+	jsonapi = ALJsonAPI()
+	fquery = FurnitureQuery(jsonapi)
+	if themename := args.name:
+		themeid = fquery.get_themeid_from_name(themename, clients)
+	else:
+		themeid = args.id
 
-	result = FurnitureQuery().get_theme(args.themeid[0], clients)
+	print(themeid)
+
+	result = fquery.get_theme(themeid, clients)
 	Utility.output(result)
 
 if __name__ == "__main__":
