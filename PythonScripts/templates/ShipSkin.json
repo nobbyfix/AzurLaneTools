@@ -9,7 +9,7 @@
 			},
 			{
 				"comment": "",
-				"params": ["SkinCategory", "Background", "SpecialBackground", "BGImage", "TabType1", "SkinCategory1", "TabName1", "Left1", "TabType2", "SkinCategory2", "TabName2", "Left2", "TabType3", "SkinCategory3", "TabName3", "Left3", "TabType4", "SkinCategory4", "TabName4", "Left4", "TabType5", "SkinCategory5", "TabName5", "Left5"]
+				"params": ["SkinCategory", "Background", "SpecialBackground", "BGImage", "TabType1", "SkinCategory1", "TabName1", "TabType2", "SkinCategory2", "TabName2", "TabType3", "SkinCategory3", "TabName3", "TabType4", "SkinCategory4", "TabName4", "TabType5", "SkinCategory5", "TabName5"]
 			},
 			{
 				"comment": "",
@@ -18,10 +18,6 @@
 			{
 				"comment": "",
 				"params": ["EventName", "EventPage", "ActivityName", "EventCurrency"]
-			},
-			{
-				"comment": "",
-				"params": ["Faces"]
 			}
 		]
 	},
