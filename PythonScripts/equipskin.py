@@ -62,9 +62,9 @@ def get_theme_from_name(client: Client, themename: str) -> BackyardTheme:
 
 def main():
 	parser = ArgumentParser()
-	parser.add_argument('-i', '--themeids', type=int, nargs='*',
+	parser.add_argument('-i', '--themeids', type=int, nargs='*', default=[],
 		help='a list of indexes from sharecfg/equip_skin_theme_template')
-	parser.add_argument('-n', '--themenames', type=str, nargs='*',
+	parser.add_argument('-n', '--themenames', type=str, nargs='*', default=[],
 		help='a list of names of themes from sharecfg/equip_skin_theme_template')
 	parser.add_argument('-c', '--client', required=True, help='client to gather information from')
 	args = parser.parse_args()
