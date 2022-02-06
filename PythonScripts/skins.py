@@ -2,6 +2,7 @@ from collections import Counter
 from itertools import chain
 from pathlib import Path
 from time import sleep
+from typing import Callable
 
 import mwparserfromhell
 
@@ -27,6 +28,17 @@ for client in Client:
 			skinids[groupid].update(shipskinids)
 		else:
 			skinids[groupid] = set(shipskinids)
+
+
+def eval_counter(count_values: dict, val_check: Callable, error_msg: str):
+	if count_values:
+		mc = Counter(count_values.values()).most_common()
+		if len(mc) > 1:
+			print(error_msg.format(count_values))
+
+		val = mc[0][0]
+		if val_check(val):
+			return val
 
 
 def game_single_skin(fullid:int) -> dict:
@@ -70,29 +82,20 @@ def game_single_skin(fullid:int) -> dict:
 
 	# check if all clients have the same info, if not use most common one
 	# background has empty string as its empty value
-	if background_counter:
-		counted_bg = Counter(background_counter.values()).most_common()
-		if len(counted_bg) > 1: print(f'{fullid} has differing backgrounds: {background_counter}')
-		if (background := counted_bg[0][0]) != '': skin_ret['Background'] = background
+	if bg := eval_counter(background_counter, (lambda v: v != ''), f'{fullid} has differing backgrounds: %s'):
+		skin_ret['Background'] = bg
 
 	# special background has empty string as its empty value
-	if sp_background_counter:
-		counted_spbg = Counter(sp_background_counter.values()).most_common()
-		if len(counted_spbg) > 1: print(f'{fullid} has differing special backgrounds: {sp_background_counter}')
-		if (spbg := counted_spbg[0][0]) != '': skin_ret['SpecialBackground'] = spbg
+	if spbg := eval_counter(sp_background_counter, (lambda v: v != ''), f'{fullid} has differing special backgrounds: %s'):
+		skin_ret['SpecialBackground'] = spbg
 
 	# live2d has empty string as its empty value
-	if live2d_counter:
-		counted_live2d = Counter(live2d_counter.values()).most_common()
-		if len(counted_live2d) > 1: print(f'{fullid} has differing live2d info: {live2d_counter}')
-		if (live2d := counted_live2d[0][0]) is not None: skin_ret['Live2D'] = live2d
+	if live2d := eval_counter(live2d_counter, (lambda v: v is not None), f'{fullid} has differing live2d info: %s'):
+		skin_ret['Live2D'] = live2d
 
 	# cost has 0 as its empty value
-	if cost_counter:
-		counted_cost = Counter(cost_counter.values()).most_common()
-		if len(counted_cost) > 1: print(f'{fullid} has differing shop cost: {cost_counter}')
-		if (cost := counted_cost[0][0]) != 0: skin_ret['Cost'] = cost
-	return skin_ret
+	if cost := eval_counter(cost_counter, (lambda v: v != 0), f'{fullid} has differing shop cost: %s'):
+		skin_ret['Live2D'] = cost
 
 def game_skins(groupid:int) -> dict:
 	"""Returns a dict containing ONLY the important information of all skins of a given ship.
