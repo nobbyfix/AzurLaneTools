@@ -60,6 +60,8 @@ def game_single_skin(fullid: int) -> dict:
 		gameskindata = ship_skin_template.load_client(fullid, client)
 		if not gameskindata: continue # continue with next client if this one does not have the skin
 
+		skin_ret['SkinID'] = gameskindata['group_index']
+
 		live2d_counter[client.name] = '1' if 1 in gameskindata['tag'] else None
 
 		# the following values are always not set for retrofit and default skins
@@ -105,18 +107,10 @@ def game_skins(groupid: int) -> dict:
 
 	:param groupid: the groupid identifying the ship
 	"""
-	additional_skincount = 0
 	skins = dict()
 	for fullid in skinids[str(groupid)]:
-		if groupid == fullid//10:
-			skinnum = fullid%10
-		else: # skinid is higher than 9 and has different groupid
-			skinnum = 10+additional_skincount
-			additional_skincount += 1
-
 		skindata = game_single_skin(fullid)
-		skindata['SkinID'] = skinnum
-		skins[skinnum] = skindata
+		skins[skindata['SkinID']] = skindata
 	return skins
 
 def wiki_skins(shipname: str, gallerypage = None) -> dict:
