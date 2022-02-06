@@ -2,7 +2,7 @@ from collections import Counter
 from itertools import chain
 from pathlib import Path
 from time import sleep
-from typing import Callable
+from typing import Any, Callable, Optional
 
 import mwparserfromhell
 
@@ -30,7 +30,7 @@ for client in Client:
 			skinids[groupid] = set(shipskinids)
 
 
-def eval_counter(count_values: dict, val_check: Callable, error_msg: str):
+def eval_counter(count_values: dict, val_check: Callable, error_msg: str) -> Optional[Any]:
 	if count_values:
 		mc = Counter(count_values.values()).most_common()
 		if len(mc) > 1:
@@ -41,8 +41,9 @@ def eval_counter(count_values: dict, val_check: Callable, error_msg: str):
 			return val
 
 
-def game_single_skin(fullid:int) -> dict:
-	"""Returns a dict containing ONLY the important information of a single skin.
+def game_single_skin(fullid: int) -> dict:
+	"""
+	Returns a dict containing ONLY the important information of a single skin.
 	The keys are named after parameters complying with Template:ShipSkin for easy convertability.
 
 	:param fullid: A skinid from sharecfg/ship_skin_template
@@ -97,8 +98,9 @@ def game_single_skin(fullid:int) -> dict:
 	if cost := eval_counter(cost_counter, (lambda v: v != 0), f'{fullid} has differing shop cost: %s'):
 		skin_ret['Live2D'] = cost
 
-def game_skins(groupid:int) -> dict:
-	"""Returns a dict containing ONLY the important information of all skins of a given ship.
+def game_skins(groupid: int) -> dict:
+	"""
+	Returns a dict containing ONLY the important information of all skins of a given ship.
 	The keys are named after parameters complying with Template:ShipSkin for easy convertability.
 
 	:param groupid: the groupid identifying the ship
@@ -117,12 +119,13 @@ def game_skins(groupid:int) -> dict:
 		skins[skinnum] = skindata
 	return skins
 
-def wiki_skins(shipname:str, gallerypage=None) -> dict:
-	"""Returns a dict containing all the parameters of all skins from a gallery page of a given ship
+def wiki_skins(shipname: str, gallerypage = None) -> dict:
+	"""
+	Returns a dict containing all the parameters of all skins from a gallery page of a given ship
 	and the additional art on the page.
 
 	:param shipname: name of the ship
-	:param gallerypage: if the gallerypage if alraedy loaded, it can be passed over
+	:param gallerypage: if the gallerypage is already loaded, it can be passed over
 	"""
 	if gallerypage is None: gallerypage = wikiclient.execute(wikiclient.mwclient.pages.get, shipname+'/Gallery')
 	if not gallerypage.exists: return
@@ -148,7 +151,7 @@ def wiki_skins(shipname:str, gallerypage=None) -> dict:
 	return skins, additional_art
 
 
-def update_gallery_page(shipname:str, save_to_file:bool=False, default_skincategory:str='') -> bool:
+def update_gallery_page(shipname: str, save_to_file: bool = False, default_skincategory: str = '') -> bool:
 	"""Updates the gallery page of a given ship.
 
 	:param shipname: the name of a ship used on the wiki
