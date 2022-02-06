@@ -23,11 +23,21 @@ t_shipskin0 = WikiHelper.MultilineTemplate('ShipSkin0')
 # get all skinids from all versions
 skinids = dict()
 for client in Client:
-	for groupid, shipskinids in ship_skin_template._load("get_id_list_by_ship_group", client).items():
+	idlist = ship_skin_template._load("get_id_list_by_ship_group", client)
+	if idlist:
+		for groupid, shipskinids in idlist.items():
+			if groupid in skinids:
+				skinids[groupid].update(shipskinids)
+			else:
+				skinids[groupid] = set(shipskinids)
+
+if not skinids:
+	for shipskindata in ship_skin_template.load_all(Client):
+		groupid = str(shipskindata.ship_group)
 		if groupid in skinids:
-			skinids[groupid].update(shipskinids)
+			skinids[groupid].add(shipskindata.id)
 		else:
-			skinids[groupid] = set(shipskinids)
+			skinids[groupid] = {shipskindata.id}
 
 
 def eval_counter(count_values: dict, val_check: Callable, error_msg: str) -> Optional[Any]:
@@ -98,7 +108,9 @@ def game_single_skin(fullid: int) -> dict:
 
 	# cost has 0 as its empty value
 	if cost := eval_counter(cost_counter, (lambda v: v != 0), f'{fullid} has differing shop cost: %s'):
-		skin_ret['Live2D'] = cost
+		skin_ret['Cost'] = cost
+
+	return skin_ret
 
 def game_skins(groupid: int) -> dict:
 	"""
@@ -185,11 +197,11 @@ def update_gallery_page(shipname: str, save_to_file: bool = False, default_skinc
 		else: wikitext += '\n'+t_shipskin.fill(skin)
 	
 	wikitext += '\n}}' # close tabber
-	if additionalArt: wikitext += f'\n{additionalArt}' # also add additional art at the end
+	if additionalArt: wikitext += f'\n\n{additionalArt}' # also add additional art at the end
 
 	if save_to_file:
 		#save wikitext to file
-		Utility.output(wikitext, Path("outout", "skins", shipname + ".wikitext"))
+		Utility.output(wikitext, Path("output", "skins", shipname + ".wikitext"))
 		sleep(1)
 	else:
 		# update gallerypage on the wiki
@@ -200,6 +212,8 @@ def update_gallery_page(shipname: str, save_to_file: bool = False, default_skinc
 
 
 def main():
+	update_gallery_page("Ayanami", save_to_file=True)
+	"""
 	_MANUAL_OVERRIDES = {
 		"fuxu": ("Foch", ""),
 		"fuxu_2": ("Foch", "Casual"),
@@ -216,6 +230,7 @@ def main():
 		print(f'Updating {shipname}...')
 		success = update_gallery_page(shipname, default_skincategory=defcat, save_to_file=True)
 		if not success: print('An error occured.')
+	"""
 
 if __name__ == "__main__":
 	main()
