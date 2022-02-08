@@ -51,6 +51,12 @@ class Rarity(Enum):
 			return {4: Rarity.PRIORITY, 5: Rarity.DECISIVE}.get(rarity_id)
 		return Rarity.from_id(rarity_id)
 
+def fill_rarity_indexes():
+	for rarity in Rarity:
+		if rarity.rarity not in rarityindex:
+			rarityindex[rarity.rarity] = rarity
+
+
 # from /model/const/nation.lua#Nation2Name
 nationindex = {}
 class Nation(Enum):
@@ -85,11 +91,11 @@ class Nation(Enum):
 
 	@staticmethod
 	def from_id(nation_id: int) -> 'Nation':
-		if not nationindex:
-			# fill nationindex
-			for nation in Nation:
-				nationindex[nation.value] = nation
 		return nationindex.get(nation_id)
+
+def fill_nation_indexes():
+	for nation in Nation:
+		nationindex[nation.value] = nation
 
 
 class Attribute(Enum):
@@ -161,29 +167,22 @@ class ShipType(Enum):
 
 	@staticmethod
 	def from_id(type_id: int) -> 'ShipType':
-		if not shiptypeindex:
-			# fill shiptypeindex
-			for shiptype in ShipType:
-				if shiptype.id == -1:
-					continue
-				shiptypeindex[shiptype.id] = shiptype
 		return shiptypeindex.get(type_id)
 
 	@staticmethod
 	def from_type(type_name: str) -> 'ShipType':
-		if not shiptypeindex_name:
-			# fill shiptypeindex
-			for shiptype in ShipType:
-				shiptypeindex_name[shiptype.name.lower()] = shiptype
 		return shiptypeindex_name[type_name.lower()]
 
 	@staticmethod
 	def from_name(type_name: str) -> 'ShipType':
-		if not shiptypeindex_fullname:
-			# fill shiptypeindex
-			for shiptype in ShipType:
-				shiptypeindex_fullname[shiptype.typename.lower()] = shiptype
 		return shiptypeindex_fullname[type_name.lower()]
+
+def fill_shiptype_indexes():
+	for shiptype in ShipType:
+		if shiptype.id != -1:
+			shiptypeindex[shiptype.id] = shiptype
+			shiptypeindex_fullname[shiptype.typename.lower()] = shiptype
+			shiptypeindex_name[shiptype.name.lower()] = shiptype
 
 
 armorindex = {}
@@ -202,8 +201,17 @@ class Armor(Enum):
 
 	@staticmethod
 	def from_id(armor_id: int) -> 'Armor':
-		if not armorindex:
-			# fill nationindex
-			for armor in Armor:
-				armorindex[armor.value] = armor
 		return armorindex.get(armor_id)
+
+def fill_armor_indexes():
+	for armor in Armor:
+		armorindex[armor.value] = armor
+
+
+def fill_all_indexes():
+	fill_rarity_indexes()
+	fill_nation_indexes()
+	fill_shiptype_indexes()
+	fill_armor_indexes()
+
+fill_all_indexes()
