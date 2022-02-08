@@ -124,36 +124,40 @@ shiptypeindex_fullname = {}
 class ShipType(Enum):
 	id: int
 	typename: str
+	categoryname: str
 	templatename: str
 
-	def __new__(cls, typeid, typename, templatename):
+	def __new__(cls, typeid, typename, catname, templatename):
 		obj = object.__new__(cls)
 		obj.id = typeid
 		obj.typename = typename
+		obj.categoryname = catname
 		obj.templatename = templatename
 		return obj
 
-	DD = (1, "Destroyer", "DD")
-	CL = (2, "Light Cruiser", "CL")
-	CA = (3, "Heavy Cruiser", "CA")
-	BC = (4, "Battlecruiser", "BC")
-	BB = (5, "Battleship", "BB")
-	CVL = (6, "Light Aircraft Carrier", "CVL")
-	CV = (7, "Aircraft Carrier", "CV")
-	SS = (8, "Submarine", "SS")
-	CAV = (9, "Aviation Cruiser", "CAV")
-	BBV = (10, "Aviation Battleship", "BBV")
-	CT = (11, "Torpedo Cruiser", "CT")
-	AR = (12, "Repair Ship", "AR")
-	BM = (13, "Monitor", "BM")
-	SSV = (17, "Submarine Carrier", "SSV")
-	CB = (18, "Large Cruiser", "CB")
-	AE = (19, "Ammunition Ship", "AE")
-	ZHAN = (-1, "", "BC")
-	HANG = (-1, "", "CVL")
-	QIAN = (-1, "", "SS")
-	ZHONG = (-1, "", "CB")
-	FANQIAN = (-1, "", "DD")
+	DD = (1, "Destroyer", "Destroyers","DD")
+	CL = (2, "Light Cruiser", "Light cruisers", "CL")
+	CA = (3, "Heavy Cruiser", "Heavy cruisers", "CA")
+	BC = (4, "Battlecruiser", "Battlecruisers", "BC")
+	BB = (5, "Battleship", "Battleships", "BB")
+	CVL = (6, "Light Aircraft Carrier", "Light aircraft carriers", "CVL")
+	CV = (7, "Aircraft Carrier", "Aircraft carriers", "CV")
+	SS = (8, "Submarine", "Submarines", "SS")
+	CAV = (9, "Aviation Cruiser", "Aviation cruisers", "CAV")
+	BBV = (10, "Aviation Battleship", "Aviation battleships", "BBV")
+	CT = (11, "Torpedo Cruiser", "Torpedo cruisers", "CT")
+	AR = (12, "Repair Ship", "Repair ships", "AR")
+	BM = (13, "Monitor", "Monitors", "BM")
+	SSV = (17, "Submarine Carrier", "Submarine carriers", "SSV")
+	CB = (18, "Large Cruiser", "Large cruisers", "CB")
+	AE = (19, "Munition Ship", "Munition ships", "AE")
+	DDG_V = (20, "DDG", "Guided-missile destroyers", "DDG")
+	DDG_M = (21, "DDG", "Guided-missile destroyers", "DDG")
+	ZHAN = (-1, "", "", "BC")
+	HANG = (-1, "", "", "CVL")
+	QIAN = (-1, "", "", "SS")
+	ZHONG = (-1, "", "", "CB")
+	FANQIAN = (-1, "", "", "DD")
 
 	@staticmethod
 	def from_id(type_id: int) -> 'ShipType':
