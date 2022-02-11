@@ -131,5 +131,5 @@ class ALJsonAPI:
 			# get the replacement string 'code' for the found namecode number for *client*
 			code = name_code.load_client(namecode_num, client)
 			# replace the namecode placeholder in the inputstring with the 'code'
-			inputstring = inputstring.replace(namecode_string, code.code)
+			inputstring = inputstring.replace(namecode_string, code.name)
 		return inputstring
