@@ -13,9 +13,16 @@ ITEMNAME_OVERRIDES_PATH = Path("data", "item_name_convert.json")
 
 rarityindex = {}
 class Rarity(Enum):
+	"""
+	Enum class that allows conversion of rarity values between the game data and wiki.
+	"""
+
 	rarity: int
+	"""Rarity id used in the game."""
 	label: str
+	"""Full rarity name used on the wiki."""
 	letter: str
+	"""Single letter used on the wiki in some templates."""
 
 	def __new__(cls, rarity, label, letter):
 		obj = object.__new__(cls)
@@ -37,21 +44,19 @@ class Rarity(Enum):
 	GIFT2 = (9, "Super Rare", "G")
 
 	@staticmethod
-	def from_id(rarity_id) -> 'Rarity':
-		if not rarityindex:
-			# fill rarityindex
-			for rarity in Rarity:
-				if rarity.rarity not in rarityindex:
-					rarityindex[rarity.rarity] = rarity
+	def from_id(rarity_id: int, is_research: bool = False) -> "Rarity":
+		"""
+		Returns a rarity object with given *rarity_id*.
+		Only returns the first one listed, as there are multiple with the same id.
+
+		If *is_research* is set True, `Rarity.PRIORITY` and `Rarity.DECISIVE` will be prioritised.
+		"""
+		if is_research:
+			if rarity := {4: Rarity.PRIORITY, 5: Rarity.DECISIVE}.get(rarity_id):
+				return rarity
 		return rarityindex.get(rarity_id)
 
-	@staticmethod
-	def from_id_adv(rarity_id, is_research) -> 'Rarity':
-		if is_research:
-			return {4: Rarity.PRIORITY, 5: Rarity.DECISIVE}.get(rarity_id)
-		return Rarity.from_id(rarity_id)
-
-def fill_rarity_indexes():
+def _fill_rarity_indexes():
 	for rarity in Rarity:
 		if rarity.rarity not in rarityindex:
 			rarityindex[rarity.rarity] = rarity
@@ -60,7 +65,16 @@ def fill_rarity_indexes():
 # from /model/const/nation.lua#Nation2Name
 nationindex = {}
 class Nation(Enum):
+	"""
+	Enum class that allows conversion of nation values between the game data and wiki.
+	"""
+
+	id: int
+	"""Nation id used in the game."""
+	value: int
+	"""Nation id used in the game."""
 	label: str
+	"""Name of the nation used on the wiki."""
 
 	def __new__(cls, nation_id, label):
 		obj = object.__new__(cls)
@@ -86,22 +100,37 @@ class Nation(Enum):
 	KIZUNA_AI = (104, "Kizuna AI")
 	HOLOLIVE = (105, "Hololive")
 	VENUS_VACATION = (106, "Venus Vacation")
-	IDOLMASTER = (107, 'The Idolmaster')
-	SSSS = (108, 'SSSS')
+	IDOLMASTER = (107, "The Idolmaster")
+	SSSS = (108, "SSSS")
+
+	@property
+	def id(self):
+		"""Nation id used in the game."""
+		return self.value
 
 	@staticmethod
-	def from_id(nation_id: int) -> 'Nation':
+	def from_id(nation_id: int) -> "Nation":
+		"""
+		Returns a nation object with given *nation_id*.
+		"""
 		return nationindex.get(nation_id)
 
-def fill_nation_indexes():
+def _fill_nation_indexes():
 	for nation in Nation:
 		nationindex[nation.value] = nation
 
 
 class Attribute(Enum):
+	"""
+	Enum class that allows conversion of ship attributes between the game data and wiki.
+	"""
+
 	pos: int
+	"""The position of the attribute in the ship statistics array."""
 	wiki_param_name: str
+	"""The name of the parameter on wiki templates used for the attribute."""
 	wiki_template_name: str
+	"""The name of the template displaying the attribute icon on the wiki."""
 
 	def __new__(cls, pos, param_name, template_name):
 		obj = object.__new__(cls)
@@ -177,12 +206,13 @@ class ShipType(Enum):
 	def from_name(type_name: str) -> 'ShipType':
 		return shiptypeindex_fullname[type_name.lower()]
 
-def fill_shiptype_indexes():
+def _fill_shiptype_indexes():
 	for shiptype in ShipType:
+		shiptypeindex_name[shiptype.name.lower()] = shiptype
+
 		if shiptype.id != -1:
 			shiptypeindex[shiptype.id] = shiptype
 			shiptypeindex_fullname[shiptype.typename.lower()] = shiptype
-			shiptypeindex_name[shiptype.name.lower()] = shiptype
 
 
 armorindex = {}
@@ -203,15 +233,15 @@ class Armor(Enum):
 	def from_id(armor_id: int) -> 'Armor':
 		return armorindex.get(armor_id)
 
-def fill_armor_indexes():
+def _fill_armor_indexes():
 	for armor in Armor:
 		armorindex[armor.value] = armor
 
 
-def fill_all_indexes():
-	fill_rarity_indexes()
-	fill_nation_indexes()
-	fill_shiptype_indexes()
-	fill_armor_indexes()
+def _fill_all_indexes():
+	_fill_rarity_indexes()
+	_fill_nation_indexes()
+	_fill_shiptype_indexes()
+	_fill_armor_indexes()
 
-fill_all_indexes()
+_fill_all_indexes()
