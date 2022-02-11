@@ -156,43 +156,47 @@ class Attribute(Enum):
 shiptypeindex = {}
 shiptypeindex_name = {}
 shiptypeindex_fullname = {}
+# from /model/const/shiptype.lua
 class ShipType(Enum):
 	id: int
 	typename: str
 	categoryname: str
 	templatename: str
+	typetext: str
 
-	def __new__(cls, typeid, typename, catname, templatename):
+	def __new__(cls, typeid, typename, catname, templatename, typetext):
 		obj = object.__new__(cls)
 		obj.id = typeid
 		obj.typename = typename
 		obj.categoryname = catname
 		obj.templatename = templatename
+		obj.typetext = typetext
 		return obj
 
-	DD = (1, "Destroyer", "Destroyers","DD")
-	CL = (2, "Light Cruiser", "Light cruisers", "CL")
-	CA = (3, "Heavy Cruiser", "Heavy cruisers", "CA")
-	BC = (4, "Battlecruiser", "Battlecruisers", "BC")
-	BB = (5, "Battleship", "Battleships", "BB")
-	CVL = (6, "Light Aircraft Carrier", "Light aircraft carriers", "CVL")
-	CV = (7, "Aircraft Carrier", "Aircraft carriers", "CV")
-	SS = (8, "Submarine", "Submarines", "SS")
-	CAV = (9, "Aviation Cruiser", "Aviation cruisers", "CAV")
-	BBV = (10, "Aviation Battleship", "Aviation battleships", "BBV")
-	CT = (11, "Torpedo Cruiser", "Torpedo cruisers", "CT")
-	AR = (12, "Repair Ship", "Repair ships", "AR")
-	BM = (13, "Monitor", "Monitors", "BM")
-	SSV = (17, "Submarine Carrier", "Submarine carriers", "SSV")
-	CB = (18, "Large Cruiser", "Large cruisers", "CB")
-	AE = (19, "Munition Ship", "Munition ships", "AE")
-	DDG_V = (20, "DDG", "Guided-missile destroyers", "DDG")
-	DDG_M = (21, "DDG", "Guided-missile destroyers", "DDG")
-	ZHAN = (-1, "", "", "BC")
-	HANG = (-1, "", "", "CVL")
-	QIAN = (-1, "", "", "SS")
-	ZHONG = (-1, "", "", "CB")
-	FANQIAN = (-1, "", "", "DD")
+	DD		= (1,	"Destroyer",				"Destroyers",					"DD",	"DD")
+	CL		= (2,	"Light Cruiser",			"Light cruisers",				"CL",	"CL")
+	CA		= (3,	"Heavy Cruiser",			"Heavy cruisers",				"CA",	"CA")
+	BC		= (4,	"Battlecruiser",			"Battlecruisers",				"BC",	"BC")
+	BB		= (5,	"Battleship",				"Battleships",					"BB",	"BB")
+	CVL		= (6,	"Light Aircraft Carrier",	"Light aircraft carriers",		"CVL",	"CVL")
+	CV		= (7,	"Aircraft Carrier",			"Aircraft carriers",			"CV",	"CV")
+	SS		= (8,	"Submarine",				"Submarines",					"SS",	"SS")
+	CAV		= (9,	"Aviation Cruiser",			"Aviation cruisers",			"CAV",	"CAV")
+	BBV		= (10,	"Aviation Battleship",		"Aviation battleships",			"BBV",	"BBV")
+	CT		= (11,	"Torpedo Cruiser",			"Torpedo cruisers",				"CT",	"CT")
+	AR		= (12,	"Repair Ship",				"Repair ships",					"AR",	"AR")
+	BM		= (13,	"Monitor",					"Monitors",						"BM",	"BM")
+	SSV		= (17,	"Submarine Carrier",		"Submarine carriers",			"SSV",	"SSV")
+	CB		= (18,	"Large Cruiser",			"Large cruisers",				"CB",	"CB")
+	AE		= (19,	"Munition Ship",			"Munition ships",				"AE",	"AE")
+	DDG_V	= (20,	"DDG",						"Guided-missile destroyers",	"DDG",	"DDG")
+	DDG_M	= (21,	"DDG",						"Guided-missile destroyers",	"DDG",	"DDG")
+	ZHAN	= (-1,	"",							"",								"BC",	"BC or BB")
+	HANG	= (-1,	"",							"",								"CVL",	"CV or CVL")
+	QIAN	= (-1,	"",							"",								"SS",	"SS or SSV")
+	ZHONG	= (-1,	"",							"",								"CB",	"CB or CA")
+	FANQIAN	= (-1,	"",							"",								"DD",	"DD or DDG or CL")
+	QUZHU	= (-1,	"",							"",								"DD",	"DD or DDG")
 
 	@staticmethod
 	def from_id(type_id: int) -> 'ShipType':
