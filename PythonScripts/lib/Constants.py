@@ -31,17 +31,17 @@ class Rarity(Enum):
 		obj.letter = letter
 		return obj
 
-	NORMAL0 = (0, "Normal", "E")
-	NORMAL = (1, "Normal", "E")
-	RARE = (2, "Rare", "B")
-	ELITE = (3, "Elite", "P")
-	SUPER_RARE = (4, "Super Rare", "G")
-	PRIORITY = (4, "Priority", "G")
-	ULTRA_RARE = (5, "Ultra Rare", "R")
-	LEGENDARY = (5, "Legendary", "R")
-	DECISIVE = (5, "Decisive", "R")
-	GIFT = (8, "Super Rare", "G")
-	GIFT2 = (9, "Super Rare", "G")
+	NORMAL0		= (0,	"Normal",		"E")
+	NORMAL		= (1,	"Normal",		"E")
+	RARE		= (2,	"Rare",			"B")
+	ELITE		= (3,	"Elite",		"P")
+	SUPER_RARE	= (4,	"Super Rare",	"G")
+	PRIORITY	= (4,	"Priority",		"G")
+	ULTRA_RARE	= (5,	"Ultra Rare",	"R")
+	LEGENDARY	= (5,	"Legendary",	"R")
+	DECISIVE	= (5,	"Decisive",		"R")
+	GIFT		= (8,	"Super Rare",	"G")
+	GIFT2		= (9,	"Super Rare",	"G")
 
 	@staticmethod
 	def from_id(rarity_id: int, is_research: bool = False) -> "Rarity":
@@ -62,8 +62,8 @@ def _fill_rarity_indexes():
 			rarityindex[rarity.rarity] = rarity
 
 
-# from /model/const/nation.lua#Nation2Name
 nationindex = {}
+# from /model/const/nation.lua#Nation2Name
 class Nation(Enum):
 	"""
 	Enum class that allows conversion of nation values between the game data and wiki.
@@ -82,26 +82,26 @@ class Nation(Enum):
 		obj.label = label
 		return obj
 
-	UNIVERSAL = (0, "Universal")
-	EAGLE_UNION = (1, "Eagle Union")
-	ROYAL_NAVY = (2, "Royal Navy")
-	SAKURA_EMPIRE = (3, "Sakura Empire")
-	IRON_BLOOD = (4, "Iron Blood")
-	EASTERN_RADIANCE = (5, "Eastern Radiance")
-	SARDEGNA_EMPIRE = (6, "Sardegna Empire")
-	NORTH_UNION = (7, "North Union")
-	IRIS_LIBRE = (8, "Iris Libre")
-	VICHYA_DOMINION = (9, "Vichya Dominion")
-	META = (97, "META")
-	UNIVERSAL2 = (98, "Universal")
-	NEPTUNIA = (101, "Neptunia")
-	BILIBILI = (102, "Bilibili")
-	UTAWARERUMONO = (103, "Utawarerumono")
-	KIZUNA_AI = (104, "Kizuna AI")
-	HOLOLIVE = (105, "Hololive")
-	VENUS_VACATION = (106, "Venus Vacation")
-	IDOLMASTER = (107, "The Idolmaster")
-	SSSS = (108, "SSSS")
+	UNIVERSAL			= (0,	"Universal")
+	EAGLE_UNION			= (1,	"Eagle Union")
+	ROYAL_NAVY			= (2,	"Royal Navy")
+	SAKURA_EMPIRE		= (3,	"Sakura Empire")
+	IRON_BLOOD			= (4,	"Iron Blood")
+	EASTERN_RADIANCE	= (5,	"Eastern Radiance")
+	SARDEGNA_EMPIRE		= (6,	"Sardegna Empire")
+	NORTH_UNION			= (7,	"North Union")
+	IRIS_LIBRE			= (8,	"Iris Libre")
+	VICHYA_DOMINION		= (9,	"Vichya Dominion")
+	META				= (97,	"META")
+	UNIVERSAL2			= (98,	"Universal")
+	NEPTUNIA			= (101,	"Neptunia")
+	BILIBILI			= (102,	"Bilibili")
+	UTAWARERUMONO		= (103,	"Utawarerumono")
+	KIZUNA_AI			= (104,	"Kizuna AI")
+	HOLOLIVE			= (105,	"Hololive")
+	VENUS_VACATION		= (106,	"Venus Vacation")
+	IDOLMASTER			= (107,	"The Idolmaster")
+	SSSS				= (108,	"SSSS")
 
 	@property
 	def id(self):
@@ -139,18 +139,18 @@ class Attribute(Enum):
 		obj.wiki_template_name = template_name
 		return obj
 
-	DURABILITY = (0, "Health", "Health")
-	CANNON = (1, "Fire", "Firepower")
-	TORPEDO = (2, "Torp", "Torpedo")
-	ANTIAIRCRAFT = (3, "AA", "AA")
-	AIR = (4, "Air", "Aviation")
-	RELOAD = (5, "Reload", "Reload")
-	ARMOR = (6, "Armor_Debug", "Armor")
-	HIT = (7, "Acc", "Accuracy")
-	DODGE = (8, "Evade", "Evasion")
-	SPEED = (9, "Speed", "Speed")
-	LUCK = (10, "Luck", "Luck")
-	ANTISUB = (11, "ASW", "ASW")
+	DURABILITY		= (0,	"Health",		"Health")
+	CANNON			= (1,	"Fire",			"Firepower")
+	TORPEDO			= (2,	"Torp",			"Torpedo")
+	ANTIAIRCRAFT	= (3,	"AA",			"AA")
+	AIR				= (4,	"Air",			"Aviation")
+	RELOAD			= (5,	"Reload",		"Reload")
+	ARMOR			= (6,	"Armor_Debug",	"Armor")
+	HIT				= (7,	"Acc",			"Accuracy")
+	DODGE			= (8,	"Evade",		"Evasion")
+	SPEED			= (9,	"Speed",		"Speed")
+	LUCK			= (10,	"Luck",			"Luck")
+	ANTISUB			= (11,	"ASW",			"ASW")
 
 
 shiptypeindex = {}
@@ -229,9 +229,9 @@ class Armor(Enum):
 		obj.label = label
 		return obj
 
-	LIGHT = (1, "Light")
-	MEDIUM = (2, "Medium")
-	HEAVY = (3, "Heavy")
+	LIGHT	= (1,	"Light")
+	MEDIUM	= (2,	"Medium")
+	HEAVY	= (3,	"Heavy")
 
 	@staticmethod
 	def from_id(armor_id: int) -> 'Armor':
