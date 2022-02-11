@@ -139,7 +139,10 @@ class NameCode(SharecfgModule):
 	def _process_data(self, client: Client, jsondata) -> None:
 		# start enumeration at one, since lua tables start keys at one
 		# the key also needs to be converted into a string to comply with SharecfgModule behaviour
-		jsondata = {str(i): data for i, data in enumerate(jsondata, 1)}
+		#jsondata = {str(i): data for i, data in enumerate(jsondata, 1)}
+		if isinstance(jsondata, dict):
+			jsondata = jsondata.values()
+		jsondata = {str(data['id']): data for data in jsondata}
 		super()._process_data(client, jsondata)
 
 	def _instantiate_client(self, dataid: str, data: dict) -> Code:
