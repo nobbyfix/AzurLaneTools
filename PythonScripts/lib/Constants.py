@@ -87,7 +87,7 @@ class Nation(Enum):
 	ROYAL_NAVY			= (2,	"Royal Navy")
 	SAKURA_EMPIRE		= (3,	"Sakura Empire")
 	IRON_BLOOD			= (4,	"Iron Blood")
-	EASTERN_RADIANCE	= (5,	"Eastern Radiance")
+	DRAGON_EMPERY		= (5,	"Dragon Empery")
 	SARDEGNA_EMPIRE		= (6,	"Sardegna Empire")
 	NORTH_UNION			= (7,	"North Union")
 	IRIS_LIBRE			= (8,	"Iris Libre")
