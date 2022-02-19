@@ -219,7 +219,8 @@ def _fill_shiptype_indexes():
 			shiptypeindex_fullname[shiptype.typename.lower()] = shiptype
 
 
-armorindex = {}
+armorindex_id = {}
+armorindex_label = {}
 class Armor(Enum):
 	label: str
 
@@ -235,11 +236,16 @@ class Armor(Enum):
 
 	@staticmethod
 	def from_id(armor_id: int) -> 'Armor':
-		return armorindex.get(armor_id)
+		return armorindex_id.get(armor_id)
+
+	@classmethod
+	def from_label(cls, armor_label: str) -> 'Armor':
+		return armorindex_label.get(armor_label)
 
 def _fill_armor_indexes():
 	for armor in Armor:
-		armorindex[armor.value] = armor
+		armorindex_id[armor.value] = armor
+		armorindex_label[armor.label] = armor
 
 
 def _fill_all_indexes():
