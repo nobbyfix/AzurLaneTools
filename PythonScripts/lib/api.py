@@ -13,7 +13,11 @@ class Client(Enum):
 
 	When used as as iterator, the default order is EN > CN > JP > KR > TW.
 	"""
+
 	locale_code: str
+	"""
+	The locale code of the client. Required for interaction with certain source repositories.
+	"""
 
 	def __new__(cls, value, locale):
 		obj = object.__new__(cls)

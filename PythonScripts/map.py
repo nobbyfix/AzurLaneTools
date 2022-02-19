@@ -192,8 +192,7 @@ def fleet_retriction(fleet_limit: list[list[Union[Constants.ShipType, int]]]) ->
 	types_str = []
 	for shiptype, amount in countedtypes.items():
 		if shiptype == 0: continue
-		type_text = ship_str_limit_text.get(shiptype.name.lower(), shiptype.templatename)
-		types_str.append(f"{amount} {{{{{shiptype.templatename}}}}} {type_text}")
+		types_str.append(f"{amount} {{{{{shiptype.templatename}}}}} {shiptype.typetext}")
 	return ", ".join(types_str)
 
 

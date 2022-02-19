@@ -3,7 +3,7 @@ from enum import Enum
 
 
 # Constant Filepaths
-JSON_SOURCE_PATH = Path("..", "SrcJson").resolve()
+JSON_SOURCE_PATH = Path("..", "SrcJson3").resolve()
 SHIPID_CONVERT_CACHE_PATH = Path("data", "shipid_convert.json")
 SHIPID_CONVERT_OVERRIDE_PATH = Path("data", "shipid_overrides.json")
 EQUIP_CONVERT_CACHE_PATH = Path("data", "equip_convert.json")
