@@ -89,7 +89,7 @@ class Nation(Enum):
 	IRON_BLOOD			= (4,	"Iron Blood")
 	DRAGON_EMPERY		= (5,	"Dragon Empery")
 	SARDEGNA_EMPIRE		= (6,	"Sardegna Empire")
-	NORTH_UNION			= (7,	"North Union")
+	NORTHERN_PARLIAMENT	= (7,	"Northern Parliament")
 	IRIS_LIBRE			= (8,	"Iris Libre")
 	VICHYA_DOMINION		= (9,	"Vichya Dominion")
 	META				= (97,	"META")
