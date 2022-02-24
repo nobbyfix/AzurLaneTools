@@ -27,8 +27,11 @@ HTML_TAG = re.compile(r"<[^>]*>")
 def sanitize(v: str) -> str:
 	return HTML_TAG.sub("", v).strip()
 
+def sanitize_w_namecode(v: str, client: Client) -> str:
+	return api.replace_namecode(sanitize(v), client)
+
 def actor(atype, name, skincat, nameoverride, skinname):
-	res = f"{atype}:{name}/{skincat}:{nameoverride}:{skinname}"
+	res = f"{atype}:{name}/{skincat}:{nameoverride}"
 	return res.strip(":").strip("/").strip(":")
 
 def story(storyname: str, client: Client):
@@ -58,14 +61,14 @@ def story(storyname: str, client: Client):
 			if 'optionFlag' in story_segment:
 				optionstr = f"'''If Option {story_segment['optionFlag']}:''' "
 
-			lines_result.append(f"[{actorstr}] {optionstr}"+sanitize(story_segment['say']))
+			lines_result.append(f"[{actorstr}] {optionstr}"+sanitize_w_namecode(story_segment['say'], client))
 		if 'sequence' in story_segment:
-			sequence_sanitized = [sanitize(line[0]) for line in story_segment['sequence']]
+			sequence_sanitized = [sanitize_w_namecode(line[0], client) for line in story_segment['sequence']]
 			sequence_text = "<br>".join(sequence_sanitized)
 			lines_result.append("[] "+sequence_text)
 
 		if 'options' in story_segment:
-			option_sanitized = [f"'''Option {line['flag']}:''' "+sanitize(line['content']) for line in story_segment['options']]
+			option_sanitized = [f"'''Option {line['flag']}:''' "+sanitize_w_namecode(line['content'], client) for line in story_segment['options']]
 			option_text = "<br>".join(option_sanitized)
 			lines_result.append("[O:Commander] "+option_text)
 
