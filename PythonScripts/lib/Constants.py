@@ -48,6 +48,7 @@ class Rarity(Enum):
 		"""
 		Returns a rarity object with given *rarity_id*.
 		Only returns the first one listed, as there are multiple with the same id.
+		
 		If *is_research* is set True, `Rarity.PRIORITY` and `Rarity.DECISIVE` will be prioritised.
 		"""
 		if is_research:
@@ -86,9 +87,9 @@ class Nation(Enum):
 	ROYAL_NAVY			= (2,	"Royal Navy")
 	SAKURA_EMPIRE		= (3,	"Sakura Empire")
 	IRON_BLOOD			= (4,	"Iron Blood")
-	EASTERN_RADIANCE    = (5,	"Dragon Empery")
+	DRAGON_EMPERY   	= (5,	"Dragon Empery")
 	SARDEGNA_EMPIRE	    = (6,	"Sardegna Empire")
-	NORTH_UNION			= (7,	"Northern Parliament")
+	NORTH_PARLIAMENT	= (7,	"Northern Parliament")
 	IRIS_LIBRE			= (8,	"Iris Libre")
 	VICHYA_DOMINION		= (9,	"Vichya Dominion")
 	META				= (97,	"META")
@@ -237,11 +238,16 @@ class Armor(Enum):
 
 	@staticmethod
 	def from_id(armor_id: int) -> 'Armor':
-		return armorindex.get(armor_id)
+		return armorindex_id.get(armor_id)
+	
+	@classmethod
+	def from_label(cls, armor_label: str) -> 'Armor':
+		return armorindex_label.get(armor_label)
 
 def _fill_armor_indexes():
 	for armor in Armor:
-		armorindex[armor.value] = armor
+		armorindex_id[armor.value] = armor
+		armorindex_label[armor.label] = armor
 
 
 def _fill_all_indexes():

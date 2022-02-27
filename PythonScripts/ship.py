@@ -8,7 +8,6 @@ import mwparserfromhell
 from lib import ALJsonAPI, Client, DEFAULT_CLIENTS, Constants, WikiHelper, Utility
 from lib.apiclasses import CachedAPILoader
 from lib.Constants import ShipType
-from matplotlib._mathtext import ship
 
 
 SKILL_TYPE = {
@@ -325,7 +324,6 @@ def getGameData(ship_groupid, api: ALJsonAPI, clients: Iterable[Client]):
 				attr = strengthen.effect_attr
 				if i%5 == 0:
 					# EXTRA EQUIP EFF
-					#print(strengthen._json)
 					if strengthen.effect_equipment_proficiency:
 						try:
 							extra_eff[strengthen.effect_equipment_proficiency[0]] += strengthen.effect_equipment_proficiency[1]
@@ -401,7 +399,7 @@ def getGameData(ship_groupid, api: ALJsonAPI, clients: Iterable[Client]):
 		fleet_class_data = fleet_tech_ship_class.load_first(fleet_tech_data['class'], DEFAULT_CLIENTS)
 		ship_data['Class'] = fleet_class_data['name'].split('-Class')[0].strip().split(' Class')[0].strip()
 
-	# LIMIT BREAK, PR SHIPS MEH
+	# LIMIT BREAK, DEV LEVELS WITHOUT FORMATTING
 	for i in range(1, 4):
 		lb_data = ship_data_breakout.load_first(ship_groupid*10+i, DEFAULT_CLIENTS)
 		if lb_data:
@@ -637,7 +635,6 @@ def getGameData(ship_groupid, api: ALJsonAPI, clients: Iterable[Client]):
 			else:
 				try: ship_data[f'Eq{i}EffInitKai'] = f"{int(ship_data[f'Eq{i}EffInitMax'][:-1])+retro_effs[f'Equip {i} Efficiency']}%"
 				except: ship_data[f'Eq{i}EffInitKai'] = f"{int(ship_data[f'Eq{i}EffInitMax'][:-1])}%"
-	exit()
 	return ship_data
 
 
