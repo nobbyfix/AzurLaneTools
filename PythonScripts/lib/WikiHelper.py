@@ -17,7 +17,7 @@ class WikiClient():
 		self.execution_delay = execution_delay
 		self.last_execute_time = 0.0
 
-		### INIT MWCIENT ###
+		### INIT MWCLIENT ###
 		print('reading wiki settings ...')
 		if settings_path.exists():
 			settings = self.load_settings()

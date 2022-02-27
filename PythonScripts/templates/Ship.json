@@ -8,7 +8,7 @@
 				"sections": [
 					{
 						"comment": "",
-						"params": ["NameOverride", "ID", "GroupID", "CNName", "JPName", "KRName", "Rarity", "Nationality", "ConstructTime", "Type", "Class", "Subclass", "Remodel", "SubtypeRetro", "ShipGroup"]
+						"params": ["ID", "GroupID", "CNName", "JPName", "KRName", "NameOverride", "Rarity", "Nationality", "ConstructTime", "Type", "Class", "Subclass", "Remodel", "SubtypeRetro", "ShipGroup"]
 					},
 					{
 						"comment": "",
@@ -18,7 +18,7 @@
 			},
 			{
 				"comment": "<!------------- Section 2: Stats ------------->",
-				"params": ["Luck", "Armor", "ArmorKai", "Speed", "SpeedKai"],
+				"params": ["Luck", "LuckMax", "Armor", "ArmorKai", "Speed", "SpeedKai"],
 				"sections": [
 					{
 						"comment": "<!-- Base -->",
@@ -55,15 +55,15 @@
 				"sections": [
 					{
 						"comment": "",
-						"params": ["Eq1Type", "Eq1BaseMax", "Eq1EffInit", "Eq1EffInitMax", "Eq1EffInitKai"]
+						"params": ["Eq1Type", "Eq1BaseMax", "Eq1BaseKai", "Eq1EffInit", "Eq1EffInitMax", "Eq1EffInitKai"]
 					},
 					{
 						"comment": "",
-						"params": ["Eq2Type", "Eq2BaseMax", "Eq2EffInit", "Eq2EffInitMax", "Eq2EffInitKai"]
+						"params": ["Eq2Type", "Eq2BaseMax", "Eq2BaseKai", "Eq2EffInit", "Eq2EffInitMax", "Eq2EffInitKai"]
 					},
 					{
 						"comment": "",
-						"params": ["Eq3Type", "Eq3BaseMax", "Eq3EffInit", "Eq3EffInitMax", "Eq3EffInitKai"]
+						"params": ["Eq3Type", "Eq3BaseMax", "Eq3BaseKai", "Eq3EffInit", "Eq3EffInitMax", "Eq3EffInitKai"]
 					}
 				]
 			},
