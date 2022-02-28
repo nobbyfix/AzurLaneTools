@@ -48,7 +48,7 @@ class Rarity(Enum):
 		"""
 		Returns a rarity object with given *rarity_id*.
 		Only returns the first one listed, as there are multiple with the same id.
-		
+
 		If *is_research* is set True, `Rarity.PRIORITY` and `Rarity.DECISIVE` will be prioritised.
 		"""
 		if is_research:
@@ -89,7 +89,7 @@ class Nation(Enum):
 	IRON_BLOOD			= (4,	"Iron Blood")
 	DRAGON_EMPERY   	= (5,	"Dragon Empery")
 	SARDEGNA_EMPIRE	    = (6,	"Sardegna Empire")
-	NORTH_PARLIAMENT	= (7,	"Northern Parliament")
+	NORTHERN_PARLIAMENT	= (7,	"Northern Parliament")
 	IRIS_LIBRE			= (8,	"Iris Libre")
 	VICHYA_DOMINION		= (9,	"Vichya Dominion")
 	META				= (97,	"META")
@@ -138,7 +138,7 @@ class Attribute(Enum):
 		obj.wiki_param_name = param_name
 		obj.wiki_template_name = template_name
 		return obj
-	
+
 	def __str__(self):
 		return format(self._name_)
 
@@ -222,7 +222,8 @@ def _fill_shiptype_indexes():
 			shiptypeindex_fullname[shiptype.typename.lower()] = shiptype
 
 
-armorindex = {}
+armorindex_id = {}
+armorindex_label = {}
 class Armor(Enum):
 	label: str
 
@@ -239,7 +240,7 @@ class Armor(Enum):
 	@staticmethod
 	def from_id(armor_id: int) -> 'Armor':
 		return armorindex_id.get(armor_id)
-	
+
 	@classmethod
 	def from_label(cls, armor_label: str) -> 'Armor':
 		return armorindex_label.get(armor_label)
