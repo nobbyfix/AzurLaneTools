@@ -173,7 +173,7 @@ retro_blueprint = {
 }
 
 DD_buffs = {
-	'RNG': 'Main gun shots required to trigger All-Out Assault halved',
+	'GNR': 'Main gun shots required to trigger All-Out Assault halved',
 	'AUX': 'Boosts stats given by [[List of Auxiliary Equipment|Aux Gear]] by 30%',
 	'TORP': 'Spread of normal torpedo launches reduced'
 }
@@ -267,7 +267,7 @@ def getGameData(ship_groupid, api: ALJsonAPI, clients: Iterable[Client]):
 	if shipstat[0].nation._value_ > 100:
 		ship_data['ShipGroup'] = 'Collab'
 	ship_data['Nationality'] = shipstat[0].nation.label
-	if shipstat[3].nation == Constants.Nation.META:
+	if shipstat[0].nation == Constants.Nation.META:
 		ship_data['ConstructTime'] = 'META'
 	ship_data['Type'] = shipstat[0].type.typename
 	ship_data['Rarity'] = shipstat[0].rarity.label
@@ -404,9 +404,9 @@ def getGameData(ship_groupid, api: ALJsonAPI, clients: Iterable[Client]):
 		lb_data = ship_data_breakout.load_first(ship_groupid*10+i, DEFAULT_CLIENTS)
 		if lb_data:
 			ship_data['LB'+str(i)] = lb_data['breakout_view'].replace('/',' / ')
-		if ship_data['Type'] == "Destroyer" and i == 3:
-			DD_buff = shipvals[3].specific_type[0]
-			ship_data['LB3'] += ' / '+DD_buffs[DD_buff]
+	if ship_data['Type'] == "Destroyer" and shipstat[0].nation != Constants.Nation.UNIVERSAL2:
+		DD_buff = shipvals[3].specific_type[0]
+		ship_data['LB3'] += ' / '+DD_buffs[DD_buff]
 
 	# EQUIPMENT SLOTS, CHANGES AT LB HALF IMPLEMENTED
 	equip_percent_base = shipstat[0]['equipment_proficiency']
@@ -433,7 +433,7 @@ def getGameData(ship_groupid, api: ALJsonAPI, clients: Iterable[Client]):
 				print(f'changed equipment @ {i}LB and {j} Slot: from {equip_type[j]} to {equip_type_new}.')
 	for i in range(1, 4):
 		ship_data['Eq'+str(i)+'Type'] = equip_string(equip_type[i])
-		if 4 in shipvals[3]['equip_'+str(i)]:
+		if 4 in shipvals[0]['equip_'+str(i)]:
 			ship_data[f'Eq{i}BaseMax'] += shipvals[3]['hide_buff_list'][0]
 
 	# SKILLS (Skills that change at Retrofit/Fatesim not implemented, AoA/Siren Killer half implemented)
@@ -612,6 +612,8 @@ def getGameData(ship_groupid, api: ALJsonAPI, clients: Iterable[Client]):
 			ship_data['RetrofitMap'] += '['+retromappart+']'
 		# RETROFIT STATS
 		for attr, attr_vals in lb3_attrs.items():
+			if attr.wiki_param_name == 'Luck':
+				continue
 			if retro_ship_id != 0:
 				try:
 					ship_data[attr.wiki_param_name+'Kai'] = ship_data[attr.wiki_param_name+'Kai'] + retro_stats[attr.wiki_template_name]

@@ -170,11 +170,9 @@ class ShipDataStatistics(SharecfgModule):
 	def _instantiate_client(self, dataid: str, data: dict) -> ShipStat:
 		attributes = {}
 		attributes_growth = {}
-		attributes_growth_extra = {}
 		for attr in Attribute:
 			attributes[attr] = data["attrs"][attr.pos]
 			attributes_growth[attr] = data["attrs_growth"][attr.pos]
-			attributes_growth_extra[attr] = data["attrs_growth_extra"][attr.pos]
 
 		return ShipStat(
 			json=data,
@@ -185,7 +183,6 @@ class ShipDataStatistics(SharecfgModule):
 			armor=Armor.from_id(data["armor_type"]),
 			attributes=attributes,
 			attributes_growth=attributes_growth,
-			attributes_growth_extra=attributes_growth_extra,
 			skin=SharecfgDataRef(data["skin_id"], "ship_skin_template"),
 		)
 
