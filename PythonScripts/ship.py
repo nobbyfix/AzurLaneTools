@@ -425,12 +425,15 @@ def getGameData(ship_groupid, api: ALJsonAPI, clients: Iterable[Client]):
 		2: shipvals[0]['equip_2'],
 		3: shipvals[0]['equip_3']
 	}
+	equip_type_old = equip_type.copy()
 	for i, shipval in enumerate(shipvals):
 		if not shipval: continue
 		for j in range(1, 4):
 			equip_type_new = shipval['equip_'+str(j)]
-			if set(equip_type_new) != set(equip_type[j]):
-				print(f'changed equipment @ {i}LB and {j} Slot: from {equip_type[j]} to {equip_type_new}.')
+			if set(equip_type_new) != set(equip_type_old[j]):
+				print(f'{shipstat[0].name}: Changed equipment @ {i}LB and {j} Slot: from {equip_type_old[j]} to {equip_type_new}.')
+			equip_type_old[j] = equip_type_new
+				
 	for i in range(1, 4):
 		ship_data['Eq'+str(i)+'Type'] = equip_string(equip_type[i])
 		if 4 in shipvals[0]['equip_'+str(i)]:
@@ -497,7 +500,6 @@ def getGameData(ship_groupid, api: ALJsonAPI, clients: Iterable[Client]):
 					attr_dicts = [retrostat.attributes, retrostat.attributes_growth]
 					retro_attrs = {k: [d[k] for d in attr_dicts] for k in attr_dicts[0]}
 					retro_enhance_id = ship_data_template.load_first(retro_ship_id, clients).strengthen_id
-					print(retro_enhance_id)
 					retro_enhance_data = ship_data_strengthen.load_first(retro_enhance_id, clients)
 					
 					for attr, attr_vals in retro_attrs.items():
@@ -518,6 +520,10 @@ def getGameData(ship_groupid, api: ALJsonAPI, clients: Iterable[Client]):
 						
 						if 4 in retrovals['equip_'+str(i+1)]:
 							ship_data[f'Eq{i+1}BaseKai'] += retrovals['hide_buff_list'][0]
+						equip_type_new = retrovals['equip_'+str(i+1)]
+						if set(equip_type_new) != set(equip_type_old[i+1]):
+							print(f'{shipstat[0].name}: Changed equipment @ Retrofit and {i+1} Slot: from {equip_type_old[i+1]} to {equip_type_new}.')
+						equip_type_old[i+1] = equip_type_new
 					#Equip slots that change at retrofit not implemented
 
 				ship_data['Index'+letter] = letter
