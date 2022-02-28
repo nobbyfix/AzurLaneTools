@@ -663,8 +663,7 @@ def main():
 	api = ALJsonAPI()
 	groupid = api.ship_converter.get_groupid(args.name)
 	if not groupid:
-		print(f'Error: "{args.name}" is not a valid/unique ship name.')
-		exit()
+		raise ValueError(f'Error: "{args.name}" is not a valid/unique ship name.')
 	template_data_game = getGameData(groupid, api, clients)
 	ship_template = WikiHelper.MultilineTemplate("Ship")
 	wikitext = ship_template.fill(template_data_game)
