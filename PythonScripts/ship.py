@@ -635,6 +635,9 @@ def getGameData(ship_groupid, api: ALJsonAPI, clients: Iterable[Client]):
 					ship_data[attr.wiki_param_name+'Kai'] = ship_data[attr.wiki_param_name+'Max']
 					ship_data[attr.wiki_param_name+'Kai120'] = ship_data[attr.wiki_param_name+'120']
 					ship_data[attr.wiki_param_name+'Kai125'] = ship_data[attr.wiki_param_name+'125']
+				try:
+					ship_data['SpeedKai'] = ship_data['Speed'] + retro_stats['Speed']
+				except: pass
 		# RETROFIT EQUIP
 		for i in range(1,4):
 			if retro_ship_id != 0:
