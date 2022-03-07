@@ -400,6 +400,8 @@ def getGameData(ship_groupid, api: ALJsonAPI, clients: Iterable[Client]):
 		ship_data['Class'] = fleet_class_data['name'].split('-Class')[0].strip().split(' Class')[0].strip()
 
 	# LIMIT BREAK, DEV LEVELS WITHOUT FORMATTING
+	if shipstat[3].nation == Constants.Nation.META:
+		ship_data_breakout = ship_meta_breakout
 	for i in range(1, 4):
 		lb_data = ship_data_breakout.load_first(ship_groupid*10+i, DEFAULT_CLIENTS)
 		if lb_data:
