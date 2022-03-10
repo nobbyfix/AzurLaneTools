@@ -269,6 +269,7 @@ def getGameData(ship_groupid, api: ALJsonAPI, clients: Iterable[Client]):
 	ship_data['Nationality'] = shipstat[0].nation.label
 	if shipstat[0].nation == Constants.Nation.META:
 		ship_data['ConstructTime'] = 'META'
+		ship_data['ShipGroup'] = 'META'
 	ship_data['Type'] = shipstat[0].type.typename
 	ship_data['Rarity'] = shipstat[0].rarity.label
 	for i in shipstat[0].tag_list:
