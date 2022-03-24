@@ -8,6 +8,7 @@ SHIPID_CONVERT_CACHE_PATH = Path("data", "shipid_convert.json")
 SHIPID_CONVERT_OVERRIDE_PATH = Path("data", "shipid_overrides.json")
 EQUIP_CONVERT_CACHE_PATH = Path("data", "equip_convert.json")
 EQUIP_WIKIDATA_PATH = Path("data", "equip_wikinames.json")
+SKIN_WIKIDATA_PATH = Path("data", "skin_wikidata.json")
 ITEMNAME_OVERRIDES_PATH = Path("data", "item_name_convert.json")
 
 
