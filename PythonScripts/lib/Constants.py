@@ -3,7 +3,7 @@ from enum import Enum
 
 
 # Constant Filepaths
-JSON_SOURCE_PATH = Path("..", "SrcJson3").resolve()
+JSON_SOURCE_PATH = Path("..", "SrcJson").resolve()
 SHIPID_CONVERT_CACHE_PATH = Path("data", "shipid_convert.json")
 SHIPID_CONVERT_OVERRIDE_PATH = Path("data", "shipid_overrides.json")
 EQUIP_CONVERT_CACHE_PATH = Path("data", "equip_convert.json")
@@ -139,6 +139,9 @@ class Attribute(Enum):
 		obj.wiki_param_name = param_name
 		obj.wiki_template_name = template_name
 		return obj
+
+	def __str__(self):
+		return format(self._name_)
 
 	DURABILITY		= (0,	"Health",		"Health")
 	CANNON			= (1,	"Fire",			"Firepower")

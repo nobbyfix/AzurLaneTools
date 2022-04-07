@@ -31,8 +31,8 @@ def seven_day_signin(loginid: int, wikifier: WikiHelper.Wikifier, client: Client
 
 def main():
 	parser = ArgumentParser()
-	parser.add_argument("-c", "--client", required=True, choices=Client.__members__,
-						help="client to gather information from")
+	parser.add_argument("-c", "--client", choices=Client.__members__, default = "EN",
+						help="client to gather information from (default: EN)")
 	parser.add_argument('loginid', metavar='INDEX', type=int, nargs=1,
 						help='an index from sharecfg/activity_7_day_sign')
 	args = parser.parse_args()
