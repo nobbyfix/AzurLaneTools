@@ -1,13 +1,44 @@
 from enum import Enum
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Union
+from typing import Optional, Union
 
 
-Client = Enum('Client', 'EN CN JP KR TW')
 CompareType = Enum('CompareType', 'New Changed Unchanged Deleted')
 VersionType = Enum('VersionType', 'AZL CV L2D PIC BGM')
 DownloadType = Enum('DownloadType', 'NoChange Removed Success Failed')
+
+
+class AbstractClient(Enum):
+	active: bool
+	locale_code: str
+	package_name: str
+
+	def __new__(cls, value, active, locale, package_name):
+		# this should be done differently, but i am too lazy to do that now
+		# TODO: change it
+		if not hasattr(cls, "package_names"):
+			cls.package_names = {}
+
+		obj = object.__new__(cls)
+		obj._value_ = value
+		obj.active = active
+		obj.locale_code = locale
+		obj.package_name = package_name
+		cls.package_names[package_name] = obj
+		return obj
+
+	@classmethod
+	def from_package_name(cls, package_name) -> Optional['AbstractClient']:
+		return cls.package_names.get(package_name)
+
+
+class Client(AbstractClient):
+	EN = (1, True, 'en-US', 'com.YoStarEN.AzurLane')
+	JP = (2, True, 'ja-JP', 'com.YoStarJP.AzurLane')
+	CN = (3, True, 'zh-CN', '')
+	KR = (4, True, 'ko-KR', 'kr.txwy.and.blhx')
+	TW = (5, True, 'zh-TW', 'com.hkmanjuu.azurlane.gp')
 
 
 @dataclass

@@ -188,6 +188,7 @@ def equip_string(eqlist):
 	#if (2 in eqlist) and (1 in eqlist) and (12 in retrolist): return 'CL/DD Guns (Seaplanes on retrofit)'
 	if (2 in eqlist) and (1 in eqlist): return 'CL/DD Guns'
 	#if (2 in eqlist) and (3 in retrolist): return 'CL Guns (CA Guns on retrofit)'
+	if (1 in eqlist) and (6 in eqlist): return 'DD Guns/Anti-Air Guns'
 	if (2 in eqlist) and (6 in eqlist): return 'CL Guns/Anti-Air Guns'
 	if (2 in eqlist) and (9 in eqlist): return 'CL Guns/Dive Bombers'
 	#if (5 in eqlist) and (1 in retrolist): return 'Torpedoes/DD Guns (retrofit)'

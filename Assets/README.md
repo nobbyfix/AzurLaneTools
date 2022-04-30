@@ -1,52 +1,50 @@
 # Azur Lane Asset Downloader and Extractor
 This tool automatically downloads the newest assets directly from the game cdn servers and extracts the Texture2D files as png from them.
 
+## Before you start
+Python 3.9+ is required with the following libraries: `requests`, `UnityPy`, `PyYAML`, `Pillow`.
+
 ## HOW TO USE
-### 1. Import files from obb/apk
-While this is *not neccessary*, this step is **highly recommended**.    
-The files from the obb/apk archives can easily be imported using the `obb_import.py` script:
-```
-./obb_import.py -f [FILEPATH]
-```
-The `FILEPATH` has to point to a valid obb/apk archive from one of the five game regions. The obb archive can be found on android in the folder `/storage/emulated/0/Android/obb/[APPCODE]/`.
-The `APPCODE` differs depending on the region you want the obb archive from:
+### 1. Import files from xapk/apk/obb
+While this is *not neccessary*, this step is **recommended** if you want all game assets available and not spam the game update server with errors on the first download.
+
+The `obb_apk_import.py` supports all game clients (EN, JP, CN, KR, TW) and multiple forms of importing the assets. The recommend and easiest way is by downloading the `.xapk` from one of many Google Play Store app distributors (like APKPure). You can find them by searching for the package name, which are as follows:
 - EN: com.YoStarEN.AzurLane
 - JP: com.YoStarJP.AzurLane
 - KR: kr.txwy.and.blhx
 - TW: com.hkmanjuu.azurlane.gp
 
-Since the CN client is not distributed through the Google Play Store, there is no obb file for it. Therefore you need the apk which contains all the files. You can simply download the apk from one of the many app distributors or, if you already have the app installed, it can be found on android in the folder `/data/app/com.bilibili.azurlane-1/` (Note: you need root permission to access this folder).
+Anternatively if you already have the game installed, for example on emulators, you can also copy the obb file onto your system and use it instead of the xapk. On android it can be found in the folder `/storage/emulated/0/Android/obb/[PACKAGE_NAME]/`.
 
-### 2. Download new updates from the game
+Since the CN client is not distributed through the Google Play Store, there is no xapk/obb file for it but you can find the android download link on the [website](https://game.bilibili.com/blhx/) which will download an apk file (not xapk like the others). Alternatively the apk is installed in the folder `/data/app/com.bilibili.azurlane-1/` on android (Note: you need root permission to access this folder).
+
+You can then execute the script by passing it the filepath to the xapk/apk/obb:
+```
+./obb_apk_import.py [FILEPATH]
+```
+
+### 2. Settings
+The `config/user_config.yml` file provides a few settings to filter which files will be downloaded (and later also extracted). The options `download-folder-listtype` and `extract-folder-listtype` can be set to either "blacklist" or "whitelist". Depending on this it will filter by the top-level foldernames (sub folders are not supported) or top-level filenames (files inside top-level folders or lower can not be filtered) set in `download-folder-list` and `extract-folder-list`. This allows to cut down the download and extraction times by skipping unneeded assets.
+
+### 3. Download new updates from the game
 **Note: To prevent helping cheaters, two files needed for this part are missing. If you ask me nicely on Discord (nobbyfix#2338) i may provide them to you (usually only if you are an active wiki member).**
 
 All assets that are usually distributed through the in-app downloader can be downloaded by simply executing:
 ```
-./main.py -c [CLIENT]
+./main.py [CLIENT]
 ```
-where `CLIENT` has to be either EN, CN, JP, KR or TW. After all assets have been downloaded, you can find three files in the clients asset folder (at `ClientAssets/[CLIENT]/`):
-- diff_new.txt
-  - A list of all files that have been downloaded for the first time since the last update.
-- diff_changed.txt
-  - A list of all files that have been downloaded previously but have been changed since the last update.
-- diff_deleted.txt
-  - Mostly for curiosity, contains a list of all files that have been deleted since the last update.
+where `CLIENT` has to be either EN, CN, JP, KR or TW. You can check which files have been downloaded or deleted using the difflog files in `ClientAssets/[CLIENT]/difflog`.
 
-### 3. Extract all new and changed files
-**Note: This requires the additinal installation of two python libraries: UnityPy and unitypack** (yes it needs both, unitypack has shitty T2D support and UnityPy doesn't support Mesh export)
-
-The newly downloaded assets can now be extracted by executing:
+### 4. Extract all new and changed files
+The asset extraction script supports extraction of all newly downloaded files and single asset bundles. The newly downloaded assets can be extracted by executing:
 ```
-./extractor -c [CLIENT]
+./extractor [CLIENT]
 ```
-where `CLIENT` is again one of EN, CN, JP, KR or TW. The extracted images will then be saved in `ClientExtract/[CLIENT]/` Since only Texture2D assets are exported, its not desired to try to export from all assetbundles. Therefore in the config file `extract_config.json` is a list of all folders which should get extracted, which can be edited as desired.
+where `CLIENT` is again one of EN, CN, JP, KR or TW. The extracted images will then be saved in `ClientExtract/[CLIENT]/` Since only Texture2D assets are exported, its not desired to try to export from all assetbundles (See [settings section](#2-settings)).
 
-Additionally all `painting`s will also be automatically reconstructed.
+A single assetbundle can be extracted by passing the filepath to the script:
+```
+./extractor -f [FILEPATH]
+```
 
-### 4. Enjoy the files
-
-## Future plans and further notes
-- planned: script that renames the files so they can be easily uploaded to the wiki
-- planned: "compress" the images as desired for the wiki
-- very far in the future: integration with the decompilation and json conversion routines
-- **feel free to report issues or use the pull request feature**
+### 5. Enjoy the files
