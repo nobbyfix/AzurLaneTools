@@ -4,6 +4,7 @@ import math
 from typing import Any, Iterable, Union
 from typing_extensions import Required
 import mwparserfromhell
+import re
 
 from lib import ALJsonAPI, Client, DEFAULT_CLIENTS, Constants, WikiHelper, Utility
 from lib.apiclasses import CachedAPILoader
@@ -29,17 +30,22 @@ tech_type_defaults = {
 	ShipType.AR: {12},
 	ShipType.BM: {3, 13, 18},
 	ShipType.SSV: {8, 17},
-	ShipType.CV: {3, 13, 18},
+	ShipType.CB: {3, 13, 18},
 	ShipType.AE: {19},
 }
 allowed_tech_types = set(tech_type_defaults.keys())
 
 def get_tech_override(shiptype, tech_shiptypes):
-	if shiptype not in allowed_tech_types: return
-	self_techtypes = tech_type_defaults[shiptype]
-	tech_shipresult = set(tech_shiptypes) & allowed_tech_types
+	#if shiptype not in allowed_tech_types: return
+	#self_techtypes = set([ShipType.from_id(i) for i in tech_type_defaults[shiptype]])
+	#tech_shiptypes_set = set([ShipType.from_id(i) for i in tech_shiptypes])
+	#tech_shipresult = tech_shiptypes_set & allowed_tech_types
+	if not (self_techtypes := tech_type_defaults.get(shiptype)):
+		print(f'Warning: Unknown ship type {shiptype}!')
+		return
+	tech_shipresult = set(tech_shiptypes)
 	if self_techtypes != tech_shipresult:
-		return ' '.join(['{{'+ship_type[shiptype_][1]+'}}' for shiptype_ in tech_shipresult])
+		return ' '.join(['{{'+ShipType.from_id(shiptype_).templatename+'}}' for shiptype_ in tech_shipresult])
 
 # attribute code, parameter name, stat pos, templatename
 attributes = {
@@ -57,6 +63,11 @@ attributes = {
 	'antisub':		['ASW',			11,	'ASW']
 }
 
+research_rarity = {
+	"Super Rare": "Priority",
+	"Ultra Rare": "Decisive"
+}
+
 # attr, enhance pos
 attribute_enhance = {
 	Constants.Attribute.CANNON:		0,
@@ -70,6 +81,12 @@ attributes_retro = {
 	'equipment_proficiency_2': 'Equip 2 Efficiency',
 	'equipment_proficiency_3': 'Equip 3 Efficiency',
 	'skill_id': ''
+}
+
+attribute_research = {
+	'HP':'{{Health}}',
+	'AA':'{{AA}}',
+	'EVA':'{{Evasion}}'
 }
 
 equipment_slots = {
@@ -188,6 +205,7 @@ def equip_string(eqlist):
 	#if (2 in eqlist) and (1 in eqlist) and (12 in retrolist): return 'CL/DD Guns (Seaplanes on retrofit)'
 	if (2 in eqlist) and (1 in eqlist): return 'CL/DD Guns'
 	#if (2 in eqlist) and (3 in retrolist): return 'CL Guns (CA Guns on retrofit)'
+	if (1 in eqlist) and (6 in eqlist): return 'DD Guns/Anti-Air Guns'
 	if (2 in eqlist) and (6 in eqlist): return 'CL Guns/Anti-Air Guns'
 	if (2 in eqlist) and (9 in eqlist): return 'CL Guns/Dive Bombers'
 	#if (5 in eqlist) and (1 in retrolist): return 'Torpedoes/DD Guns (retrofit)'
@@ -203,6 +221,7 @@ def oil_consumption(start, end, level, api):
 	return start + math.floor(end * fight_oil_ratio / 10000)
 
 def calculate_stat(base_stat, growth, level, enhance, affinity=1.06):
+	#return (base_stat + ((level-1) * growth/1000) + enhance) * affinity
 	return math.floor((base_stat + ((level-1) * growth/1000) + enhance) * affinity)
 
 class OldIDLoader(CachedAPILoader):
@@ -246,7 +265,6 @@ def getGameData(ship_groupid, api: ALJsonAPI, clients: Iterable[Client]):
 	shipstat = [ ship_data_statistics.load_first(f"{ship_groupid}{i}", clients) for i in range(1, 4+1) ]
 	shipvals = [ ship_data_template.load_first(f"{ship_groupid}{i}", clients) for i in range(1, 4+1) ]
 	research_data = ship_data_blueprint.load_first(ship_groupid, clients)
-
 	ship_data = dict()
 
 	ship_data['GroupID'] = ship_groupid
@@ -272,10 +290,12 @@ def getGameData(ship_groupid, api: ALJsonAPI, clients: Iterable[Client]):
 		ship_data['ShipGroup'] = 'META'
 	ship_data['Type'] = shipstat[0].type.typename
 	ship_data['Rarity'] = shipstat[0].rarity.label
+	if research_data:
+		ship_data['Rarity'] = research_rarity.get(ship_data['Rarity'])
 	for i in shipstat[0].tag_list:
 		if i[-4:] == "lass" and i[:4] != "Plan":
 			ship_data['Class'] = i[:-6]
-	base_star = shipstat[0].star																								#<----------------PRINT
+	base_star = shipstat[0].star
 
 	# BASE STAT CALCULATION
 	base_attr_val = shipstat[0].attributes
@@ -283,8 +303,10 @@ def getGameData(ship_groupid, api: ALJsonAPI, clients: Iterable[Client]):
 	ship_data['ConsumptionInitial'] = oil_consumption(shipvals[0].oil_at_start, shipvals[0].oil_at_end, 1, api)
 	for attr, val in base_attr_val.items():
 		if attr in [Constants.Attribute.SPEED, Constants.Attribute.LUCK]:
+			#ship_data[attr.wiki_param_name] = val
 			ship_data[attr.wiki_param_name] = math.floor(val)
 		else:
+			#ship_data[attr.wiki_param_name + "Initial"] = val
 			ship_data[attr.wiki_param_name + "Initial"] = math.floor(val)
 
 	# LVL 100/120 STAT CALCULATION
@@ -320,9 +342,11 @@ def getGameData(ship_groupid, api: ALJsonAPI, clients: Iterable[Client]):
 			ship_data['ConstructTime'] = 'Research'
 			strengthen_data = {}
 			extra_eff = {}
+			enhance_list = [0,0,0,0,0]
 			for i in research_data.strengthen_effect:
 				strengthen = ship_strengthen_blueprint.load_first(str(i), clients)
 				attr = strengthen.effect_attr
+				enhance = strengthen.effect
 				if i%5 == 0:
 					# EXTRA EQUIP EFF
 					if strengthen.effect_equipment_proficiency:
@@ -334,12 +358,25 @@ def getGameData(ship_groupid, api: ALJsonAPI, clients: Iterable[Client]):
 					dev_list = list(strengthen.effect_desc.split('|'))
 					for j in strengthen.extra_desc:
 						dev_list.append(j)
-					for j in dev_list.copy():
-						if 'Limit' in j or 'Unlock' in j:
-							dev_list.remove(j)
+					dev_clone = dev_list.copy()
+					for j in range(len(dev_clone)):
+						if dev_clone[j][:2] in attribute_research and dev_clone[j].strip()[-1] != '%':
+							if j == 0:
+								dev_list[0] = attribute_research[dev_clone[j][:2]] + ' ' + dev_clone[j][2:].replace(' ','')
+							else: 
+								dev_list[0] += ', ' + attribute_research[dev_clone[j][:2]] + ' ' + dev_clone[j][2:].replace(' ','')
+								dev_list.remove(dev_clone[j])
+						if dev_clone[j][:3] in attribute_research:
+							if j == 0:
+								dev_list[0] = attribute_research[dev_clone[j][:3]] + ' ' + dev_clone[j][3:].replace(' ','')
+							else: 
+								dev_list[0] += ', ' + attribute_research[dev_clone[j][:3]] + ' ' + dev_clone[j][3:].replace(' ','')
+								dev_list.remove(dev_clone[j])
+						if 'Limit' in dev_clone[j] or 'Unlock' in dev_clone[j]:
+							dev_list.remove(dev_clone[j])
 					for j in range(len(dev_list)):
 						dev_list[j] = dev_list[j].replace('base','Mount')
-					ship_data['B'+str(i%100)] = str(dev_list)
+					ship_data['B'+str(i%100)] = '<li>'+'</li><li>'.join(dev_list)+'</li>'
 				# EXTRA STATS (Not really how it works, but adding to enhance values is easier)
 				if type(attr) is list:
 					for j in attr:
@@ -347,14 +384,21 @@ def getGameData(ship_groupid, api: ALJsonAPI, clients: Iterable[Client]):
 							strengthen_data[j[0]] += j[1]
 						except:
 							strengthen_data[j[0]] = j[1]
+				for j in range(len(enhance)):
+					enhance_list[j] += enhance[j]
+					
 			# FATE SIM
 			luck_max = 0
+			change_skill_list = []
 			for i in research_data.fate_strengthen:
 				strengthen = ship_strengthen_blueprint.load_first(str(i), clients)
 				attrlist = strengthen.effect_attr
+				change_skill = strengthen.change_skill
 				if type(attrlist) is list:
 					for j in attrlist:
 						luck_max += j[1]
+				if type(change_skill) is list:
+					change_skill_list.append(change_skill)
 			ship_data['LuckMax'] = str(luck_max)
 		ship_data['ConsumptionMax'] = oil_consumption(shipvals[3].oil_at_start, shipvals[3].oil_at_end, 100, api)
 		ship_data['ReinforcementValue'] = ''
@@ -364,12 +408,12 @@ def getGameData(ship_groupid, api: ALJsonAPI, clients: Iterable[Client]):
 			if shipstat[3].nation != Constants.Nation.META:
 				if (enhanceslot := attribute_enhance.get(attr)) is not None:
 					enhance_val = enhance_data.durability[enhanceslot]
-					ship_data['ReinforcementValue'] += str(enhance_data.attr_exp[enhanceslot])+' {{'+attr.wiki_template_name+'}} '
+					if research_data:
+						enhance_val = enhance_list[enhanceslot]/100
+					else:
+						ship_data['ReinforcementValue'] += str(enhance_data.attr_exp[enhanceslot])+' {{'+attr.wiki_template_name+'}} '
 				if research_data:
-					try:
-						enhance_val += strengthen_data[str(attr).lower()]#Dirty, but works
-					except:
-						pass
+					enhance_val += strengthen_data.get(str(attr).lower(),0)#Dirty, but works
 			else:
 				try:
 					enhance_val = enhance_data[str(attr).lower()]
@@ -401,15 +445,16 @@ def getGameData(ship_groupid, api: ALJsonAPI, clients: Iterable[Client]):
 		ship_data['Class'] = fleet_class_data['name'].split('-Class')[0].strip().split(' Class')[0].strip()
 
 	# LIMIT BREAK, DEV LEVELS WITHOUT FORMATTING
-	if shipstat[3].nation == Constants.Nation.META:
-		ship_data_breakout = ship_meta_breakout
-	for i in range(1, 4):
-		lb_data = ship_data_breakout.load_first(ship_groupid*10+i, DEFAULT_CLIENTS)
-		if lb_data:
-			ship_data['LB'+str(i)] = lb_data['breakout_view'].replace('/',' / ')
-	if ship_data['Type'] == "Destroyer" and shipstat[0].nation != Constants.Nation.UNIVERSAL2:
-		DD_buff = shipvals[3].specific_type[0]
-		ship_data['LB3'] += ' / '+DD_buffs[DD_buff]
+	if not research_data:
+		if shipstat[3].nation == Constants.Nation.META:
+			ship_data_breakout = ship_meta_breakout
+		for i in range(1, 4):
+			lb_data = ship_data_breakout.load_first(ship_groupid*10+i, DEFAULT_CLIENTS)
+			if lb_data:
+				ship_data['LB'+str(i)] = lb_data['breakout_view'].replace('/',' / ')
+		if ship_data['Type'] == "Destroyer" and shipstat[0].nation != Constants.Nation.UNIVERSAL2:
+			DD_buff = shipvals[3].specific_type[0]
+			ship_data['LB3'] += ' / '+DD_buffs[DD_buff]
 
 	# EQUIPMENT SLOTS, CHANGES AT LB HALF IMPLEMENTED
 	equip_percent_base = shipstat[0]['equipment_proficiency']
@@ -441,33 +486,12 @@ def getGameData(ship_groupid, api: ALJsonAPI, clients: Iterable[Client]):
 		ship_data['Eq'+str(i)+'Type'] = equip_string(equip_type[i])
 		if 4 in shipvals[0]['equip_'+str(i)]:
 			ship_data[f'Eq{i}BaseMax'] += shipvals[3]['hide_buff_list'][0]
-
-	# SKILLS (Skills that change at Retrofit/Fatesim not implemented, AoA/Siren Killer half implemented)
-	skill_list = shipvals[0]['buff_list_display']
-	if shipvals[3]:
-		skill_list = shipvals[3]['buff_list_display']
-	for i in range(1, len(skill_list)+1):
-		skillid = skill_list[i-1]
-		skill_data_client = Client.EN
-		skill_data_main = skill_data_template.load_client(skillid, skill_data_client)
-		for client in [Client.CN, Client.JP]:
-			if skill_data := skill_data_template.load_client(skillid, client):
-				ship_data['Skill'+str(i)+client.name] = api.replace_namecode(skill_data['name'], client)
-				if not skill_data_main:
-					skill_data_client = client
-					skill_data_main = skill_data
-
-		ship_data['Type'+str(i)] = SKILL_TYPE[skill_data_main['type']]
-		ship_data['Skill'+str(i)] = api.replace_namecode(skill_data_main['name'], skill_data_client)
-		desc = skill_data_main['desc']
-		desc_add = skill_data_main['desc_add']
-		for j, desc_add_item in enumerate(desc_add):
-			desc = desc.replace('$'+str(j+1), desc_add_item[0][0]+' ('+desc_add_item[skill_data_main['max_level']-1][0]+')')
-			desc = desc.replace('.0%','%')
-		ship_data['Skill'+str(i)+'Desc'] = api.replace_namecode(desc, skill_data_client)
-
-		buffdata = api.loader.load_buff(skillid, skill_data_client)
-		ship_data['Skill'+str(i)+'Icon'] = buffdata.get('icon', skillid)
+	
+	ghost_equip = []
+	for i, stat in enumerate(shipstat):
+		if stat['fix_equip_list'] != ghost_equip:
+			ghost_equip = stat['fix_equip_list']
+			print(f"Equip ghost equip {ghost_equip} @ LB{i}")
 
 	# RETROFIT
 	retrofit_data = ship_data_trans.load_first(ship_groupid, DEFAULT_CLIENTS)
@@ -649,6 +673,123 @@ def getGameData(ship_groupid, api: ALJsonAPI, clients: Iterable[Client]):
 			else:
 				try: ship_data[f'Eq{i}EffInitKai'] = f"{int(ship_data[f'Eq{i}EffInitMax'][:-1])+retro_effs[f'Equip {i} Efficiency']}%"
 				except: ship_data[f'Eq{i}EffInitKai'] = f"{int(ship_data[f'Eq{i}EffInitMax'][:-1])}%"
+
+	# SKILLS
+	skill_list_0 = [i for i in shipvals[1]['buff_list_display'] if i in shipvals[1]['buff_list'] or shipstat[3].nation == Constants.Nation.META]
+	skill_list = [(i,'') for i in skill_list_0]
+	if shipvals[3]:
+		skill_list_3 = [i for i in shipvals[3]['buff_list_display'] if i in shipvals[3]['buff_list'] or shipstat[3].nation == Constants.Nation.META]
+		if skill_list_3 != skill_list_0:
+			c = 0
+			for i in skill_list_3:
+				if i not in skill_list_0:
+					c += 1
+					skill_list = skill_list[:c] + [(i,'LB')] + skill_list[c:]
+				c += 1
+	if retrofit_data:
+		if retro_ship_id != 0:
+			skill_list_r = retrovals['buff_list_display']
+			if skill_list_r != skill_list_3:
+				c = 0
+				for i in skill_list_r:
+					if i not in skill_list_3:
+						if len(skill_list) > c+1:
+							#Check if next skill has been replaced by LB (aka the current skill is AoA)
+							if skill_list[c+1][1] == 'LB':
+								skill_data_main = skill_data_template.load_client(i, Client.EN)
+								for client in [Client.CN, Client.JP]:
+									if skill_data := skill_data_template.load_client(i, client):
+										if not skill_data_main:
+											skill_data_main = skill_data
+								#If it is indeed AoA (or similar), insert after 'LB'
+								if skill_data_main['max_level'] == 1:
+									c += 2
+									skill_list = skill_list[:c] + [(i,'R')] + skill_list[c:]
+								#If it is not AoA, insert before AoA as new skill
+								else:
+									skill_list = skill_list[:c] + [(i,'RN')] + skill_list[c:]
+							else:
+								c += 1
+								skill_list = skill_list[:c] + [(i,'R')] + skill_list[c:]
+						#elif len(skill_list) <= c+1:
+						#	continue
+						else:
+							if len(skill_list) > c and skill_list[c][1] == 'LB':
+								skill_data_main = skill_data_template.load_client(i, Client.EN)
+								for client in [Client.CN, Client.JP]:
+									if skill_data := skill_data_template.load_client(i, client):
+										if not skill_data_main:
+											skill_data_main = skill_data
+								if skill_data_main['max_level'] == 1:
+									c += 1
+									skill_list = skill_list[:c] + [(i,'R')] + skill_list[c:]
+								else:
+									print('Dunno when it ever gets here, but could be bad')
+									skill_list = skill_list[:c] + [(i,'R')] + skill_list[c:]
+							else:
+								c += 1
+								skill_list = skill_list[:c] + [(i,'R')] + skill_list[c:]
+					c += 1
+	elif research_data:
+		if change_skill_list:
+			for i in change_skill_list:
+				for c,j in enumerate(skill_list):
+					if str(i[0]) == str(j[0]):
+						skill_list = skill_list[:c+1] + [(i[1],'FS')] + skill_list[c+1:]
+	
+	skill_n = 1
+	ship_temp_data = dict()
+	for i in skill_list:
+		skillid = i[0]
+		skill_data_client = Client.EN
+		skill_data_main = skill_data_template.load_client(skillid, skill_data_client)
+		for client in [Client.CN, Client.JP]:
+			if skill_data := skill_data_template.load_client(skillid, client):
+				ship_temp_data['Skill'+str(skill_n)+client.name] = api.replace_namecode(skill_data['name'], client)
+				if not skill_data_main:
+					skill_data_client = client
+					skill_data_main = skill_data
+					
+		
+		desc = skill_data_main['desc']
+		desc_add = skill_data_main['desc_add']
+		for j, desc_add_item in enumerate(desc_add):
+			desc = desc.replace('$'+str(j+1), desc_add_item[0][0]+' ('+desc_add_item[skill_data_main['max_level']-1][0]+')')
+		desc = desc.replace('.0%','%').replace('Ⅰ', 'I').replace('Ⅱ', 'II').replace('Ⅲ', 'III')
+
+		if i[1] == 'LB':
+			ship_data['Skill'+str(skill_n-1)] = ship_data['Skill'+str(skill_n-1)].replace('Ⅰ', '').replace('I', '').strip()
+			for client in [Client.CN, Client.JP]:
+				ship_data['Skill'+str(skill_n-1)+client.name] = ship_data['Skill'+str(skill_n-1)+client.name].replace('Ⅰ', '').replace('I','').strip()
+			n1 = [s for s in re.findall(r'[^\ ]*[\d]+\.?\d*[^\ \.:]*', ship_data['Skill'+str(skill_n-1)+'Desc'])]
+			n1 += [s for s in re.findall(r'\bI+\b', ship_data['Skill'+str(skill_n-1)+'Desc'])]
+			n2 = [s for s in re.findall(r'[^\ ]*[\d]+\.?\d*[^\ \.:]*', desc)]
+			n2 += [s for s in re.findall(r'\bI+\b', desc)]
+			if len(n1) == len(n2):
+			    for i,x in enumerate(n1):
+			        ship_data['Skill'+str(skill_n-1)+'Desc'] = ship_data['Skill'+str(skill_n-1)+'Desc'].replace(x,f"{x} ({n2[i]})",1)
+		elif i[1] == 'R' and skill_list[skill_n-1][1] == 'LB':
+			ship_data['Skill'+str(skill_n-1)+'Desc'] += f"\n'''(Upon Retrofit)''' {desc}"
+		else:
+			ship_data['Skill'+str(skill_n)+'Desc'] = api.replace_namecode(desc, skill_data_client)
+			if 'R' in i[1]:
+				ship_data['Skill'+str(skill_n)] = '(Retrofit) ' + api.replace_namecode(skill_data_main['name'], skill_data_client)
+				#if :
+				if 'N' not in i[1] and skill_list[skill_n-2][1] != 'R':
+					ship_data['Skill'+str(skill_n)+'Desc'] += f"\n'''(Replaces {ship_data['Skill'+str(skill_n-1)]})'''"
+			elif i[1] == 'FS':
+				ship_data['Skill'+str(skill_n)] = '(Fate Simulation)<br/>' + api.replace_namecode(skill_data_main['name'], skill_data_client)
+				ship_data['Skill'+str(skill_n)+'Desc'] += f"\n'''(Replaces {ship_data['Skill'+str(skill_n-1)]})'''"
+			else:
+				ship_data['Skill'+str(skill_n)] = api.replace_namecode(skill_data_main['name'], skill_data_client)
+			
+			for client in [Client.CN, Client.JP]:
+				ship_data['Skill'+str(skill_n)+client.name] = ship_temp_data.get('Skill'+str(skill_n)+client.name,'Skill'+str(skill_n)+client.name)
+			buffdata = api.loader.load_buff(skillid, skill_data_client)
+			ship_data['Skill'+str(skill_n)+'Icon'] = buffdata.get('icon', skillid)
+
+			ship_data['Type'+str(skill_n)] = SKILL_TYPE[skill_data_main['type']]
+			skill_n += 1
 	return ship_data
 
 
@@ -677,7 +818,8 @@ def main():
 	api = ALJsonAPI()
 	groupid = api.ship_converter.get_groupid(args.name)
 	if not groupid:
-		raise ValueError(f'Error: "{args.name}" is not a valid/unique ship name.')
+		try: groupid = int(args.name)
+		except: raise ValueError(f'Error: "{args.name}" is not a valid/unique ship name.')
 	template_data_game = getGameData(groupid, api, clients)
 	ship_template = WikiHelper.MultilineTemplate("Ship")
 	wikitext = ship_template.fill(template_data_game)
