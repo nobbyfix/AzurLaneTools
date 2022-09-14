@@ -151,14 +151,14 @@ class CachedAPILoader():
 		self._generate_cache()
 
 	def _regenerate_cache(self) -> None:
-		self._clear_cache()
+		self._cache.clear()
 		self._generate_cache()
 
 	@abstractmethod
 	def _generate_cache(self) -> None: pass
 
 	def get(self, key) -> Any:
-		return self._cache[key]
+		return self._cache.get(key)
 
 ### SHARECFG DATA CLASSES ###
 @APIdataclass
@@ -234,7 +234,6 @@ class ShipSkin(SharecfgData):
 class Task(SharecfgData):
 	awards: list[Award]
 	target_id: Union[int, list[int], list[tuple[int, int]]]
-	target_id_client: int
 
 @APIdataclass
 class Metatask(SharecfgData): pass

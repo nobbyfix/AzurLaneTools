@@ -1,14 +1,12 @@
-from abc import abstractmethod
 from argparse import ArgumentParser
 import math
-from typing import Any, Iterable, Union
-from typing_extensions import Required
+from typing import Iterable, Union
 import mwparserfromhell
 import re
 
 from lib import ALJsonAPI, Client, DEFAULT_CLIENTS, Constants, WikiHelper, Utility
 from lib.apiclasses import CachedAPILoader
-from lib.Constants import ShipType
+from lib.Constants import Attribute, ShipType
 
 
 SKILL_TYPE = {
@@ -584,6 +582,8 @@ def getGameData(ship_groupid, api: ALJsonAPI, clients: Iterable[Client]):
 						except: retro_effs[attributes_retro[attribute_code]] = sum(map(lambda x: int(str(x)[2:]),values))
 						attribute += attributes_retro[attribute_code] + ' '
 						valtype = 'Eff'
+					else:
+						raise NotImplementedError(f"not implemented retro attribute '{attribute_code}'")
 
 					firstval = True
 					for value in values:

@@ -124,7 +124,7 @@ def find_chapter_tasks(chapterid: int, api: ALJsonAPI, client: Client) -> tuple[
 
 	task_data_template = api.get_sharecfgmodule("task_data_template")
 	for task in task_data_template.all_client(client):
-		taskid_it = flatten(task.target_id_client, task.target_id)
+		taskid_it = flatten(task.target_id)
 		if chapterid in taskid_it:
 			if task.sub_type == 1020: clear_task = task
 			elif task.sub_type == 1021: threestar_task = task
@@ -165,7 +165,7 @@ class EnemyNameLoader(CachedAPILoader):
 						self._cache[entry.icon] = (entry, False)
 	
 	def name_from_icon(self, icon: str) -> str:
-		if entry := self._cache[icon]:
+		if entry := self._cache.get(icon):
 			entry, priority = entry
 			name = entry.get("name") or entry.prefab
 			if priority:

@@ -9,7 +9,7 @@
 			},
 			{
 				"comment": "",
-				"params": ["SkinCategory", "Background", "SpecialBackground", "BGImage", "TabType1", "SkinCategory1", "TabName1", "TabType2", "SkinCategory2", "TabName2", "TabType3", "SkinCategory3", "TabName3", "TabType4", "SkinCategory4", "TabName4", "TabType5", "SkinCategory5", "TabName5"]
+				"params": ["SkinCategory", "CategoryOverride", "Background", "SpecialBackground", "BGImage", "TabType1", "SkinCategory1", "TabName1", "TabType2", "SkinCategory2", "TabName2", "TabType3", "SkinCategory3", "TabName3", "TabType4", "SkinCategory4", "TabName4", "TabType5", "SkinCategory5", "TabName5"]
 			},
 			{
 				"comment": "",

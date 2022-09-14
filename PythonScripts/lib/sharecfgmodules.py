@@ -242,7 +242,6 @@ class TaskDataTemplate(SharecfgModule):
 			json=data,
 			awards=[Award(*awarddata) for awarddata in award_display],
 			target_id=targetid,
-			target_id_client=data["target_id_for_client"],
 		)
 
 @dataclass
