@@ -783,7 +783,6 @@ def getGameData(ship_groupid, api: ALJsonAPI, clients: Iterable[Client]):
 						ship_data['Skill'+str(skill_n-1)+'Desc'] = ship_data['Skill'+str(skill_n-1)+'Desc'].replace(x,f"{x} ({n2[i]})",1)
 		elif i[1] == 'R' and skill_list[skill_n-1][1] == 'LB':
 			ship_data['Skill'+str(skill_n-1)+'Desc'] += f"\n'''(Upon Retrofit)''' {desc}"
-			print(skillid)
 		else:
 			ship_data['Skill'+str(skill_n)+'Desc'] = api.replace_namecode(desc, skill_data_client)
 			if 'R' in i[1]:
