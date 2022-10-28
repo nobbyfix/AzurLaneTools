@@ -34,7 +34,18 @@ def restore_painting(image, abpath: Path, imgname: str, do_retry: bool):
 
 	return restore_painting(image, abpath.with_name(abpath.name+'_tex'), imgname, False)
 
-def extract_assetbundle(rootfolder: Path, filepath: str, targetfolder: Path):
+def try_safe_image(image, target: Path) -> Path:
+	target.parent.mkdir(parents=True, exist_ok=True)
+	while True:
+		if target.exists():
+			print(f'ERROR: Tried to save "{target}", but the file already exists.')
+			target = target.with_name(target.stem + "_" + target.suffix)
+		else:
+			image.save(target)
+			return target
+
+def extract_assetbundle(rootfolder: Path, filepath: str, targetfolder: Path) -> Path:
+	all_images = []
 	abpath = Path(rootfolder, filepath)
 	for imageobj in imgrecon.load_images(str(abpath)):
 		if imageobj.name == 'UISprite': continue # skip the UISprite element
@@ -43,18 +54,19 @@ def extract_assetbundle(rootfolder: Path, filepath: str, targetfolder: Path):
 		image = imageobj.image
 		if filepath.split('/')[0] == 'painting':
 			image = restore_painting(image, abpath, imageobj.name, True)
+		all_images.append((image, imageobj.name))
 
-		target = Path(Path(targetfolder, filepath).parent, imageobj.name+'.png')
-		target.parent.mkdir(parents=True, exist_ok=True)
+	if len(all_images) == 1:
+		image, imgname = all_images[0]
+		target = Path(Path(targetfolder, filepath).parent, imgname+'.png')
+		return try_safe_image(image, target)
 
-		while True:
-			if target.exists():
-				print(f'ERROR: Tried to save "{imageobj.name}" from "{abpath}" to "{target}", but the file already exists.')
-				target = target.with_name(target.stem + "_" + target.suffix)
-			else:
-				image.save(target)
-				break
-		return target
+	if len(all_images) > 1:
+		img_target_dir = Path(Path(targetfolder, filepath).parent, abpath.name)
+		for image, imgname in all_images:
+			target = Path(img_target_dir, imgname+'.png')
+			try_safe_image(image, target)
+		return img_target_dir
 
 
 def extract_by_client(client: Client):
