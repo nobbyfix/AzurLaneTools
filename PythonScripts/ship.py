@@ -16,7 +16,7 @@ SKILL_TYPE = {
 }
 
 tech_type_defaults = {
-	ShipType.DD: {1},
+	ShipType.DD: {1,20,21},
 	ShipType.CL: {2},
 	ShipType.CA: {3, 13, 18},
 	ShipType.BC: {4, 5, 10},
@@ -30,6 +30,7 @@ tech_type_defaults = {
 	ShipType.SSV: {8, 17},
 	ShipType.CB: {3, 13, 18},
 	ShipType.AE: {19},
+        ShipType.SF: {22}
 }
 allowed_tech_types = set(tech_type_defaults.keys())
 
@@ -299,6 +300,17 @@ def getGameData(ship_groupid, api: ALJsonAPI, clients: Iterable[Client]):
 	base_attr_val = shipstat[0].attributes
 	ship_data['Armor'] = shipstat[0].armor.label
 	ship_data['ConsumptionInitial'] = oil_consumption(shipvals[0].oil_at_start, shipvals[0].oil_at_end, 1, api)
+	#initialise hunting range table
+	if ship_data['Type'] in ('Submarine', 'Submarine Carrier', 'Sailing Frigate'):
+		ship_data['Ammo'] = shipstat[0].ammo
+		ship_data['Oxygen'] = shipstat[0].oxy_max
+		hunt = shipstat[0].hunting_range
+		x = [[' ' for i in range(7)] for i in range(7)]
+		for i in range(len(hunt)):
+			for j in hunt[i]:
+				x[j[0]+3][j[1]+3]=str(i+1)
+		x[3][3]='x'
+		ship_data['Range'] = '{{HuntingRange/Alternative\n    |' + '|\n    |'.join(['|'.join(i) for i in x]) + '|\n  }}'
 	for attr, val in base_attr_val.items():
 		if attr in [Constants.Attribute.SPEED, Constants.Attribute.LUCK]:
 			#ship_data[attr.wiki_param_name] = val
@@ -766,15 +778,15 @@ def getGameData(ship_groupid, api: ALJsonAPI, clients: Iterable[Client]):
 			n2 = [s for s in re.findall(r'[^\ ]*[\d]+\.?\d*[^\ \.:]*', desc)]
 			n2 += [s for s in re.findall(r'\bI+\b', desc)]
 			if len(n1) == len(n2):
-			    for i,x in enumerate(n1):
-			        ship_data['Skill'+str(skill_n-1)+'Desc'] = ship_data['Skill'+str(skill_n-1)+'Desc'].replace(x,f"{x} ({n2[i]})",1)
+				for i,x in enumerate(n1):
+					if x != n2[i]:
+						ship_data['Skill'+str(skill_n-1)+'Desc'] = ship_data['Skill'+str(skill_n-1)+'Desc'].replace(x,f"{x} ({n2[i]})",1)
 		elif i[1] == 'R' and skill_list[skill_n-1][1] == 'LB':
 			ship_data['Skill'+str(skill_n-1)+'Desc'] += f"\n'''(Upon Retrofit)''' {desc}"
 		else:
 			ship_data['Skill'+str(skill_n)+'Desc'] = api.replace_namecode(desc, skill_data_client)
 			if 'R' in i[1]:
 				ship_data['Skill'+str(skill_n)] = '(Retrofit) ' + api.replace_namecode(skill_data_main['name'], skill_data_client)
-				#if :
 				if 'N' not in i[1] and skill_list[skill_n-2][1] != 'R':
 					ship_data['Skill'+str(skill_n)+'Desc'] += f"\n'''(Replaces {ship_data['Skill'+str(skill_n-1)]})'''"
 			elif i[1] == 'FS':

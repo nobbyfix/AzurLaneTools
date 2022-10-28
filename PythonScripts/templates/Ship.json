@@ -18,7 +18,7 @@
 			},
 			{
 				"comment": "<!------------- Section 2: Stats ------------->",
-				"params": ["Luck", "LuckMax", "Armor", "ArmorKai", "Speed", "SpeedKai"],
+				"params": ["Luck", "LuckMax", "Armor", "ArmorKai", "Speed", "SpeedKai", "Oxygen", "Ammo", "Range"],
 				"sections": [
 					{
 						"comment": "<!-- Base -->",
