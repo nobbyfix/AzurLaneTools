@@ -391,6 +391,7 @@ class SharecfgModule(Module):
 	name: str
 	_loader: JsonLoader
 	_data: dict[Client, dict] = field(default_factory=dict, init=False, repr=False)
+	_all_key_warning: bool = False
 
 	def _load_data(self, client: Client) -> Optional[dict]:
 		"""
@@ -473,8 +474,12 @@ class SharecfgModule(Module):
 		if ids := self._load("all", client):
 			return ids
 		
-		# if "all" key is not present, use the key view of the entire client dict
-		print(f"WARNING: \"all\" key not present for client '{client.name}' in module '{self.name}'.")
+		# print warning that "all" key is missing
+		if not self._all_key_warning:
+			print(f"WARNING: \"all\" key not present for client '{client.name}' in module '{self.name}'.")
+			self._all_key_warning = True
+		
+		# use the key view of the entire client dict for missing "all" key
 		if data := self._load_data(client):
 			return data.keys()
 
