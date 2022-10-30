@@ -7,33 +7,63 @@ from collections.abc import Iterable, Callable, Generator
 from typing import Union, Optional
 
 
-class Client(Enum):
+class AbstractClient(Enum):
+	active: bool
+	""" Denotes whether a client is being actively updated. """
+	locale_code: str
+	""" The locale code of the client. Required for interaction with certain source repositories. """
+	package_name: str
+	""" The google play store package name. Useful for matching with apk files. """
+
+	def __new__(cls, value, active, locale, package_name):
+		# this should be done differently, but i am too lazy to do that now
+		# TODO: change it
+		if not hasattr(cls, "package_name_index"):
+			cls.package_name_index = {}
+
+		obj = object.__new__(cls)
+		obj._value_ = value
+		obj.active = active
+		obj.locale_code = locale
+		obj.package_name = package_name
+
+		if package_name is not None:
+			if package_name in cls.package_name_index:
+				print(f"Created enum instance with duplicate package name '{package_name}': '{value}' for class '{cls.__name__}'.")
+			else:
+				cls.package_name_index[package_name] = obj
+		return obj
+
+	def __repr__(self) -> str:
+		return f"<{self.__class__.__name__}.{self._name_}: '{self.locale_code}'>"
+
+	@classmethod
+	def from_package_name(cls, package_name: str) -> Optional['AbstractClient']:
+		"""
+		Returns a Client Enum instance if one matching the package_name is found.
+		"""
+		return cls.package_names.get(package_name)
+
+
+class Client(AbstractClient):
 	"""
 	Enum class that implements all available azur lane client variants.
 
 	When used as as iterator, the default order is EN > CN > JP > KR > TW.
 	"""
+	EN = (1, True, 'en-US', 'com.YoStarEN.AzurLane')
+	CN = (3, True, 'zh-CN', None)
+	JP = (2, True, 'ja-JP', 'com.YoStarJP.AzurLane')
+	KR = (4, True, 'ko-KR', 'kr.txwy.and.blhx')
+	TW = (5, True, 'zh-TW', 'com.hkmanjuu.azurlane.gp')
 
-	locale_code: str
+
+class JsonLoader(metaclass=ABCMeta):
 	"""
-	The locale code of the client. Required for interaction with certain source repositories.
+	Abstract class providing an interface for loading sharecfg and gamecfg json files.
 	"""
-
-	def __new__(cls, value, locale):
-		obj = object.__new__(cls)
-		obj._value_ = value
-		obj.locale_code = locale
-		return obj
-
-	EN = (1, "en-US")
-	CN = (2, "zh-CN")
-	JP = (3, "ja-JP")
-	KR = (4, "ko-KR")
-	TW = (5, "zh-TW")
-
-
-class JsonLoader:
-	source_path: Path
+	source_directory: Path
+	""" The path to the directory containg the json source files. """
 
 	def __init__(self, source_directory: Path):
 		"""
@@ -42,6 +72,12 @@ class JsonLoader:
 		if not source_directory.exists():
 			raise FileNotFoundError(f"The source directory {source_directory} does not exist.")
 		self.source_directory = source_directory
+
+	def __repr__(self) -> str:
+		return f"<{self.__class__.__name__}: '{str(self.source_directory)}'>"
+
+	def __str__(self) -> str:
+		return f"{self.__class__.__name__}('{str(self.source_directory)}')"
 
 	@abstractmethod
 	def load_sharecfg(self, sharecfg_name: str, client: Client) -> dict:
@@ -155,6 +191,10 @@ class JsonLoader:
 		return self.load_multi_gamecfg("story", story_name, clients)
 
 class nobbyfix_JsonLoader(JsonLoader):
+	"""
+	Implementation of the JsonLoader for this json repository:
+	https://github.com/nobbyfix/AzurLaneSourceJson
+	"""
 	def load_sharecfg(self, sharecfg_name: str, client: Client) -> dict:
 		jsonpath = Path(self.source_directory, client.name, "sharecfg", sharecfg_name+".json")
 		with open(jsonpath, "r", encoding="utf8") as f:
@@ -169,6 +209,10 @@ class nobbyfix_JsonLoader(JsonLoader):
 			return json.load(f)
 
 class AzurLaneTools_JsonLoader(JsonLoader):
+	"""
+	Implementation of the JsonLoader for this json repository:
+	https://github.com/AzurLaneTools/AzurLaneData
+	"""
 	_gamecfg_cache: dict[Client, dict[str, dict]]
 
 	def __init__(self, source_directory: Path):
@@ -389,6 +433,7 @@ class SharecfgModule(Module):
 	Implementation of the Module class for sharecfg files.
 	"""
 	name: str
+	""" Name of the Module. Matches with the name of the file containing the underlying data. """
 	_loader: JsonLoader
 	_data: dict[Client, dict] = field(default_factory=dict, init=False, repr=False)
 	_all_key_warning: bool = False
