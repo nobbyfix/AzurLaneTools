@@ -3,49 +3,50 @@ from pathlib import Path
 from enum import Enum
 from dataclasses import dataclass, field
 from abc import ABCMeta, abstractmethod
-from collections.abc import Iterable, Callable, Generator
+from collections.abc import Iterable, Callable, Generator, Hashable
 from typing import Union, Optional
 
 
-class AbstractClient(Enum):
+class _Client(Enum):
+	__packagename2member_map__: dict[str, "_Client"]
+
 	active: bool
-	""" Denotes whether a client is being actively updated. """
+	"""Denotes whether a client is being actively updated."""
 	locale_code: str
-	""" The locale code of the client. Required for interaction with certain source repositories. """
+	"""The locale code of the client. Required for interaction with certain source repositories."""
 	package_name: str
-	""" The google play store package name. Useful for matching with apk files. """
+	"""The google play store package name. Useful for matching with apk files."""
 
-	def __new__(cls, value, active, locale, package_name):
-		# this should be done differently, but i am too lazy to do that now
-		# TODO: change it
-		if not hasattr(cls, "package_name_index"):
-			cls.package_name_index = {}
-
+	def __new__(cls, value, *args):
 		obj = object.__new__(cls)
 		obj._value_ = value
-		obj.active = active
-		obj.locale_code = locale
-		obj.package_name = package_name
-
-		if package_name is not None:
-			if package_name in cls.package_name_index:
-				print(f"Created enum instance with duplicate package name '{package_name}': '{value}' for class '{cls.__name__}'.")
-			else:
-				cls.package_name_index[package_name] = obj
 		return obj
+
+	def __init__(self, value, active, locale, package_name) -> None:
+		# add attributes to enum objects
+		self.active = active
+		self.locale_code = locale
+		self.package_name = package_name
+
+		# add enum objects to member maps
+		if package_name is not None:
+			if package_name in self.__packagename2member_map__:
+				print(f"Created enum instance with duplicate package name '{package_name}': '{value}' for class '{self.__class__.__name__}'.")
+			else:
+				self.__packagename2member_map__[package_name] = self		
 
 	def __repr__(self) -> str:
 		return f"<{self.__class__.__name__}.{self._name_}: '{self.locale_code}'>"
 
 	@classmethod
-	def from_package_name(cls, package_name: str) -> Optional['AbstractClient']:
+	def from_package_name(cls, package_name: str) -> Optional["_Client"]:
 		"""
-		Returns a Client Enum instance if one matching the package_name is found.
+		Returns a member with *package_name* matching it's `package_name` attribute.
+		Returns `None` if no match exists.
 		"""
-		return cls.package_names.get(package_name)
+		return cls.__packagename2member_map__.get(package_name)
 
-
-class Client(AbstractClient):
+class Client(_Client):
 	"""
 	Enum class that implements all available azur lane client variants.
 
@@ -65,7 +66,7 @@ class JsonLoader(metaclass=ABCMeta):
 	source_directory: Path
 	""" The path to the directory containg the json source files. """
 
-	def __init__(self, source_directory: Path):
+	def __init__(self, source_directory: Path) -> None:
 		"""
 		source_directory - directory containing the converted json files
 		"""
@@ -215,7 +216,7 @@ class AzurLaneTools_JsonLoader(JsonLoader):
 	"""
 	_gamecfg_cache: dict[Client, dict[str, dict]]
 
-	def __init__(self, source_directory: Path):
+	def __init__(self, source_directory: Path) -> None:
 		super().__init__(source_directory)
 		self._gamecfg_cache = {c: {} for c in Client}
 
@@ -253,13 +254,14 @@ Allows for simpler coding style, since all apiclasses need these params set.
 """
 
 @dataclass(eq=False)
-class ApiData:
+class ApiData(Hashable):
 	"""
 	Generic data class returned by all modules.
 	"""
 	id: int
+	""" Unique ID of the ApiData within their corresponding module. """
 
-	def __hash__(self):
+	def __hash__(self) -> int:
 		return hash(self.id)
 
 @APIdataclass
@@ -269,7 +271,7 @@ class SharecfgData(ApiData):
 	"""
 	_json: dict = field(repr=False)
 
-	def __init__(self, json: dict, **kwargs):
+	def __init__(self, json: dict, **kwargs) -> None:
 		self._json = json
 		for k, v in kwargs.items():
 			setattr(self, k, v)
@@ -300,7 +302,7 @@ class MergedSharecfgData(ApiData):
 	"""
 	_scfgdata: list[SharecfgData] = field(repr=False)
 
-	def __init__(self, *args: SharecfgData, **kwargs):
+	def __init__(self, *args: SharecfgData, **kwargs) -> None:
 		self._scfgdata = []
 		for arg in args:
 			if isinstance(arg, SharecfgData):
@@ -433,10 +435,10 @@ class SharecfgModule(Module):
 	Implementation of the Module class for sharecfg files.
 	"""
 	name: str
-	""" Name of the Module. Matches with the name of the file containing the underlying data. """
-	_loader: JsonLoader
+	"""Name of the Module. Matches with the name of the file containing the underlying data."""
+	_loader: JsonLoader = field(repr=False)
 	_data: dict[Client, dict] = field(default_factory=dict, init=False, repr=False)
-	_all_key_warning: bool = False
+	_all_key_warning: bool = field(default=False, init=False, repr=False)
 
 	def _load_data(self, client: Client) -> Optional[dict]:
 		"""
@@ -458,7 +460,7 @@ class SharecfgModule(Module):
 		# return *client* json data for easier access in data loader methods
 		return self._data[client]
 
-	def _process_data(self, client: Client, jsondata) -> None:
+	def _process_data(self, client: Client, jsondata: dict) -> None:
 		jsondata["is_sublisted"] = "indexs" in jsondata
 		jsondata["is_sharecfgdata"] = "__name" in jsondata
 		self._data[client] = jsondata

@@ -3,7 +3,7 @@ from abc import ABCMeta, abstractmethod
 from collections.abc import Iterable
 from typing import Any, Optional, Union
 
-from .api import Client, APIdataclass, ApiData, SharecfgData, MergedSharecfgData, Module
+from .api import ApiModule, Client, APIdataclass, ApiData, SharecfgData, MergedSharecfgData, Module, SharecfgModule
 from .Constants import Armor, Nation, Rarity, Attribute, ShipType
 
 
@@ -41,7 +41,7 @@ class ApiDataRef(DataRef):
 	"""
 	A reference to ApiData of *module* with dataid *id*.
 	"""
-	def _get_module(self, api):
+	def _get_module(self, api: "ALJsonAPI") -> ApiModule:
 		return api.get_apimodule(self.module)
 
 @dataclass
@@ -49,7 +49,7 @@ class SharecfgDataRef(DataRef):
 	"""
 	A reference to SharecfgData of *module* with dataid *id*.
 	"""
-	def _get_module(self, api):
+	def _get_module(self, api: "ALJsonAPI") -> SharecfgModule:
 		return api.get_sharecfgmodule(self.module)
 
 

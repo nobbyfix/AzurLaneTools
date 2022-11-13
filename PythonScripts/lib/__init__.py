@@ -22,13 +22,13 @@ class ALJsonAPI:
 	"""
 	General purpose class to interact with json gamedata.
 	"""
-	_apimodules: dict
-	_sharecfgmodules: dict
+	_apimodules: dict[str, ApiModule]
+	_sharecfgmodules: dict[str, SharecfgModule]
 	loader: JsonLoader
 	ship_converter: ships.ShipIDConverter
 	equip_converter: equips.EquipConverter
 
-	def __init__(self, loader: JsonLoader = None, source_path: Path = None):
+	def __init__(self, loader: JsonLoader = None, source_path: Path = None) -> None:
 		"""
 		Initializes the JsonAPI. If neither *loader* nor *source_path* is given,
 		the JsonLoader is initialized with the path given in "Constants.JSON_SOURCE_PATH".
