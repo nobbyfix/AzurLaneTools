@@ -93,7 +93,7 @@ class Nation(Enum):
 	NORTHERN_PARLIAMENT	= (7,	"Northern Parliament")
 	IRIS_LIBRE			= (8,	"Iris Libre")
 	VICHYA_DOMINION		= (9,	"Vichya Dominion")
-	TEMPESTA			= (96, "Tempesta")
+	TEMPESTA			= (96,  "Tempesta")
 	META				= (97,	"META")
 	UNIVERSAL2			= (98,	"Universal")
 	NEPTUNIA			= (101,	"Neptunia")
@@ -104,6 +104,7 @@ class Nation(Enum):
 	VENUS_VACATION		= (106,	"Venus Vacation")
 	IDOLMASTER			= (107,	"The Idolmaster")
 	SSSS				= (108,	"SSSS")
+	ATELIER_RYZA			= (109,	"Atelier Ryza")
 
 	@property
 	def id(self):
@@ -196,10 +197,10 @@ class ShipType(Enum):
 	AE		= (19,	"Munition Ship",			"Munition ships",				"AE",	"AE")
 	DDG_V	= (20,	"DDG",						"Guided-missile destroyers",	"DDG",	"DDG")
 	DDG_M	= (21,	"DDG",						"Guided-missile destroyers",	"DDG",	"DDG")
-	SF		= (22,	"Sailing Frigate",			"Sailing Frigate",		"SF",	"SF")
+	SF		= (22,	"Sailing Frigate",			"Sailing Frigate",		"IX",	"IX")
 	ZHAN	= (-1,	"",							"",								"BC",	"BC or BB")
 	HANG	= (-1,	"",							"",								"CVL",	"CV or CVL")
-	QIAN	= (-1,	"",							"",								"SS",	"SS or SSV")
+	QIAN	= (-1,	"",							"",								"SS",	"SS or SSV or IX")
 	ZHONG	= (-1,	"",							"",								"CB",	"CB or CA")
 	FANQIAN	= (-1,	"",							"",								"DD",	"DD or DDG or CL")
 	QUZHU	= (-1,	"",							"",								"DD",	"DD or DDG")
