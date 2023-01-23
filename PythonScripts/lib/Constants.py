@@ -1,5 +1,6 @@
 from pathlib import Path
 from enum import Enum
+from typing import Optional
 
 
 # Constant Filepaths
@@ -12,11 +13,11 @@ SKIN_WIKIDATA_PATH = Path("data", "skin_wikidata.json")
 ITEMNAME_OVERRIDES_PATH = Path("data", "item_name_convert.json")
 
 
-rarityindex = {}
 class Rarity(Enum):
 	"""
 	Enum class that allows conversion of rarity values between the game data and wiki.
 	"""
+	__num2member_map__: dict[int, "Rarity"] = {}
 
 	rarity: int
 	"""Rarity id used in the game."""
@@ -24,13 +25,6 @@ class Rarity(Enum):
 	"""Full rarity name used on the wiki."""
 	letter: str
 	"""Single letter used on the wiki in some templates."""
-
-	def __new__(cls, rarity, label, letter):
-		obj = object.__new__(cls)
-		obj.rarity = rarity
-		obj.label = label
-		obj.letter = letter
-		return obj
 
 	NORMAL0		= (0,	"Normal",		"E")
 	NORMAL		= (1,	"Normal",		"E")
@@ -44,44 +38,44 @@ class Rarity(Enum):
 	GIFT		= (8,	"Super Rare",	"G")
 	GIFT2		= (9,	"Super Rare",	"G")
 
-	@staticmethod
-	def from_id(rarity_id: int, is_research: bool = False) -> "Rarity":
-		"""
-		Returns a rarity object with given *rarity_id*.
-		Only returns the first one listed, as there are multiple with the same id.
+	def __init__(self, rarity, label, letter) -> None:
+		# add attributes to enum objects
+		self.rarity = rarity
+		self.label = label
+		self.letter = letter
+		# add enum objects to member maps
+		if rarity not in self.__num2member_map__:
+			self.__num2member_map__[rarity] = self
 
+	def __str__(self) -> str:
+		return self.label
+
+	@classmethod
+	def from_id(cls, rarity_num: int, is_research: bool = False) -> Optional["Rarity"]:
+		"""
+		Returns a `Rarity` member with *rarity_num* matching it's `rarity` attribute.
+		Returns `None` if no match exists.
+
+		For `rarity_num=4`, `Rarity.SUPER_RARE` will be returned over `Rarity.PRIORITY`.
+		For `rarity_num=5`, `Rarity.ULTRA_RARE` will be returned over `Rarity.LEGENDARY` and `Rarity.DECISIVE`.
+		
 		If *is_research* is set True, `Rarity.PRIORITY` and `Rarity.DECISIVE` will be prioritised.
 		"""
 		if is_research:
-			if rarity := {4: Rarity.PRIORITY, 5: Rarity.DECISIVE}.get(rarity_id):
+			if rarity := {4: Rarity.PRIORITY, 5: Rarity.DECISIVE}.get(rarity_num):
 				return rarity
-		return rarityindex.get(rarity_id)
-
-def _fill_rarity_indexes():
-	for rarity in Rarity:
-		if rarity.rarity not in rarityindex:
-			rarityindex[rarity.rarity] = rarity
+		return cls.__num2member_map__.get(rarity_num)
 
 
-nationindex = {}
 # from /model/const/nation.lua#Nation2Name
 class Nation(Enum):
 	"""
 	Enum class that allows conversion of nation values between the game data and wiki.
 	"""
-
 	id: int
-	"""Nation id used in the game."""
-	value: int
 	"""Nation id used in the game."""
 	label: str
 	"""Name of the nation used on the wiki."""
-
-	def __new__(cls, nation_id, label):
-		obj = object.__new__(cls)
-		obj._value_ = nation_id
-		obj.label = label
-		return obj
 
 	UNIVERSAL			= (0,	"Universal")
 	EAGLE_UNION			= (1,	"Eagle Union")
@@ -93,7 +87,7 @@ class Nation(Enum):
 	NORTHERN_PARLIAMENT	= (7,	"Northern Parliament")
 	IRIS_LIBRE			= (8,	"Iris Libre")
 	VICHYA_DOMINION		= (9,	"Vichya Dominion")
-	TEMPESTA			= (96,  "Tempesta")
+	TEMPESTA			= (96,	"Tempesta")
 	META				= (97,	"META")
 	UNIVERSAL2			= (98,	"Universal")
 	NEPTUNIA			= (101,	"Neptunia")
@@ -106,44 +100,39 @@ class Nation(Enum):
 	SSSS				= (108,	"SSSS")
 	ATELIER_RYZA			= (109,	"Atelier Ryza")
 
+	def __new__(cls, nation_id, label):
+		obj = object.__new__(cls)
+		obj._value_ = nation_id
+		obj.label = label
+		return obj
+	
+	def __str__(self) -> str:
+		return self.label
+
 	@property
-	def id(self):
+	def id(self) -> int:
 		"""Nation id used in the game."""
 		return self.value
 
-	@staticmethod
-	def from_id(nation_id: int) -> "Nation":
+	@classmethod
+	def from_id(cls, nation_id: int) -> Optional["Nation"]:
 		"""
-		Returns a nation object with given *nation_id*.
+		Returns a `Nation` member with *nation_id* matching it's `id` attribute.
+		Returns `None` if no match exists.
 		"""
-		return nationindex.get(nation_id)
-
-def _fill_nation_indexes():
-	for nation in Nation:
-		nationindex[nation.value] = nation
+		return cls._value2member_map_.get(nation_id)
 
 
 class Attribute(Enum):
 	"""
 	Enum class that allows conversion of ship attributes between the game data and wiki.
 	"""
-
 	pos: int
 	"""The position of the attribute in the ship statistics array."""
 	wiki_param_name: str
 	"""The name of the parameter on wiki templates used for the attribute."""
 	wiki_template_name: str
 	"""The name of the template displaying the attribute icon on the wiki."""
-
-	def __new__(cls, pos, param_name, template_name):
-		obj = object.__new__(cls)
-		obj.pos = pos
-		obj.wiki_param_name = param_name
-		obj.wiki_template_name = template_name
-		return obj
-
-	def __str__(self):
-		return format(self._name_)
 
 	DURABILITY		= (0,	"Health",		"Health")
 	CANNON			= (1,	"Fire",			"Firepower")
@@ -158,26 +147,35 @@ class Attribute(Enum):
 	LUCK			= (10,	"Luck",			"Luck")
 	ANTISUB			= (11,	"ASW",			"ASW")
 
+	def __init__(self, pos, param_name, template_name) -> None:
+		# add attributes to enum objects
+		self.pos = pos
+		self.wiki_param_name = param_name
+		self.wiki_template_name = template_name
 
-shiptypeindex = {}
-shiptypeindex_name = {}
-shiptypeindex_fullname = {}
+	def __str__(self) -> str:
+		return self.name
+
+
 # from /model/const/shiptype.lua
 class ShipType(Enum):
-	id: int
-	typename: str
-	categoryname: str
-	templatename: str
-	typetext: str
+	"""
+	Enum class that allows conversion of shiptype values between the game data and wiki.
+	"""
+	__id2member_map__: dict[int, "ShipType"] = {}
+	__name2member_map__: dict[str, "ShipType"] = {}
+	__fullname2member_map__: dict[str, "ShipType"] = {}
 
-	def __new__(cls, typeid, typename, catname, templatename, typetext):
-		obj = object.__new__(cls)
-		obj.id = typeid
-		obj.typename = typename
-		obj.categoryname = catname
-		obj.templatename = templatename
-		obj.typetext = typetext
-		return obj
+	id: int
+	"""The ID of the shiptype as used in the game."""
+	typename: str
+	"""The full name of the shiptype as used on the wiki."""
+	categoryname: str
+	"""The full name of the shiptypes category as used on the wiki"""
+	templatename: str
+	"""The name of the template to display the shiptype icon on the wiki."""
+	typetext: str
+	"""The text displaying the abbreviation of the shiptype or multiple types for shiptype bundles."""
 
 	DD		= (1,	"Destroyer",				"Destroyers",					"DD",	"DD")
 	CL		= (2,	"Light Cruiser",			"Light cruisers",				"CL",	"CL")
@@ -197,7 +195,7 @@ class ShipType(Enum):
 	AE		= (19,	"Munition Ship",			"Munition ships",				"AE",	"AE")
 	DDG_V	= (20,	"DDG",						"Guided-missile destroyers",	"DDG",	"DDG")
 	DDG_M	= (21,	"DDG",						"Guided-missile destroyers",	"DDG",	"DDG")
-	SF		= (22,	"Sailing Frigate",			"Sailing Frigate",		"IX",	"IX")
+	IX		= (22,	"Sailing Frigate",			"Sailing Frigate",		"IX",	"IX")
 	ZHAN	= (-1,	"",							"",								"BC",	"BC or BB")
 	HANG	= (-1,	"",							"",								"CVL",	"CV or CVL")
 	QIAN	= (-1,	"",							"",								"SS",	"SS or SSV or IX")
@@ -205,60 +203,88 @@ class ShipType(Enum):
 	FANQIAN	= (-1,	"",							"",								"DD",	"DD or DDG or CL")
 	QUZHU	= (-1,	"",							"",								"DD",	"DD or DDG")
 
-	@staticmethod
-	def from_id(type_id: int) -> 'ShipType':
-		return shiptypeindex.get(type_id)
+	def __init__(self, typeid, typename, catname, templatename, typetext):
+		# add attributes to enum objects
+		self.id = typeid
+		self.typename = typename
+		self.categoryname = catname
+		self.templatename = templatename
+		self.typetext = typetext
 
-	@staticmethod
-	def from_type(type_name: str) -> 'ShipType':
-		return shiptypeindex_name[type_name.lower()]
+		# add enum objects to member maps
+		self.__name2member_map__[self.name.lower()] = self
+		if typeid != -1:
+			self.__id2member_map__[typeid] = self
+		if typename != "":
+			self.__fullname2member_map__[typename.lower()] = self
 
-	@staticmethod
-	def from_name(type_name: str) -> 'ShipType':
-		return shiptypeindex_fullname[type_name.lower()]
+	@classmethod
+	def from_id(cls, type_id: int) -> Optional["ShipType"]:
+		"""
+		Returns a `ShipType` member with *type_id* matching it's `id` attribute.
+		Returns `None` if no match exists.
+		"""
+		return cls.__id2member_map__.get(type_id)
 
-def _fill_shiptype_indexes():
-	for shiptype in ShipType:
-		shiptypeindex_name[shiptype.name.lower()] = shiptype
+	@classmethod
+	def from_type(cls, type_name: str) -> Optional["ShipType"]:
+		"""
+		Returns a `ShipType` member with *type_name* matching it's `name` attribute, ignoring capitalization.
+		Returns `None` if no match exists.
+		"""
+		return cls.__name2member_map__.get(type_name)
 
-		if shiptype.id != -1:
-			shiptypeindex[shiptype.id] = shiptype
-			shiptypeindex_fullname[shiptype.typename.lower()] = shiptype
+	@classmethod
+	def from_name(cls, type_name: str) -> Optional["ShipType"]:
+		"""
+		Returns a `ShipType` member with *type_name* matching it's `typename` attribute.
+		Returns `None` if no match exists.
+		"""
+		return cls.__fullname2member_map__.get(type_name)
 
 
-armorindex_id = {}
-armorindex_label = {}
 class Armor(Enum):
+	__label2member_map__: dict[str, "Armor"] = {}
+	id: id
+	"""ID of the armor type as used in the game."""
 	label: str
-
-	def __new__(cls, armor_id, label):
-		obj = object.__new__(cls)
-		obj._value_ = armor_id
-		obj.label = label
-		return obj
+	"""Name of the armor type."""
 
 	LIGHT	= (1,	"Light")
 	MEDIUM	= (2,	"Medium")
 	HEAVY	= (3,	"Heavy")
 
-	@staticmethod
-	def from_id(armor_id: int) -> 'Armor':
-		return armorindex_id.get(armor_id)
+	def __new__(cls, armor_id, label):
+		obj = object.__new__(cls)
+		obj._value_ = armor_id
+		return obj
+
+	def __init__(self, armor_id, label) -> None:
+		# add attributes to enum objects
+		self.label = label
+		# add enum objects to member maps
+		self.__label2member_map__[label] = self
+
+	def __str__(self) -> str:
+		return self.label
+
+	@property
+	def id(self) -> int:
+		"""
+		ID of the armor type as used in the game.
+		"""
+		return self.value
 
 	@classmethod
-	def from_label(cls, armor_label: str) -> 'Armor':
-		return armorindex_label.get(armor_label)
+	def from_id(cls, armor_id: int) -> Optional["Armor"]:
+		"""
+		Returns an Armor member with matching *armor_id* if match exists, otherwise None.
+		"""
+		return cls._value2member_map_.get(armor_id)
 
-def _fill_armor_indexes():
-	for armor in Armor:
-		armorindex_id[armor.value] = armor
-		armorindex_label[armor.label] = armor
-
-
-def _fill_all_indexes():
-	_fill_rarity_indexes()
-	_fill_nation_indexes()
-	_fill_shiptype_indexes()
-	_fill_armor_indexes()
-
-_fill_all_indexes()
+	@classmethod
+	def from_label(cls, armor_label: str) -> Optional["Armor"]:
+		"""
+		Returns an Armor member with matching *armor_label* if match exists, otherwise None.
+		"""
+		return cls.__label2member_map__.get(armor_label)
