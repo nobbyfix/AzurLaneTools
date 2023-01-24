@@ -8,7 +8,7 @@ from typing import Union, Optional
 
 
 class _Client(Enum):
-	__packagename2member_map__: dict[str, "_Client"]
+	__packagename2member_map__: dict[str, "_Client"] = {}
 
 	active: bool
 	"""Denotes whether a client is being actively updated."""
