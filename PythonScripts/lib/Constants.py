@@ -98,6 +98,7 @@ class Nation(Enum):
 	VENUS_VACATION		= (106,	"Venus Vacation")
 	IDOLMASTER			= (107,	"The Idolmaster")
 	SSSS				= (108,	"SSSS")
+	ATELIER_RYZA			= (109,	"Atelier Ryza")
 
 	def __new__(cls, nation_id, label):
 		obj = object.__new__(cls)
@@ -194,10 +195,10 @@ class ShipType(Enum):
 	AE		= (19,	"Munition Ship",			"Munition ships",				"AE",	"AE")
 	DDG_V	= (20,	"DDG",						"Guided-missile destroyers",	"DDG",	"DDG")
 	DDG_M	= (21,	"DDG",						"Guided-missile destroyers",	"DDG",	"DDG")
-	SF		= (22,	"Sailing Frigate",			"Sailing Frigate",				"SF",	"SF")
+	IX		= (22,	"Sailing Frigate",			"Sailing Frigate",		"IX",	"IX")
 	ZHAN	= (-1,	"",							"",								"BC",	"BC or BB")
 	HANG	= (-1,	"",							"",								"CVL",	"CV or CVL")
-	QIAN	= (-1,	"",							"",								"SS",	"SS or SSV or SF")
+	QIAN	= (-1,	"",							"",								"SS",	"SS or SSV or IX")
 	ZHONG	= (-1,	"",							"",								"CB",	"CB or CA")
 	FANQIAN	= (-1,	"",							"",								"DD",	"DD or DDG or CL")
 	QUZHU	= (-1,	"",							"",								"DD",	"DD or DDG")

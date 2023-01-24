@@ -106,6 +106,7 @@ equipment_slots = {
 #	15: 'ASW Aircraft', # NOT EXISTING
 #	17: 'Helicopter', # NOT EXISTING
 	18: 'Goods',
+        21: 'Fuze AA guns', #No one rly cares
 #	[1, 7]: 'DD Guns/Fighters on first Limit Break',
 #	['??']: 'Submarine-mounted 203mm Gun',
 #	[7, 8]: 'Fighters / Torpedo Bombers (MLB)',
@@ -208,10 +209,11 @@ def equip_string(eqlist):
 	if (2 in eqlist) and (6 in eqlist): return 'CL Guns/Anti-Air Guns'
 	if (2 in eqlist) and (9 in eqlist): return 'CL Guns/Dive Bombers'
 	#if (5 in eqlist) and (1 in retrolist): return 'Torpedoes/DD Guns (retrofit)'
-	if (10 in eqlist) and (18 in eqlist): return 'Auxiliary Equipment++'
+	if (10 in eqlist) and (18 in eqlist): return 'Auxiliary Equipment/Cargo'
 	if (2 in eqlist) and (10 in eqlist): return 'CL Guns/Auxiliary Equipment'
 	if (5 in eqlist) and (10 in eqlist): return 'Torpedoes/Auxiliary Equipment'
 	if (6 in eqlist) and (10 in eqlist): return 'Anti-Air Guns/Auxiliary Equipment'
+	if (6 in eqlist) and (21 in eqlist): return 'Anti-Air Guns'
 	raise ValueError(f'Equipment types {eqlist} are unknown.')
 
 def oil_consumption(start, end, level, api):
@@ -765,8 +767,10 @@ def getGameData(ship_groupid, api: ALJsonAPI, clients: Iterable[Client]):
 		
 		desc = skill_data_main['desc']
 		desc_add = skill_data_main['desc_add']
-		for j, desc_add_item in enumerate(desc_add):
-			desc = desc.replace('$'+str(j+1), desc_add_item[0][0]+' ('+desc_add_item[skill_data_main['max_level']-1][0]+')')
+		for n,i in enumerate(desc_add):
+                        add_str = [s.split('$'+str(n+1)) for s in re.findall(r'[^ ]*\$'+str(n+1)+r'.*?\b', desc)]
+                        for o in add_str:
+                                desc = desc.replace('$'+str(n+1)+o[1], i[0][0]+o[1]+' ('+o[0]+i[skill_data_main['max_level']-1][0]+o[1]+')',1)
 		desc = desc.replace('.0%','%').replace('Ⅰ', 'I').replace('Ⅱ', 'II').replace('Ⅲ', 'III')
 
 		if i[1] == 'LB':
@@ -790,7 +794,7 @@ def getGameData(ship_groupid, api: ALJsonAPI, clients: Iterable[Client]):
 				if 'N' not in i[1] and skill_list[skill_n-2][1] != 'R':
 					ship_data['Skill'+str(skill_n)+'Desc'] += f"\n'''(Replaces {ship_data['Skill'+str(skill_n-1)]})'''"
 			elif i[1] == 'FS':
-				ship_data['Skill'+str(skill_n)] = '(Fate Simulation)<br/>' + api.replace_namecode(skill_data_main['name'], skill_data_client)
+				ship_data['Skill'+str(skill_n)] = '(Fate Simulation)<br>' + api.replace_namecode(skill_data_main['name'], skill_data_client)
 				ship_data['Skill'+str(skill_n)+'Desc'] += f"\n'''(Replaces {ship_data['Skill'+str(skill_n-1)]})'''"
 			else:
 				ship_data['Skill'+str(skill_n)] = api.replace_namecode(skill_data_main['name'], skill_data_client)
