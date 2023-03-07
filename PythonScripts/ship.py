@@ -30,7 +30,7 @@ augment_defaults = {
 	ShipType.SSV: "[[{}]], [[Kunai]], [[Dagger]]",
 	ShipType.CB: "[[{}]], [[Lance]], [[Greatsword]]",
 	ShipType.AE: "[[{}]], [[Lance]], [[Greatsword]]",
-        ShipType.IX: "[[{}]]"
+	ShipType.IX: "[[{}]]"
 }
 
 tech_type_defaults = {
@@ -48,7 +48,7 @@ tech_type_defaults = {
 	ShipType.SSV: {8, 17},
 	ShipType.CB: {3, 13, 18},
 	ShipType.AE: {19},
-        ShipType.IX: {22}
+	ShipType.IX: {22}
 }
 allowed_tech_types = set(tech_type_defaults.keys())
 
@@ -67,17 +67,17 @@ def get_tech_override(shiptype, tech_shiptypes):
 # attribute code, parameter name, stat pos, templatename
 attributes = {
 	'durability':	['Health',		0,	'Health'],
-	'cannon':		['Fire',		1,	'Firepower'],
-	'torpedo':		['Torp',		2,	'Torpedo'],
+	'cannon':	['Fire',		1,	'Firepower'],
+	'torpedo':	['Torp',		2,	'Torpedo'],
 	'antiaircraft':	['AA',			3,	'AA'],
-	'air':			['Air',			4,	'Aviation'],
-	'reload':		['Reload',		5,	'Reload'],
-	'armor':		['ArmorDebug',	6,	'Armor'],
-	'hit':			['Acc',			7,	'Accuracy'],
-	'dodge':		['Evade',		8,	'Evasion'],
-	'speed':		['Speed',		9,	'Speed'],
-	'luck':			['Luck',		10,	'Luck'],
-	'antisub':		['ASW',			11,	'ASW']
+	'air':		['Air',			4,	'Aviation'],
+	'reload':	['Reload',		5,	'Reload'],
+	'armor':	['ArmorDebug',		6,	'Armor'],
+	'hit':		['Acc',			7,	'Accuracy'],
+	'dodge':	['Evade',		8,	'Evasion'],
+	'speed':	['Speed',		9,	'Speed'],
+	'luck':		['Luck',		10,	'Luck'],
+	'antisub':	['ASW',			11,	'ASW']
 }
 
 research_rarity = {
@@ -88,7 +88,7 @@ research_rarity = {
 # attr, enhance pos
 attribute_enhance = {
 	Constants.Attribute.CANNON:		0,
-	Constants.Attribute.TORPEDO:	1,
+	Constants.Attribute.TORPEDO:		1,
 	Constants.Attribute.AIR:		3,
 	Constants.Attribute.RELOAD:		4,
 }
@@ -124,7 +124,7 @@ equipment_slots = {
 #	15: 'ASW Aircraft', # NOT EXISTING
 #	17: 'Helicopter', # NOT EXISTING
 	18: 'Goods',
-        21: 'Fuze AA guns', #No one rly cares
+	21: 'Fuze AA guns', #No one rly cares
 #	[1, 7]: 'DD Guns/Fighters on first Limit Break',
 #	['??']: 'Submarine-mounted 203mm Gun',
 #	[7, 8]: 'Fighters / Torpedo Bombers (MLB)',
@@ -319,7 +319,7 @@ def getGameData(ship_groupid, api: ALJsonAPI, clients: Iterable[Client]):
 	ship_data = dict()
 
 	if not shipstat[0]:
-		raise ValueError(f'Error: "{args.name}" is not a valid/unique ship name on the given clients.')
+		raise ValueError(f'Error: Ship "{ShipConverter.get_shipname(ship_groupid)}" does not exist on the given clients.')
 
 	if not shipstat[3]:
 		shipstat[3] = shipstat[0]
