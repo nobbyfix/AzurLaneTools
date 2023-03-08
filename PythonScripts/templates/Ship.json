@@ -64,6 +64,10 @@
 					{
 						"comment": "",
 						"params": ["Eq3Type", "Eq3BaseMax", "Eq3BaseKai", "Eq3EffInit", "Eq3EffInitMax", "Eq3EffInitKai"]
+					},
+					{
+						"comment": "",
+						"params": ["MeleeOverride"]
 					}
 				]
 			},
