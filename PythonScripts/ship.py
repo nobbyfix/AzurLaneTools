@@ -283,8 +283,8 @@ def get_skilldesc(skill_data_main,max_level):
 					desc = desc.replace('$'+str(n+1)+o[1], da_base+o[1]+' ('+o[0]+da_max+o[1]+')',1)
 		else:
 			desc = desc.replace('$'+str(n+1),da_base)
-		desc = re.sub(r'\.0([^\d])',r'\1',desc)
-		desc = desc.replace('Ⅰ', 'I').replace('Ⅱ', 'II').replace('Ⅲ', 'III')
+	desc = re.sub(r'\.0([^\d])',r'\1',desc)
+	desc = desc.replace('Ⅰ', 'I').replace('Ⅱ', 'II').replace('Ⅲ', 'III')
 	return desc
 
 
