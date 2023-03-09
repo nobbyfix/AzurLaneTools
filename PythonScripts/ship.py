@@ -766,7 +766,8 @@ def getGameData(ship_groupid, api: ALJsonAPI, clients: Iterable[Client]):
 	else:
 		skill_list_0 = shipvals[0]['buff_list_display']
 		skill_list_n = shipvals[0]['buff_list']
-	skill_list = [(i,'') if i in skill_list_n else (i,'RN') for i in skill_list_0]
+	#If a skill is buff_list_display, but not in buff_list (shows as locked) it is a retro skill unless the ship is a META ship
+	skill_list = [(i,'') if i in skill_list_n or shipstat[0].nation == Constants.Nation.META else (i,'RN') for i in skill_list_0]
 	if shipvals[3]:
                 #Insert skills changed by LB (AoA) in skill_list after the original skill (Wouldn't handle jumbled order of skills well) 
 		skill_list_3 = shipvals[3]['buff_list_display']#[i for i in shipvals[3]['buff_list_display'] if i in shipvals[1]['buff_list']]
