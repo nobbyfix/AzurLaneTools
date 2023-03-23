@@ -764,7 +764,6 @@ def getGameData(ship_groupid, api: ALJsonAPI, clients: Iterable[Client]):
 				except: ship_data[f'Eq{i}EffInitKai'] = f"{int(ship_data[f'Eq{i}EffInitMax'][:-1])}%"
 
 	# SKILLS
-
 	#Initialise skill list for LB1 (For AoA, LB0 if Bulin) and full skill_list
 	if shipvals[1]:
 		skill_list_0 = shipvals[1]['buff_list_display']
