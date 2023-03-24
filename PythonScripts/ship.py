@@ -283,8 +283,8 @@ def get_skilldesc(skill_data_main,max_level):
 					desc = desc.replace('$'+str(n+1)+o[1], da_base+o[1]+' ('+o[0]+da_max+o[1]+')',1)
 		else:
 			desc = desc.replace('$'+str(n+1),da_base)
-		desc = re.sub(r'\.0([^\d])',r'\1',desc)
-		desc = desc.replace('Ⅰ', 'I').replace('Ⅱ', 'II').replace('Ⅲ', 'III')
+	desc = re.sub(r'\.0([^\d])',r'\1',desc)
+	desc = desc.replace('Ⅰ', 'I').replace('Ⅱ', 'II').replace('Ⅲ', 'III')
 	return desc
 
 
@@ -766,7 +766,8 @@ def getGameData(ship_groupid, api: ALJsonAPI, clients: Iterable[Client]):
 	else:
 		skill_list_0 = shipvals[0]['buff_list_display']
 		skill_list_n = shipvals[0]['buff_list']
-	skill_list = [(i,'') if i in skill_list_n else (i,'RN') for i in skill_list_0]
+	#If a skill is buff_list_display, but not in buff_list (shows as locked) it is a retro skill unless the ship is a META ship
+	skill_list = [(i,'') if i in skill_list_n or shipstat[0].nation == Constants.Nation.META else (i,'RN') for i in skill_list_0]
 	if shipvals[3]:
                 #Insert skills changed by LB (AoA) in skill_list after the original skill (Wouldn't handle jumbled order of skills well) 
 		skill_list_3 = shipvals[3]['buff_list_display']#[i for i in shipvals[3]['buff_list_display'] if i in shipvals[1]['buff_list']]
@@ -823,7 +824,6 @@ def getGameData(ship_groupid, api: ALJsonAPI, clients: Iterable[Client]):
 						#Insert the skill changed by Fate Sim after the skill it changes
 						skill_list.insert(c+1,(i[1],'FS'))
 	ops_skills = skill_world_display.all_ids(clients)
-	
 	skill_n = 1
 	ship_temp_data = dict()
 	for i in skill_list:
@@ -838,17 +838,22 @@ def getGameData(ship_groupid, api: ALJsonAPI, clients: Iterable[Client]):
 					skill_data_main = skill_data
 					
 		desc = get_skilldesc(skill_data_main,skill_data_main.max_level)
-		
+		if skillid in ops_skills:
+			skill_data_ops = skill_world_display.load_first(skillid,clients)
+			desc_ops = get_skilldesc(skill_data_ops,skill_data_main.max_level)
+			desc +='\n' + desc_ops
 
 		if i[1] == 'LB':
-                        #For AoA get AoA 1 and AoA 2 name and desc
+			#For AoA get AoA 1 and AoA 2 name and desc
 			name1 = ship_data['Skill'+str(skill_n-1)]
 			name2 = api.replace_namecode(skill_data_main.name, skill_data_client)
 			desc1 = ship_data['Skill'+str(skill_n-1)+'Desc']
+
 			words1 = re.sub(r'; (\w)',lambda m: '. '+m.expand(r'\1').upper(),desc1).split(' ')
 			words2 = re.sub(r'; (\w)',lambda m: '. '+m.expand(r'\1').upper(),desc).split(' ')
 			
-			#Extract desc that only applies for one of the skills
+			#Extract desc that only applies for one of the skills (Can break on newlines in skill desc)
+			#Probably not working properly on skills with more effect on AoA I, fix it whenever that happens 
 			afterwords = ''
 			if len(words1) != len(words2):
 				words = sorted(((name1,words1),(name2,words2)),key=lambda e: len(e[1]))
@@ -858,34 +863,32 @@ def getGameData(ship_groupid, api: ALJsonAPI, clients: Iterable[Client]):
 			for client in [Client.CN, Client.JP]:
 				ship_data['Skill'+str(skill_n-1)+client.name] = ship_data['Skill'+str(skill_n-1)+client.name].replace('Ⅰ', '').replace('I','').strip()
 
-			#Find all occurences of Roman and normal numbers for both AoA lvls and format them into 1 string
+			#Find all occurances of Roman and normal numbers for both AoA lvls and format them into 1 string
 			n1 = [s for s in re.findall(r'(?:[^\ \d(]*[\d]+(?:\.\d+)?[^\ \d.:)]*|\bI+\b)', desc1)]
 			n2 = [s for s in re.findall(r'(?:[^\ \d(]*[\d]+(?:\.\d+)?[^\ \d.:)]*|\bI+\b)', desc)]
 			max_len = min(len(n1),len(n2))
 			for n in range(max_len):
 				if n1[n] != n2[n]:
-					desc1 = desc1.replace(n1[n],f"{n1[n]} ({n2[n]})",1)
-			ship_data['Skill'+str(skill_n-1)+'Desc'] = desc1+afterwords
+					desc1 = desc1.replace(n1[n],f"${n}",1)
+			for n in range(max_len):
+				desc1 = desc1.replace(f"${n}",f"{n1[n]} ({n2[n]})")
+			ship_data['Skill'+str(skill_n-1)+'Desc'] = api.replace_namecode(desc1+afterwords, skill_data_client)
 		
 		elif i[1] == 'R' and skill_list[skill_n-1][1] == 'LB':
-                        #Filter out retrofit with new AoA
+			#Filter out retrofit with new AoA
 			ship_data['Skill'+str(skill_n-1)+'Desc'] += f"\n'''(Upon Retrofit)''' {desc}"
 		else:
-                        #All of these add a new skill to the list
+			#All of these add a new skill to the list
 			ship_data['Skill'+str(skill_n)+'Desc'] = api.replace_namecode(desc, skill_data_client)
-			if skillid in ops_skills:
-				skill_data_ops = skill_world_display.load_first(skillid,clients)
-				desc_ops = get_skilldesc(skill_data_ops,skill_data_main.max_level)
-				ship_data['Skill'+str(skill_n)+'Desc'] +='\n' + api.replace_namecode(desc_ops, skill_data_client)
 			if 'R' in i[1]:
-                                #Retrofit skill
+				#Retrofit skill
 				ship_data['Skill'+str(skill_n)] = '(Retrofit) '
 				if 'N' not in i[1] and skill_list[skill_n-2][1] != 'R':
-                                        #Not a new retrofit skill, so replacement for the skill before and check if skill before is not in by retro too
+					#Not a new retrofit skill, so replacement for the skill before and check if skill before is not in by retro too
 					#(Might break on 2 or more replacing retro skills) 
 					ship_data['Skill'+str(skill_n)+'Desc'] += f"\n'''(Replaces {ship_data['Skill'+str(skill_n-1)]})'''"
 			elif i[1] == 'FS':
-                                #Replacement skill from Fate Sim
+				#Replacement skill from Fate Sim
 				ship_data['Skill'+str(skill_n)] = '(Fate Simulation)<br>'
 				ship_data['Skill'+str(skill_n)+'Desc'] += f"\n'''(Replaces {ship_data['Skill'+str(skill_n-1)]})'''"
 			elif i[1] == 'A':
@@ -893,8 +896,8 @@ def getGameData(ship_groupid, api: ALJsonAPI, clients: Iterable[Client]):
 				ship_data['Skill'+str(skill_n)] = '(Augment Module)<br>'
 				ship_data['Skill'+str(skill_n)+'Desc'] += f"\n'''(Replaces {ship_data['Skill'+str(skill_n-1)]})'''"
 			else:
-                                #Only base skills left now
-                                ship_data['Skill'+str(skill_n)] = ''
+				#Only base skills left now
+				ship_data['Skill'+str(skill_n)] = ''
 
 			ship_data['Skill'+str(skill_n)] += api.replace_namecode(skill_data_main['name'], skill_data_client)
 			for client in [Client.CN, Client.JP]:
