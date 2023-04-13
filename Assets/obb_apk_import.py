@@ -69,7 +69,13 @@ def unpack(zipfile: ZipFile, client: Client):
 
 def extract_asset(zipfile: ZipFile, filepath: str, target: Path):
 	target.parent.mkdir(exist_ok=True, parents=True)
-	with zipfile.open('assets/AssetBundles/'+filepath+".ys", 'r') as zf, open(target, 'wb') as f:
+	
+	if "." in Path(filepath).name:
+		assetpath = "assets/AssetBundles/"+filepath
+	else:
+		assetpath = "assets/AssetBundles/"+filepath+".ys"
+
+	with zipfile.open(assetpath, 'r') as zf, open(target, 'wb') as f:
 		shutil.copyfileobj(zf, f)
 
 
