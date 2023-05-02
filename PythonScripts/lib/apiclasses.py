@@ -268,3 +268,6 @@ class ShipReward(Awardable):
 @APIdataclass
 class Furniture(MergedSharecfgData, Awardable):
 	theme: Optional[SharecfgDataRef]
+
+@APIdataclass
+class ExtendedEquipStat(MergedSharecfgData): pass
