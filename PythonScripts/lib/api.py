@@ -430,6 +430,12 @@ class Module(metaclass=ABCMeta):
 				yield data
 
 @dataclass
+class SharecfgmoduleDataSettings:
+	is_sublisted: bool = False
+	is_sharecfgdata: bool = False
+	is_sharecfgdata2: bool = False
+
+@dataclass
 class SharecfgModule(Module):
 	"""
 	Implementation of the Module class for sharecfg files.
@@ -438,6 +444,7 @@ class SharecfgModule(Module):
 	"""Name of the Module. Matches with the name of the file containing the underlying data."""
 	_loader: JsonLoader = field(repr=False)
 	_data: dict[Client, dict] = field(default_factory=dict, init=False, repr=False)
+	_settings: SharecfgmoduleDataSettings = field(default_factory=SharecfgmoduleDataSettings, init=False)
 	_all_key_warning: bool = field(default=False, init=False, repr=False)
 
 	def _load_data(self, client: Client) -> Optional[dict]:
@@ -454,16 +461,44 @@ class SharecfgModule(Module):
 			# on failure mark the data for client as None so loading is not attempted again
 			try:
 				jsondata = self._loader.load_sharecfg(self.name, client)
-				self._process_data(client, jsondata)
+				jsondata = self._process_data(client, jsondata)
+
+				# do sharecfgdata loading if sharecfg file is a sharecfgdata one
+				# has to be done on sharecfg load, otherwise all_id functions return None
+				if self._settings.is_sharecfgdata or self._settings.is_sharecfgdata2:
+					self._do_sharecfgdata_loading(client, jsondata)
+
 			except FileNotFoundError:
 				self._data[client] = None
 		# return *client* json data for easier access in data loader methods
 		return self._data[client]
 
-	def _process_data(self, client: Client, jsondata: dict) -> None:
-		jsondata["is_sublisted"] = "indexs" in jsondata
-		jsondata["is_sharecfgdata"] = "__name" in jsondata
+	def _do_sharecfgdata_loading(self, client: Client, clientdata: dict) -> None:
+		if self._settings.is_sharecfgdata:
+			sharecfgdataname = clientdata["__name"]
+			try:
+				sharecfgdata = self._loader.load_sharecfgdata(sharecfgdataname, client)
+				self._data[client] |= sharecfgdata
+			except FileNotFoundError:
+				print(f"Failed to load sharecfgdata '{sharecfgdataname}' for module '{self.name}'.")
+		
+		if self._settings.is_sharecfgdata2:
+			sharecfgdataname = self.name
+			try:
+				sharecfgdata = self._loader.load_sharecfgdata(sharecfgdataname, client)
+				self._data[client] |= sharecfgdata
+			except FileNotFoundError:
+				print(f"Failed to load sharecfgdata '{sharecfgdataname}' for module '{self.name}'.")
+
+	def _process_data(self, client: Client, jsondata: dict) -> dict:
+		if jsondata == []:
+			jsondata = {}
+			self._settings.is_sharecfgdata2 = True
+		
+		self._settings.is_sublisted = "indexs" in jsondata
+		self._settings.is_sharecfgdata = "__name" in jsondata
 		self._data[client] = jsondata
+		return jsondata
 
 	def _load(self, dataid: str, client: Client) -> Optional[dict]:
 		"""
@@ -475,7 +510,7 @@ class SharecfgModule(Module):
 				return data
 
 			# do sublist loading if the sharecfg file is sublisted
-			if clientdata["is_sublisted"]:
+			if self._settings.is_sublisted:
 				if sublistid := clientdata["indexs"].get(dataid):
 					sublistname = clientdata["subList"][sublistid-1]
 					sublistpath = f"{clientdata['subFolderName'].lower()}/{sublistname}"
@@ -485,16 +520,6 @@ class SharecfgModule(Module):
 						return self._data[client].get(dataid)
 					except FileNotFoundError:
 						print(f"Failed to load sublist '{sublistpath}' for module '{self.name}'.")
-			
-			# do sharecfgdata loading if sharecfg file is a sharecfgdata one
-			if clientdata["is_sharecfgdata"]:
-				sharecfgdataname = clientdata["__name"]
-				try:
-					sharecfgdata = self._loader.load_sharecfgdata(sharecfgdataname, client)
-					self._data[client] |= sharecfgdata
-					return self._data[client].get(dataid)
-				except FileNotFoundError:
-					print(f"Failed to load sharecfgdata '{sharecfgdataname}' for module '{self.name}'.")
 
 	def _instantiate_client(self, dataid: str, data: dict) -> SharecfgData:
 		"""

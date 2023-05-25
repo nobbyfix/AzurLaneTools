@@ -221,7 +221,6 @@ class ShipStat(SharecfgData):
 	armor: Armor
 	attributes: dict[Attribute, int]
 	attributes_growth: dict[Attribute, int]
-	attributes_growth_extra: dict[Attribute, int]
 	skin: SharecfgDataRef
 
 @APIdataclass

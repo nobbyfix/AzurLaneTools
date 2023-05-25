@@ -37,7 +37,7 @@ class ShipRewardModule(ApiModule):
 
 	def all_client_ids(self, client: Client) -> Iterable[int]:
 		ship_data_statistics = self._getmodule("ship_data_statistics")
-		client_ids = [sid for sid in ship_data_statistics.all_client_ids(client) if sid%10 == 1]
+		client_ids = [sid for sid in ship_data_statistics.all_client_ids(client) if int(sid)%10 == 1]
 		return client_ids
 
 @dataclass
