@@ -105,6 +105,10 @@ class AwardDisplay:
 		return awardable
 
 @dataclass
+class AwardDisplayLabeled(AwardDisplay):
+	label: str
+
+@dataclass
 class Award(AwardDisplay):
 	"""
 	An AwardDisplay that also specifies that amount of the items awarded.

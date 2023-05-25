@@ -48,8 +48,8 @@ class FurnitureModule(ApiModule):
 
 		furniture_data = furniture_data_template.load_client(dataid, client)
 		furniture_shop = furniture_shop_template.load_client(dataid, client)
-
-		return Furniture(furniture_data, furniture_shop)
+		if furniture_data is not None and furniture_shop is not None:
+			return Furniture(furniture_data, furniture_shop)
 
 	def all_client_ids(self, client: Client) -> Iterable[int]:
 		furniture_data_template = self._getmodule("furniture_data_template")
@@ -61,12 +61,12 @@ class ExtendedEquipDataStatistics(ApiModule):
 		equip_data_statistics = self._getmodule("equip_data_statistics")
 
 		def_data = equip_data_statistics.load_client(dataid, client)
-		
-		if isinstance(def_data, EquipStatUpgrade):
-			base_data = def_data.base.load(self._api, client)
-			return ExtendedEquipStat(def_data, base_data)
-		else:
-			return ExtendedEquipStat(def_data)
+		if def_data is not None:
+			if isinstance(def_data, EquipStatUpgrade):
+				base_data = def_data.base.load(self._api, client)
+				return ExtendedEquipStat(def_data, base_data)
+			else:
+				return ExtendedEquipStat(def_data)
 
 	def all_client_ids(self, client: Client) -> Iterable[int]:
 		equip_data_statistics = self._getmodule("equip_data_statistics")

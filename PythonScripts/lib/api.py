@@ -313,10 +313,12 @@ class MergedSharecfgData(ApiData):
 
 	def __getattr__(self, name):
 		for sdata in self._scfgdata:
-			data = getattr(sdata, name, None)
-			if data is not None:
+			try:
+				data = getattr(sdata, name)
 				return data
-		raise AttributeError
+			except AttributeError as e:
+				pass
+		raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{name}'")
 
 	def __contains__(self, key):
 		for sdata in self._scfgdata:
