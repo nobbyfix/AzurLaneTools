@@ -374,11 +374,15 @@ class Module(metaclass=ABCMeta):
 		Returns all dataids that are associated with *client* as an iterable.
 		"""
 
-	def all_client(self, client: Client, id_filter: Callable[[int], bool] = None) -> Generator[ApiData]:
+	def all_client(self, client: Client, id_filter: Callable[[Union[int, str]], bool] = None) -> Generator[ApiData]:
 		"""
 		Returns all ApiData entries associated with *client* as a generator.
 
 		An *id_filter* can be used to pre-filter certain entries using their ids.
+		The id_filter is a callable that takes an ApiData ID as input and returns whether it
+		should be included or not as a boolean.
+		There is no guarantee about the type of the ApiData ID, it should be assumed that both
+		strings or integer can be supplied.
 		"""
 		if id_filter:
 			filtered_ids = [dataid for dataid in self.all_client_ids(client) if not id_filter(dataid)]
@@ -414,12 +418,16 @@ class Module(metaclass=ABCMeta):
 				ids = ids.union(client_ids)
 		return ids
 
-	def load_all(self, clients: Iterable[Client], id_filter: Callable[[int], bool] = None) -> Generator[ApiData]:
+	def load_all(self, clients: Iterable[Client], id_filter: Callable[[Union[int, str]], bool] = None) -> Generator[ApiData]:
 		"""
 		Returns all ApiData entries associated with *clients* as a generator.
 		The ApiData returned for a certain dataid will be determined by Module.load_first.
 
 		An *id_filter* can be used to pre-filter certain entries using their ids.
+		The id_filter is a callable that takes an ApiData ID as input and returns whether it
+		should be included or not as a boolean.
+		There is no guarantee about the type of the ApiData ID, it should be assumed that both
+		strings or integer can be supplied.
 		"""
 		if id_filter:
 			filtered_ids = [dataid for dataid in self.all_ids(clients) if not id_filter(dataid)]
