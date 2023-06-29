@@ -10,6 +10,9 @@ version_hash_name = {
 	'l2dhash': VersionType.L2D,
 	'pichash': VersionType.PIC,
 	'bgmhash': VersionType.BGM,
+	'cipherhash': VersionType.CIPHER,
+	'mangahash': VersionType.MANGA,
+	'paintinghash': VersionType.PAINTING,
 }
 version_file_suffix = {
 	VersionType.AZL: '',
@@ -17,6 +20,9 @@ version_file_suffix = {
 	VersionType.L2D: '-live2d',
 	VersionType.PIC: '-pic',
 	VersionType.BGM: '-bgm',
+	VersionType.CIPHER: '-cipher',
+	VersionType.MANGA: '-manga',
+	VersionType.PAINTING: '-painting',
 }
 
 

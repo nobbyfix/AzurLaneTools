@@ -5,7 +5,7 @@ from typing import Optional, Union
 
 
 CompareType = Enum('CompareType', 'New Changed Unchanged Deleted')
-VersionType = Enum('VersionType', 'AZL CV L2D PIC BGM')
+VersionType = Enum('VersionType', 'AZL CV L2D PIC BGM CIPHER MANGA PAINTING')
 DownloadType = Enum('DownloadType', 'NoChange Removed Success Failed')
 
 
