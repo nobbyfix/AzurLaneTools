@@ -4,32 +4,15 @@ from typing import Generator, Iterable, Optional
 from .classes import DownloadType, HashRow, UpdateResult, VersionType, VersionResult
 
 
-version_hash_name = {
-	'azhash': VersionType.AZL,
-	'cvhash': VersionType.CV,
-	'l2dhash': VersionType.L2D,
-	'pichash': VersionType.PIC,
-	'bgmhash': VersionType.BGM,
-	'cipherhash': VersionType.CIPHER,
-	'mangahash': VersionType.MANGA,
-	'paintinghash': VersionType.PAINTING,
-}
-version_file_suffix = {
-	VersionType.AZL: '',
-	VersionType.CV: '-cv',
-	VersionType.L2D: '-live2d',
-	VersionType.PIC: '-pic',
-	VersionType.BGM: '-bgm',
-	VersionType.CIPHER: '-cipher',
-	VersionType.MANGA: '-manga',
-	VersionType.PAINTING: '-painting',
-}
-
-
 def parse_version_string(rawstring: str) -> VersionResult:
+	"""
+	Tries to parse the raw version string as returned by the game server into a VersionResult.
+
+	Raises NotImplementedError if the versiontype does not exist.
+	"""
 	parts = rawstring.split('$')[1:]
 	versionname = parts[0]
-	versiontype = version_hash_name.get(versionname)
+	versiontype = VersionType.from_hashname(versionname)
 	if not versiontype:
 		raise NotImplementedError(f'Unknown versionname {versionname}.')
 
@@ -40,15 +23,13 @@ def parse_version_string(rawstring: str) -> VersionResult:
 
 
 def load_version_string(version_type: VersionType, relative_parent_dir: Path) -> Optional[str]:
-	fname = 'version'+version_file_suffix[version_type]+'.txt'
-	fpath = Path(relative_parent_dir, fname)
+	fpath = Path(relative_parent_dir, version_type.version_filename)
 	if fpath.exists():
 		with open(fpath, 'r') as f:
 			return f.read()
 
 def save_version_string(version_type: VersionType, relative_parent_dir: Path, content: str):
-	fname = 'version'+version_file_suffix[version_type]+'.txt'
-	with open(Path(relative_parent_dir, fname), 'w', encoding='utf8') as f:
+	with open(Path(relative_parent_dir, version_type.version_filename), 'w', encoding='utf8') as f:
 		f.write(content)
 
 def save_version_string2(version_result: VersionResult, relative_parent_dir: Path):
@@ -65,8 +46,7 @@ def parse_hash_rows(hashes: str) -> Generator[HashRow, None, None]:
 		yield HashRow(path, int(size), md5hash)
 
 def load_hash_file(version_type: VersionType, relative_parent_dir: Path) -> Optional[Generator[HashRow, None, None]]:
-	fname = 'hashes'+version_file_suffix[version_type]+'.csv'
-	fpath = Path(relative_parent_dir, fname)
+	fpath = Path(relative_parent_dir, version_type.hashes_filename)
 	if fpath.exists():
 		with open(fpath, 'r', encoding='utf8') as f:
 			return parse_hash_rows(f.read())
@@ -74,8 +54,7 @@ def load_hash_file(version_type: VersionType, relative_parent_dir: Path) -> Opti
 def save_hash_file(version_type: VersionType, relative_parent_dir: Path, hashrows: Iterable[HashRow]):
 	rowstrings = [f"{row.filepath},{row.size},{row.md5hash}" for row in hashrows if row]
 	content = '\n'.join(rowstrings)
-	fname = 'hashes'+version_file_suffix[version_type]+'.csv'
-	with open(Path(relative_parent_dir, fname), 'w') as f:
+	with open(Path(relative_parent_dir, version_type.hashes_filename), 'w') as f:
 		f.write(content)
 
 def update_version_data(version_type: VersionType, relative_parent_dir: Path, version_string: str, hashrows: Iterable[HashRow]):

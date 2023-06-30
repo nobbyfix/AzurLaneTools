@@ -98,7 +98,7 @@ class Nation(Enum):
 	VENUS_VACATION		= (106,	"Venus Vacation")
 	IDOLMASTER			= (107,	"The Idolmaster")
 	SSSS				= (108,	"SSSS")
-	ATELIER_RYZA			= (109,	"Atelier Ryza")
+	ATELIER_RYZA		= (109,	"Atelier Ryza")
 
 	def __new__(cls, nation_id, label):
 		obj = object.__new__(cls)
