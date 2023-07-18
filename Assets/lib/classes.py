@@ -40,7 +40,7 @@ class VersionType(Enum):
 		Full version filename using the suffix.
 		"""
 		suffix = self.suffix
-		if suffix: suffix += "-"
+		if suffix: suffix = "-"+suffix
 		return f"version{suffix}.txt"
 
 	@property
@@ -49,7 +49,7 @@ class VersionType(Enum):
 		Full hashes filename using the suffix.
 		"""
 		suffix = self.suffix
-		if suffix: suffix += "-"
+		if suffix: suffix = "-"+suffix
 		return f"hashes{suffix}.csv"
 
 
