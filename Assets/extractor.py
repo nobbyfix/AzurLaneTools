@@ -1,4 +1,5 @@
 #!/usr/bin/env python3.9
+import itertools
 from argparse import ArgumentParser
 from pathlib import Path
 import multiprocessing as mp
@@ -73,7 +74,12 @@ def extract_by_client(client: Client):
 	userconfig = config.load_user_config()
 	client_directory = Path(userconfig.asset_directory, client.name)
 	extract_directory = Path(userconfig.extract_directory, client.name)
-	downloaded_files = get_diff_files(client_directory, VersionType.AZL, DownloadType.Success)
+
+	downloaded_files_collection = []
+	for vtype in [VersionType.AZL, VersionType.PAINTING, VersionType.MANGA, VersionType.PIC]:
+		downloaded_files = get_diff_files(client_directory, vtype, DownloadType.Success)
+		downloaded_files_collection.append(downloaded_files)
+	downloaded_files_collection = itertools.chain(*downloaded_files_collection)
 
 	def _filter(assetpath: str):
 		if assetpath.split('/')[0] in userconfig.extract_filter:
@@ -81,7 +87,7 @@ def extract_by_client(client: Client):
 		return userconfig.extract_isblacklist
 
 	with mp.Pool(processes=mp.cpu_count()-1) as pool:
-		for assetpath in filter(_filter, downloaded_files):
+		for assetpath in filter(_filter, downloaded_files_collection):
 			pool.apply_async(extract_assetbundle, (Path(client_directory, 'AssetBundles'), assetpath, extract_directory,))
 
 		# explicitly join pool
