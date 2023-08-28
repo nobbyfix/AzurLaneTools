@@ -4,7 +4,7 @@ from typing import Union
 from collections.abc import Iterable
 
 from . import Client, SharecfgModule, Utility
-from .apiclasses import (ApiDataRef, LoginRewards, SharecfgDataRef, AwardDisplay, Award, BackyardTheme,
+from .apiclasses import (ApiDataRef, LoginRewards, SharecfgDataRef, AwardDisplay, AwardDisplayLabeled, Award, BackyardTheme,
 	Chapter, Code, EquipStat, EquipStatUpgrade, Expedition, FurnitureData, Item, MetashipSkill,
 	MetataskRef, Metatask, Milestone, Resource, ShipID, ShipSkin, ShipStat, ShopItem, Task)
 from .Constants import Armor, Rarity, Nation, Attribute, ShipType
@@ -44,7 +44,6 @@ class BackyardThemeTemplate(SharecfgModule):
 			json=data,
 			furniture=[ApiDataRef(fid, "furniture") for fid in data["ids"]]
 		)
-
 
 
 def convert_shiptype(typeid: Union[str, int]) -> Union[ShipType, int]:
@@ -103,11 +102,20 @@ class EquipDataStatistics(SharecfgModule):
 
 @dataclass
 class ExpeditionDataTemplate(SharecfgModule):
+	def parse_awarddata(self, awarddata, dataid: str) -> AwardDisplay:
+		if len(awarddata) == 2:
+			return AwardDisplay(*awarddata)
+		elif len(awarddata) == 3:
+			return AwardDisplayLabeled(*awarddata)
+		else:
+			print(f"WARNING: Found AwardDisplay with more/less than 2 arguments (dataid: {dataid})")
+			print(f"WARNING: AwardDisplay raw data <{awarddata}>")
+
 	def _instantiate_client(self, dataid: str, data: dict) -> Expedition:
 		return Expedition(
 			json=data,
 			icons=[icon for icon in (data["icon"].strip(), data["add_icon"].strip()) if icon],
-			award_display=[AwardDisplay(*awarddata) for awarddata in data["award_display"]],
+			award_display=[self.parse_awarddata(awarddata, dataid) for awarddata in data["award_display"]],
 		)
 
 @dataclass

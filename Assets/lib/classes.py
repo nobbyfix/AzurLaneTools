@@ -5,8 +5,60 @@ from typing import Optional, Union
 
 
 CompareType = Enum('CompareType', 'New Changed Unchanged Deleted')
-VersionType = Enum('VersionType', 'AZL CV L2D PIC BGM')
 DownloadType = Enum('DownloadType', 'NoChange Removed Success Failed')
+
+class VersionType(Enum):
+	__hash2member_map__: dict[str, "VersionType"] = {}
+	hashname: str
+	"""Hash name used on the version result returned by the game server."""
+	suffix: str
+	"""Suffix used on version and hash files."""
+
+	AZL			= (1,	"azhash",		"")
+	CV			= (2,	"cvhash",		"cv")
+	L2D			= (3,	"l2dhash",		"live2d")
+	PIC			= (4,	"pichash",		"pic")
+	BGM			= (5,	"bgmhash",		"bgm")
+	CIPHER		= (6,	"cipherhash",	"cipher")
+	MANGA		= (7,	"mangahash",	"manga")
+	PAINTING	= (8,	"paintinghash",	"painting")
+
+
+	def __init__(self, _, hashname, suffix) -> None:
+		# add attributes to enum objects
+		self.hashname = hashname
+		self.suffix = suffix
+		# add enum objects to member maps
+		self.__hash2member_map__[hashname] = self
+
+	def __str__(self) -> str:
+		return self.label
+
+	@property
+	def version_filename(self) -> str:
+		"""
+		Full version filename using the suffix.
+		"""
+		suffix = self.suffix
+		if suffix: suffix = "-"+suffix
+		return f"version{suffix}.txt"
+
+	@property
+	def hashes_filename(self) -> str:
+		"""
+		Full hashes filename using the suffix.
+		"""
+		suffix = self.suffix
+		if suffix: suffix = "-"+suffix
+		return f"hashes{suffix}.csv"
+
+
+	@classmethod
+	def from_hashname(cls, hashname: str) -> Optional["VersionType"]:
+		"""
+		Returns a VersionType member with matching *hashname* if match exists, otherwise None.
+		"""
+		return cls.__hash2member_map__.get(hashname)
 
 
 class AbstractClient(Enum):
