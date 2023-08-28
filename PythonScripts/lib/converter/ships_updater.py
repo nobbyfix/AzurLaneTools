@@ -22,6 +22,9 @@ def update_converter(convert_fp: PathLike, override_fp: PathLike, api: ALJsonAPI
 	conversions = {'ship': dict(), 'groupid': dict()}
 
 	def idfilter(dataid: int) -> bool:
+		if type(dataid) == str:
+			if not dataid.isdigit(): return True
+			else: dataid = int(dataid)
 		if dataid%10 != 1: return True
 		if dataid//1000 == 900: return True
 		if dataid == 901001: return True

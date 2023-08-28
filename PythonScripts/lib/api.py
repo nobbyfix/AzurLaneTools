@@ -50,7 +50,7 @@ class Client(_Client):
 	"""
 	Enum class that implements all available azur lane client variants.
 
-	When used as as iterator, the default order is EN > CN > JP > KR > TW.
+	When used as iterator, the default order is EN > CN > JP > KR > TW.
 	"""
 	EN = (1, True, 'en-US', 'com.YoStarEN.AzurLane')
 	CN = (3, True, 'zh-CN', None)
@@ -469,7 +469,6 @@ class SharecfgModule(Module):
 				# has to be done on sharecfg load, otherwise all_id functions return None
 				if self._settings.is_sharecfgdata or self._settings.is_sharecfgdata2:
 					self._do_sharecfgdata_loading(client, jsondata)
-
 			except FileNotFoundError:
 				self._data[client] = None
 		# return *client* json data for easier access in data loader methods
