@@ -37,7 +37,8 @@ def update_converter(convert_fp: PathLike, wiki_namecache_fp: PathLike, api: ALJ
 
 		json_res_data = { "gameid": gameid, "icon": icon, "gamename": gamename, "wikiname": wikiname }
 		for k1, k2 in (("icon", str(icon)), ("gameid", str(gameid)), ("gamename", gamename), ("wikiname", wikiname)):
-			conversions[k1][k2] = json_res_data
+			if k2:
+				conversions[k1][k2] = json_res_data
 
 	# save data to file
 	with open(convert_fp, 'w', encoding="utf8") as f:

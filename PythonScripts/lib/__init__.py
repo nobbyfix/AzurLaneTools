@@ -4,7 +4,7 @@ from typing import Union
 
 from .api import Client, JsonLoader, nobbyfix_JsonLoader, AzurLaneTools_JsonLoader, ApiModule, SharecfgModule
 from . import apimodules, sharecfgmodules, Constants
-from .converter import ships, equips
+from .converter import ships, equips, augments
 
 
 ### USEFUL CONSTANTS
@@ -27,6 +27,7 @@ class ALJsonAPI:
 	loader: JsonLoader
 	ship_converter: ships.ShipIDConverter
 	equip_converter: equips.EquipConverter
+	augment_converter: augments.AugmentConverter
 
 	def __init__(self, loader: JsonLoader = None, source_path: Path = None) -> None:
 		"""
@@ -50,6 +51,9 @@ class ALJsonAPI:
 		if name == "equip_converter":
 			self.equip_converter = equips.load_converter(Constants.EQUIP_CONVERT_CACHE_PATH)
 			return self.equip_converter
+		if name == "augment_converter":
+			self.augment_converter = augments.load_converter(Constants.AUGMENT_CONVERT_CACHE_PATH)
+			return self.augment_converter
 		raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{name}'")
 
 	### Module Loader Methods

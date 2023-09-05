@@ -25,7 +25,7 @@ def update_converter(convert_fp: PathLike, override_fp: PathLike, api: ALJsonAPI
 	def idfilter(dataid: Union[int, str]) -> bool:
 		try:
 			dataid = int(dataid)
-		except: return False
+		except: return True
 		if dataid%10 != 1: return True
 		if dataid//1000 == 900: return True
 		if dataid == 901001: return True

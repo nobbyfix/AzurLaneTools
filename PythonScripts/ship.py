@@ -107,22 +107,22 @@ attribute_research = {
 }
 
 equipment_slots = {
-	1: 'DD Guns',
-	2: 'CL Guns',
-	3: 'CA Guns',
-	4: 'BB Guns',
+	1: 'DD Main Guns',
+	2: 'CL Main Guns',
+	3: 'CA Main Guns',
+	4: 'BB Main Guns',
 	5: 'Torpedoes',
 	6: 'Anti-Air Guns',
 	7: 'Fighters',
 	8: 'Torpedo Bombers',
 	9: 'Dive Bombers',
 	10: 'Auxiliary Equipment',
-	11: 'CB Guns', 
+	11: 'CB Main Guns',
 	12: 'Seaplanes',
 	13: 'Submarine Torpedoes',
 	14: 'Auxiliary Equipment',
-#	15: 'ASW Aircraft', # NOT EXISTING
-#	17: 'Helicopter', # NOT EXISTING
+	15: 'ASW Bombers',
+#	17: 'Helicopter', # NOT EXISTING (outside aux slots)
 	18: 'Goods',
 	21: 'Fuze AA guns', #No one rly cares
 #	[1, 7]: 'DD Guns/Fighters on first Limit Break',
@@ -217,21 +217,22 @@ DD_buffs = {
 
 def equip_string(eqlist):
 	if len(eqlist) == 1: return equipment_slots[eqlist[0]]
-	if (3 in eqlist) and (4 in eqlist): return 'CA/CB Guns'
-	if (3 in eqlist) and (11 in eqlist): return 'CA/CB Guns'
-	if (3 in eqlist) and (2 in eqlist): return 'CA/CL Guns'
-	#if (2 in eqlist) and (1 in eqlist) and (12 in retrolist): return 'CL/DD Guns (Seaplanes on retrofit)'
-	if (2 in eqlist) and (1 in eqlist): return 'CL/DD Guns'
-	#if (2 in eqlist) and (3 in retrolist): return 'CL Guns (CA Guns on retrofit)'
-	if (1 in eqlist) and (6 in eqlist): return 'DD Guns/Anti-Air Guns'
-	if (2 in eqlist) and (6 in eqlist): return 'CL Guns/Anti-Air Guns'
-	if (2 in eqlist) and (9 in eqlist): return 'CL Guns/Dive Bombers'
-	#if (5 in eqlist) and (1 in retrolist): return 'Torpedoes/DD Guns (retrofit)'
+	if (3 in eqlist) and (4 in eqlist): return 'CA/CB Main Guns'
+	if (3 in eqlist) and (11 in eqlist): return 'CA/CB Main Guns'
+	if (3 in eqlist) and (2 in eqlist): return 'CA/CL Main Guns'
+	#if (2 in eqlist) and (1 in eqlist) and (12 in retrolist): return 'CL/DD Main Guns (Seaplanes on retrofit)'
+	if (2 in eqlist) and (1 in eqlist): return 'CL/DD Main Guns'
+	#if (2 in eqlist) and (3 in retrolist): return 'CL Main Guns (CA Main Guns on retrofit)'
+	if (1 in eqlist) and (6 in eqlist): return 'DD Main Guns/Anti-Air Guns'
+	if (2 in eqlist) and (6 in eqlist): return 'CL Main Guns/Anti-Air Guns'
+	if (2 in eqlist) and (9 in eqlist): return 'CL Main Guns/Dive Bombers'
+	#if (5 in eqlist) and (1 in retrolist): return 'Torpedoes/DD Main Guns (retrofit)'
 	if (10 in eqlist) and (18 in eqlist): return 'Auxiliary Equipment/Cargo'
-	if (2 in eqlist) and (10 in eqlist): return 'CL Guns/Auxiliary Equipment'
+	if (2 in eqlist) and (10 in eqlist): return 'CL Main Guns/Auxiliary Equipment'
 	if (5 in eqlist) and (10 in eqlist): return 'Torpedoes/Auxiliary Equipment'
 	if (6 in eqlist) and (10 in eqlist): return 'Anti-Air Guns/Auxiliary Equipment'
 	if (6 in eqlist) and (21 in eqlist): return 'Anti-Air Guns'
+	if (6 in eqlist) and (15 in eqlist): return 'Anti-Air Guns/ASW Bombers'
 	raise ValueError(f'Equipment types {eqlist} are unknown.')
 
 def oil_consumption(start, end, level, api):
@@ -479,7 +480,7 @@ def getGameData(ship_groupid, api: ALJsonAPI, clients: Iterable[Client]):
 				if research_data:
 					enhance_val = enhance_list[enhanceslot]/100
 				else:
-					ship_data['ReinforcementValue'] += str(enhance_data.attr_exp[enhanceslot])+' {{'+attr.wiki_template_name+'}} '
+					ship_data['ReinforcementValue'] += ' {{'+attr.wiki_template_name+'}} ' + str(enhance_data.attr_exp[enhanceslot])
 			if research_data:
 				enhance_val += strengthen_data.get(str(attr).lower(),0)#Dirty, but works
 		else:
@@ -560,18 +561,12 @@ def getGameData(ship_groupid, api: ALJsonAPI, clients: Iterable[Client]):
 			ghost_equip = stat['fix_equip_list']
 			print(f"Equip ghost equip {ghost_equip} @ LB{i}")
 
-	augment = spweapon_data_statistics.load_all(clients,lambda x: x%20!=0 or x>100000)
-	aug10_id = None
-	for i in augment:
-		try:
-			if i.unique == ship_groupid:
-				aug10_id = int(i.id)+10
-				aug10 = spweapon_data_statistics.load_first(aug10_id,clients)
-				ship_data['MeleeOverride'] = augment_defaults[shipstat[0].type].format(i.name)
-				augment_skill = aug10.skill_upgrade[0]
-				break
-		except AttributeError:
-			pass
+	augment = api.augment_converter.from_shipid(ship_groupid)
+	if augment:
+		ship_data['MeleeOverride'] = augment_defaults[shipstat[0].type].format(augment.wikiname)
+		aug10_id = int(augment.id)+10
+		aug10 = spweapon_data_statistics.load_first(aug10_id,clients)
+		augment_skill = aug10.skill_upgrade[0]
 
 	# RETROFIT
 	retrofit_data = ship_data_trans.load_first(ship_groupid, DEFAULT_CLIENTS)
@@ -596,18 +591,26 @@ def getGameData(ship_groupid, api: ALJsonAPI, clients: Iterable[Client]):
 				retro_node_id = retro_node[1]
 				nodeid_to_letter[retro_node_id] = letter
 				retro_node_data = transform_data_template.load_first(retro_node_id, DEFAULT_CLIENTS)
+
+				ship_data['Index'+letter] = letter
+				icon = retro_node_data['icon'].lower()
+				if icon[:5] == "mode_": continue
+				if icon in retroicon_convert: icon = retroicon_convert[icon]
+				ship_data['RetrofitImage'+letter] = icon
+				ship_data['ProjName'+letter] = retro_node_data['name']
+				ship_data['ProjType'+letter] = retroicon_class[icon]
 				
 				# RETROFIT INTO DIFFERENT SHIP_ID
-				if retro_node_data['ship_id']: # (Usually only entered once at most, in case of DDGs thrice)
+				if retro_node_data['ship_id']: # (Only entered once at most)
 					retro_ship_id = retro_node_data['ship_id'][0][1]
-					retrostat = ship_data_statistics.load_first(f"{retro_ship_id}", clients)
-					retrovals = ship_data_template.load_first(f"{retro_ship_id}", clients)
+					retrostat = ship_data_statistics.load_first(retro_ship_id, clients)
+					retrovals = ship_data_template.load_first(retro_ship_id, clients)
 					retro_type = retrostat.type.typename
 					if retro_type != ship_data['Type']:
 						ship_data['SubtypeRetro'] = retro_type
 					attr_dicts = [retrostat.attributes, retrostat.attributes_growth]
 					retro_attrs = {k: [d[k] for d in attr_dicts] for k in attr_dicts[0]}
-					retro_enhance_id = ship_data_template.load_first(retro_ship_id, clients).strengthen_id
+					retro_enhance_id = retrovals.strengthen_id
 					retro_enhance_data = ship_data_strengthen.load_first(retro_enhance_id, clients)
 					
 					for attr, attr_vals in retro_attrs.items():
@@ -633,14 +636,10 @@ def getGameData(ship_groupid, api: ALJsonAPI, clients: Iterable[Client]):
 							print(f'{shipstat[0].name}: Changed equipment @ Retrofit and {i+1} Slot: from {equip_type_old[i+1]} to {equip_type_new}.')
 						equip_type_old[i+1] = equip_type_new
 					#Equip slots that change at retrofit not implemented
+				
+				if retro_node_data.descrip:
+					print(f'{retro_node_data.name} Description: "{retro_node_data.descrip}"')
 
-				ship_data['Index'+letter] = letter
-				icon = retro_node_data['icon'].lower()
-				if icon[:5] == "mode_": continue
-				if icon in retroicon_convert: icon = retroicon_convert[icon]
-				ship_data['RetrofitImage'+letter] = icon
-				ship_data['ProjName'+letter] = retro_node_data['name']
-				ship_data['ProjType'+letter] = retroicon_class[icon]
 				attribute = ''
 				attribute_data = dict()
 				for effect in retro_node_data['effect']:
@@ -653,7 +652,7 @@ def getGameData(ship_groupid, api: ALJsonAPI, clients: Iterable[Client]):
 					if firstattr: firstattr = False
 					else: attribute += ', '
 					valtype = 'Normal'
-					if attribute_code == 'skill_id':
+					if attribute_code == 'skill_id': #Will break if this is entered more than once
 						retro_skill = skill_data_template.load_client(values[0], Client.EN)
 						attribute += f'Unlock Skill "{retro_skill.name}"'
 						continue
@@ -664,7 +663,8 @@ def getGameData(ship_groupid, api: ALJsonAPI, clients: Iterable[Client]):
 					elif attribute_code in attributes_retro:
 						try: retro_effs[attributes_retro[attribute_code]] += sum(map(lambda x: int(str(x)[2:]),values))
 						except: retro_effs[attributes_retro[attribute_code]] = sum(map(lambda x: int(str(x)[2:]),values))
-						attribute += attributes_retro[attribute_code] + ' '
+						attribute += retro_node_data.name.split('Improvement')[0] + 'Efficiency '
+						#print(attributes_retro[attribute_code], values) #Useful to check which retro Eff upgrade has a wrong name if there is one
 						valtype = 'Eff'
 					else:
 						raise NotImplementedError(f"not implemented retro attribute '{attribute_code}'")
@@ -676,7 +676,7 @@ def getGameData(ship_groupid, api: ALJsonAPI, clients: Iterable[Client]):
 
 						if valtype == 'Eff': value = str(int(value*100))+'%'
 						else: attribute += attribute_name + ' '
-						attribute += '+'+str(value)
+						attribute += '+' + str(value)
 
 				ship_data['Attribute'+letter] = attribute
 
@@ -761,8 +761,8 @@ def getGameData(ship_groupid, api: ALJsonAPI, clients: Iterable[Client]):
 	# SKILLS
 	#Initialise skill list for LB1 (For AoA, LB0 if Bulin) and full skill_list
 	if shipvals[1]:
-		skill_list_0 = shipvals[1]['buff_list_display']#[i for i in shipvals[1]['buff_list_display'] if i in shipvals[1]['buff_list']]
-		skill_list_n = shipvals[1]['buff_list']
+		skill_list_0 = shipvals[1]['buff_list_display']
+		skill_list_n = set(shipvals[1]['buff_list'])|(set(skill_list_0)&set(shipvals[3]['buff_list']))
 	else:
 		skill_list_0 = shipvals[0]['buff_list_display']
 		skill_list_n = shipvals[0]['buff_list']
@@ -770,7 +770,7 @@ def getGameData(ship_groupid, api: ALJsonAPI, clients: Iterable[Client]):
 	skill_list = [(i,'') if i in skill_list_n or shipstat[0].nation == Constants.Nation.META else (i,'RN') for i in skill_list_0]
 	if shipvals[3]:
                 #Insert skills changed by LB (AoA) in skill_list after the original skill (Wouldn't handle jumbled order of skills well) 
-		skill_list_3 = shipvals[3]['buff_list_display']#[i for i in shipvals[3]['buff_list_display'] if i in shipvals[1]['buff_list']]
+		skill_list_3 = shipvals[3]['buff_list_display']
 		if skill_list_3 != skill_list_0:
 			c = 0
 			for i in skill_list_3:
@@ -778,7 +778,7 @@ def getGameData(ship_groupid, api: ALJsonAPI, clients: Iterable[Client]):
 					c += 1
 					skill_list.insert(c,(i,'LB'))
 				c += 1
-	if aug10_id:
+	if augment:
 		old,new = augment_skill
 		for n,i in enumerate(skill_list):
 			if i[0] == old:
@@ -832,7 +832,8 @@ def getGameData(ship_groupid, api: ALJsonAPI, clients: Iterable[Client]):
 		skill_data_main = skill_data_template.load_client(skillid, skill_data_client)
 		for client in [Client.CN, Client.JP]:
 			if skill_data := skill_data_template.load_client(skillid, client):
-				ship_temp_data['Skill'+str(skill_n)+client.name] = api.replace_namecode(skill_data['name'], client)
+				try: ship_temp_data['Skill'+str(skill_n)+client.name] = api.replace_namecode(skill_data['name'], client)
+				except: pass
 				if not skill_data_main:
 					skill_data_client = client
 					skill_data_main = skill_data
@@ -846,7 +847,8 @@ def getGameData(ship_groupid, api: ALJsonAPI, clients: Iterable[Client]):
 		if i[1] == 'LB':
 			#For AoA get AoA 1 and AoA 2 name and desc
 			name1 = ship_data['Skill'+str(skill_n-1)]
-			name2 = api.replace_namecode(skill_data_main.name, skill_data_client)
+			try: name2 = api.replace_namecode(skill_data_main.name, skill_data_client)
+			except: pass
 			desc1 = ship_data['Skill'+str(skill_n-1)+'Desc']
 
 			words1 = re.sub(r'; (\w)',lambda m: '. '+m.expand(r'\1').upper(),desc1).split(' ')
@@ -879,7 +881,8 @@ def getGameData(ship_groupid, api: ALJsonAPI, clients: Iterable[Client]):
 			ship_data['Skill'+str(skill_n-1)+'Desc'] += f"\n'''(Upon Retrofit)''' {desc}"
 		else:
 			#All of these add a new skill to the list
-			ship_data['Skill'+str(skill_n)+'Desc'] = api.replace_namecode(desc, skill_data_client)
+			try: ship_data['Skill'+str(skill_n)+'Desc'] = api.replace_namecode(desc, skill_data_client)
+			except: ship_data['Skill'+str(skill_n)+'Desc'] = desc
 			if 'R' in i[1]:
 				#Retrofit skill
 				ship_data['Skill'+str(skill_n)] = '(Retrofit) '
@@ -899,7 +902,8 @@ def getGameData(ship_groupid, api: ALJsonAPI, clients: Iterable[Client]):
 				#Only base skills left now
 				ship_data['Skill'+str(skill_n)] = ''
 
-			ship_data['Skill'+str(skill_n)] += api.replace_namecode(skill_data_main['name'], skill_data_client)
+			try: ship_data['Skill'+str(skill_n)] += api.replace_namecode(skill_data_main['name'], skill_data_client)
+			except: pass
 			for client in [Client.CN, Client.JP]:
 				ship_data['Skill'+str(skill_n)+client.name] = ship_temp_data.get('Skill'+str(skill_n)+client.name,'Skill'+str(skill_n)+client.name)
 			buffdata = api.loader.load_buff(skillid, skill_data_client)

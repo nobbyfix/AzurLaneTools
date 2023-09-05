@@ -11,6 +11,7 @@ def request_equips(wikiclient: WikiClient, offset=0):
 		limit=500,
 		tables="equipment",
 		fields="equipment.Name,equipment.Image",
+		where="equipment.Type != 'Augment Module'",
 		offset=offset)
 	return result['cargoquery']
 
