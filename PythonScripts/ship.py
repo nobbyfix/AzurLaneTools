@@ -30,7 +30,9 @@ augment_defaults = {
 	ShipType.SSV: "[[{}]], [[Kunai]], [[Dagger]]",
 	ShipType.CB: "[[{}]], [[Lance]], [[Greatsword]]",
 	ShipType.AE: "[[{}]], [[Lance]], [[Greatsword]]",
-	ShipType.IX: "[[{}]]"
+	ShipType.IX_S: "[[{}]]",
+	ShipType.IX_V: "[[{}]]",
+	ShipType.IX_M: "[[{}]]",
 }
 
 tech_type_defaults = {
@@ -48,7 +50,9 @@ tech_type_defaults = {
 	ShipType.SSV: {8, 17},
 	ShipType.CB: {3, 13, 18},
 	ShipType.AE: {19},
-	ShipType.IX: {22}
+	ShipType.IX_S: {22,23,24},
+	ShipType.IX_V: {22,23,24},
+	ShipType.IX_M: {22,23,24}
 }
 allowed_tech_types = set(tech_type_defaults.keys())
 
