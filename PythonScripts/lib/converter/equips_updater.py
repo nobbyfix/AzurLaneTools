@@ -13,10 +13,10 @@ def load_wikinames(filepath: PathLike) -> dict[int, str]:
 	conversions = {}
 	for entry in wikidata:
 		data = entry['title']
-		image = int(data['Image'].strip(".png"))
-		if image in conversions: continue
+		baseid = int(data['BaseID'].strip(".png"))
+		if baseid in conversions: continue
 		name = html.unescape(data['Name'])
-		conversions[image] = name
+		conversions[baseid] = name
 	return conversions
 
 
@@ -33,7 +33,7 @@ def update_converter(convert_fp: PathLike, wiki_namecache_fp: PathLike, api: ALJ
 		gameid = equipstat.id
 		gamename = equipstat.name
 		icon = int(equipstat.icon)
-		wikiname = overrides.get(gameid) or overrides.get(icon) or ''
+		wikiname = overrides.get(gameid) or ''
 
 		json_res_data = { "gameid": gameid, "icon": icon, "gamename": gamename, "wikiname": wikiname }
 		for k1, k2 in (("icon", str(icon)), ("gameid", str(gameid)), ("gamename", gamename), ("wikiname", wikiname)):
