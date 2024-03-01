@@ -73,25 +73,33 @@ class AwardDisplay:
 
 	"""
 	unimplemented:
-	10	NPC_SHIP
-	12	WORLD_ITEM
-	13	WORLD_COLLECTION
+	10		DROP_TYPE_OPERATION
+	13		DROP_TYPE_WORLD_COLLECTION
+	19		DROP_TYPE_LOVE_LETTER
+	22		DROP_TYPE_META_PT
+	1000	DROP_TYPE_USE_ACTIVITY_DROP
+	1001	DROP_TYPE_RYZA_DROP
+	1002	DROP_TYPE_WORKBENCH_DROP
+	1003	DROP_TYPE_FEAST_DROP
 	"""
-	# see const.lua for all drop types an m02.lua#updateDropCfg for which the data source is
+	# see "const.lua" for all drop types and "model/vo/drop.lua" for which the data source is
 	def resolve(self) -> DataRef:
 		if self.type == 1: return ApiDataRef(id=self.refid, module="player_resource_reward")
-		if self.type == 2 or self.type == 8: return ApiDataRef(id=self.refid, module="all_item_data_statistics")
+		if self.type in [2,8]: return ApiDataRef(id=self.refid, module="all_item_data_statistics")
 		if self.type == 3: return SharecfgDataRef(id=self.refid, module="equip_data_statistics")
 		if self.type == 4: return ApiDataRef(id=self.refid, module="ship_reward")
 		if self.type == 5: return ApiDataRef(id=self.refid, module="furniture")
-
-		# not tested
 		if self.type == 6: return SharecfgDataRef(id=self.refid, module="strategy_data_template")
-		if self.type == 7: return SharecfgDataRef(id=self.refid, module="ship_skin_template")
+		if self.type in [7,23]: return SharecfgDataRef(id=self.refid, module="ship_skin_template")
 		if self.type == 9: return SharecfgDataRef(id=self.refid, module="equip_skin_template")
+		if self.type == 12: return SharecfgDataRef(id=self.refid, module="world_item_data_template")
 		if self.type == 14: return SharecfgDataRef(id=self.refid, module="item_data_frame")
 		if self.type == 15: return SharecfgDataRef(id=self.refid, module="item_data_chat")
 		if self.type == 17: return SharecfgDataRef(id=self.refid, module="emoji_template")
+		if self.type == 21: return SharecfgDataRef(id=self.refid, module="spweapon_data_statistics")
+		if self.type == 24: return SharecfgDataRef(id=self.refid, module="benefit_buff_template")
+		if self.type == 25: return SharecfgDataRef(id=self.refid, module="commander_data_template")
+		if self.type == 100: return SharecfgDataRef(id=self.refid, module="drop_data_restore")
 		raise NotImplementedError(f"Cannot resolve award of type {self.type}: Unknown or unimplemented type.")
 
 	def load(self, api: "ALJsonAPI", client: Client) -> Awardable:
