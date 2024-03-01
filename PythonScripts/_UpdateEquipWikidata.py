@@ -10,7 +10,7 @@ def request_equips(wikiclient: WikiClient, offset=0):
 		format="json",
 		limit=500,
 		tables="equipment",
-		fields="equipment.Name,equipment.Image",
+		fields="equipment.Name,equipment.BaseID",
 		where="equipment.Type != 'Augment Module'",
 		offset=offset)
 	return result['cargoquery']
