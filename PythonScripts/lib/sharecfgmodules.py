@@ -140,6 +140,9 @@ class ItemDataStatistics(SharecfgModule):
 		)
 
 @dataclass
+class ItemVirtualDataStatistics(ItemDataStatistics): pass
+
+@dataclass
 class NameCode(SharecfgModule):
 	# cjson converts the lua table into a json array, not a dict
 	# SharecfgModule expects a dict (to use the get function)
@@ -166,7 +169,7 @@ class PlayerResource(SharecfgModule):
 	def _instantiate_client(self, dataid: str, data: dict) -> Resource:
 			item = None
 			if (itemid := data["itemid"]) != 0:
-				item = SharecfgDataRef(itemid, "item_data_statistics")
+				item = ApiDataRef(itemid, "all_item_data_statistics")
 
 			return Resource(
 				json=data,
@@ -268,6 +271,7 @@ __all__ = {
 	"expedition_data_template": ExpeditionDataTemplate,
 	"furniture_data_template": FurnitureDataTemplate,
 	"item_data_statistics": ItemDataStatistics,
+	"item_virtual_data_statistics": ItemVirtualDataStatistics,
 	"name_code": NameCode,
 	"player_resource": PlayerResource,
 	"ship_data_statistics": ShipDataStatistics,

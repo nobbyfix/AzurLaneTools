@@ -308,7 +308,7 @@ def getGameData(ship_groupid, api: ALJsonAPI, clients: Iterable[Client]):
 	ship_meta_breakout = api.get_sharecfgmodule("ship_meta_breakout")
 	skill_data_template = api.get_sharecfgmodule("skill_data_template")
 	skill_world_display = api.get_sharecfgmodule("skill_world_display")
-	item_data_statistics = api.get_sharecfgmodule("item_data_statistics")
+	item_data_statistics = api.get_apimodule("all_item_data_statistics")
 	ship_data_by_star = api.get_sharecfgmodule("ship_data_by_star")
 	spweapon_data_statistics = api.get_sharecfgmodule("spweapon_data_statistics")
 	ShipConverter = api.ship_converter

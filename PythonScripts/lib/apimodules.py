@@ -1,3 +1,4 @@
+import itertools
 from dataclasses import dataclass
 from typing import Optional
 from collections.abc import Iterable
@@ -72,12 +73,31 @@ class ExtendedEquipDataStatistics(ApiModule):
 		equip_data_statistics = self._getmodule("equip_data_statistics")
 		return equip_data_statistics.all_client_ids(client)
 
+@dataclass
+class AllItemDataStatistics(ApiModule):
+	def _load_client(self, dataid: str, client: Client) -> Optional[Item]:
+		item_data_statistics = self._getmodule("item_data_statistics")
+		item_virtual_data_statistics = self._getmodule("item_virtual_data_statistics")
+
+		item_data = item_data_statistics.load_client(dataid, client)
+		item_virtual_data = item_virtual_data_statistics.load_client(dataid, client)
+		if item_data:
+			return item_data
+		else:
+			return item_virtual_data
+
+	def all_client_ids(self, client: Client) -> Iterable[int]:
+		item_data_statistics = self._getmodule("item_data_statistics")
+		item_virtual_data_statistics = self._getmodule("item_virtual_data_statistics")
+		return itertools.chain(item_data_statistics.all_client_ids(client), item_virtual_data_statistics.all_client_ids(client))
+
 
 __all__ = {
 	"player_resource_reward": PlayerResourceReward,
 	"ship_reward": ShipRewardModule,
 	"furniture": FurnitureModule,
 	"extended_equip_data_statistics": ExtendedEquipDataStatistics,
+	"all_item_data_statistics": AllItemDataStatistics,
 }
 
 def import_module(modulename: str) -> ApiModule:

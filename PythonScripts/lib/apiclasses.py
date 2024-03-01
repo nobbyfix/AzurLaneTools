@@ -80,7 +80,7 @@ class AwardDisplay:
 	# see const.lua for all drop types an m02.lua#updateDropCfg for which the data source is
 	def resolve(self) -> DataRef:
 		if self.type == 1: return ApiDataRef(id=self.refid, module="player_resource_reward")
-		if self.type == 2 or self.type == 8: return SharecfgDataRef(id=self.refid, module="item_data_statistics")
+		if self.type == 2 or self.type == 8: return ApiDataRef(id=self.refid, module="all_item_data_statistics")
 		if self.type == 3: return SharecfgDataRef(id=self.refid, module="equip_data_statistics")
 		if self.type == 4: return ApiDataRef(id=self.refid, module="ship_reward")
 		if self.type == 5: return ApiDataRef(id=self.refid, module="furniture")
@@ -213,7 +213,7 @@ class Code(SharecfgData): pass
 @APIdataclass
 class Resource(SharecfgData):
 	name: str
-	item: Optional[SharecfgDataRef]
+	item: Optional[ApiDataRef]
 
 @APIdataclass
 class ShipStat(SharecfgData):
