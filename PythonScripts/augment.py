@@ -1,14 +1,9 @@
-from abc import abstractmethod
 from argparse import ArgumentParser
-import math
 from difflib import get_close_matches
 from typing import Iterable
 
-from lib import ALJsonAPI, Client, DEFAULT_CLIENTS, Constants, WikiHelper, Utility
+from lib import ALJsonAPI, Client, WikiHelper, Utility
 from lib.Constants import ShipType as ship_types
-from lib.Constants import Armor as Armour
-from lib.Constants import Nation
-from lib.apiclasses import CachedAPILoader
 
 
 attributes = {

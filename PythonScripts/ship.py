@@ -6,7 +6,7 @@ import re
 
 from lib import ALJsonAPI, Client, DEFAULT_CLIENTS, Constants, WikiHelper, Utility
 from lib.apiclasses import CachedAPILoader
-from lib.Constants import Attribute, ShipType
+from lib.Constants import ShipType
 
 
 SKILL_TYPE = {
