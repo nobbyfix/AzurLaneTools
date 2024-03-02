@@ -162,7 +162,10 @@ class EnemyNameLoader(CachedAPILoader):
 					if "name" in entry:
 						self._cache[entry.icon] = (entry, entry.name in self._api.ship_converter.ship_to_id)
 					else:
-						self._cache[entry.icon] = (entry, False)
+						if entry_prev:
+							self._cache[entry.icon] = (entry_prev, False)
+						else:
+							self._cache[entry.icon] = (entry, False)
 	
 	def name_from_icon(self, icon: str) -> str:
 		if entry := self._cache.get(icon):
@@ -407,7 +410,7 @@ def main():
 		eventid = args.eventid[0] * args.mult
 		chapter_template = api.get_sharecfgmodule("chapter_template")
 		ids = chapter_template.all_client_ids(client)
-		mapids = filter(lambda mapid: 0 < (mapid - eventid) < 100, ids)
+		mapids = filter(lambda mapid: 0 < (int(mapid) - eventid) < 100, ids)
 
 	template_map = WikiHelper.MultilineTemplate("Map")
 	mapstrings = []
