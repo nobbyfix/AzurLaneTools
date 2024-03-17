@@ -28,16 +28,10 @@ property_limit_text = {
 property_limit_sign = {
 	-1: "<",
 	0: "=",
-	1: ">" }
-
-ship_str_limit_text = {
-	"zhan": "BC or BB",
-	"hang": "CV or CVL",
-	"qian": "SS or SSV",
-	"zhong": "CB or CA",
-	"fanqian": "DD or CL",
+	1: ">",
 }
 
+# "model/const/chapterconst.lua" with slot0.AttachX
 node_type_letter = {
 	-1: "x", # land
 	0: " ", # water
@@ -50,7 +44,6 @@ node_type_letter = {
 	7: "m", # matime_escort: mine
 	8: "b", # boss
 	9: "story", # story
-	10: "rival", # rival
 	11: "areaboss", # areaboss
 	12: "p", # siren (champion)
 	14: "torpedofleet", # torpedo-fleet

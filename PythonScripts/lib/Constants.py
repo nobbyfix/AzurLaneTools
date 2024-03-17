@@ -210,6 +210,7 @@ class ShipType(Enum):
 	ZHONG	= (-1,	"",				"",				"CB",	"CB or CA")
 	FANQIAN	= (-1,	"",				"",				"DD",	"DD or DDG or CL")
 	QUZHU	= (-1,	"",				"",				"DD",	"DD or DDG")
+	FEGNFAN	= (-1,	"",				"",				"IXs",	"IX")
 
 	def __init__(self, typeid, typename, catname, templatename, typetext):
 		# add attributes to enum objects

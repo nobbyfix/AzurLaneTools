@@ -134,7 +134,6 @@ class ShipID:
 	singleid: Optional[int]
 
 	def __init__(self, groupid: int = 0, fullid: int = 0):
-		if not (groupid or fullid): raise ValueError("ShipID needs either groupid or fullid to be set.")
 		if groupid and fullid:
 			self.fullid = fullid
 			self.groupid = groupid
@@ -147,6 +146,8 @@ class ShipID:
 			self.fullid = None
 			self.groupid = groupid
 			self.singleid = None
+		else:
+			raise ValueError("ShipID needs either groupid or fullid to be set.")
 
 	def __str__(self):
 		maxid = self.fullid if self.fullid else self.groupid
