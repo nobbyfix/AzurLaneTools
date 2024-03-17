@@ -12,7 +12,7 @@ from .apiclasses import Awardable, EquipStat, Item, ShipReward, Furniture
 
 
 class WikiClient():
-	def __init__(self, execution_delay: float = 1.5, settings_path: Path = Path('data', 'wiki_settings.json')):
+	def __init__(self, execution_delay: float = 1.5, settings_path: Path = WikiConstants.WIKICLIENT_SETTINGS_PATH):
 		self.settings_path = settings_path
 		self.execution_delay = execution_delay
 		self.last_execute_time = 0.0

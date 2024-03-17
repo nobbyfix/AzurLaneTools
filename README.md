@@ -4,4 +4,4 @@ Feel free to create pull requests and issues to let me know about problems or ju
 
 ## Additional Dependencies
 Lua 5.1 (with cjson)  
-Python 3.9
+Python 3.11 (or higher)

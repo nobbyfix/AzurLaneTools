@@ -2,8 +2,8 @@ import re
 from pathlib import Path
 from typing import Union
 
-from .api import Client, JsonLoader, nobbyfix_JsonLoader, AzurLaneTools_JsonLoader, ApiModule, SharecfgModule
-from . import apimodules, sharecfgmodules, Constants
+from .api import Client, JsonLoader, nobbyfix_JsonLoader, AzurLaneTools_JsonLoader, Module, ApiModule, SharecfgModule
+from . import settings, apimodules, sharecfgmodules, Constants
 from .converter import ships, equips, augments
 
 
@@ -11,6 +11,10 @@ from .converter import ships, equips, augments
 DEFAULT_CLIENTS = [Client.EN, Client.CN, Client.JP]
 NAMECODE = re.compile(r'(\{namecode:(\d+)\})')
 
+jsonloaders = {
+	"nobbyfix": nobbyfix_JsonLoader,
+	"AzurLaneTools": AzurLaneTools_JsonLoader,
+}
 
 
 class UnknownModuleError(Exception):
@@ -25,21 +29,29 @@ class ALJsonAPI:
 	_apimodules: dict[str, ApiModule]
 	_sharecfgmodules: dict[str, SharecfgModule]
 	loader: JsonLoader
+	apisettings: settings.APISettings
 	ship_converter: ships.ShipIDConverter
 	equip_converter: equips.EquipConverter
 	augment_converter: augments.AugmentConverter
 
-	def __init__(self, loader: JsonLoader = None, source_path: Path = None) -> None:
+	def __init__(self, loader: JsonLoader = None, source_path: Path = None, settings_path: Path = None) -> None:
 		"""
-		Initializes the JsonAPI. If neither *loader* nor *source_path* is given,
-		the JsonLoader is initialized with the path given in "Constants.JSON_SOURCE_PATH".
+		Initializes the JsonAPI. Uses the JsonLoader as set in the settings file at "data/settings.toml".
+		Path of the settings file can be overridden using *settings_path*.
+		For usage of a different/custom JsonLoader, *loader* can be set, which will ignore the settings file.
 		"""
-		if loader is None:
-			if source_path:
-				loader = AzurLaneTools_JsonLoader(source_path)
+		if source_path:
+			raise DeprecationWarning("Initialisation of ALJsonAPI using 'source_path' should be removed.")
+		
+		if loader:
+			self.loader = loader
+		else:
+			if settings_path:
+				self.apisettings = settings.read_and_parse_settings(settings_path)
 			else:
-				loader = AzurLaneTools_JsonLoader(Constants.JSON_SOURCE_PATH)
-		self.loader = loader
+				self.apisettings = settings.read_and_parse_settings()
+			self.loader = jsonloaders[self.apisettings.jsonloader_variant](self.apisettings.json_source_path)
+
 		self._apimodules = {}
 		self._sharecfgmodules = {}
 
@@ -122,6 +134,9 @@ class ALJsonAPI:
 
 	def get_sharecfgmodule(self, name: str) -> SharecfgModule:
 		return self._get_module(name)
+	
+	def get_module(self, name: str) -> Module:
+		return self.get_sharecfgmodule(name) or self.get_apimodule(name)
 
 	### Additional Api Methods
 

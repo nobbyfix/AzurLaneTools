@@ -3,15 +3,17 @@ from enum import Enum
 from typing import Optional
 
 
-# Constant Filepaths
-JSON_SOURCE_PATH = Path("..", "SrcJson").resolve()
-SHIPID_CONVERT_CACHE_PATH = Path("data", "shipid_convert.json")
-SHIPID_CONVERT_OVERRIDE_PATH = Path("data", "shipid_overrides.json")
-EQUIP_CONVERT_CACHE_PATH = Path("data", "equip_convert.json")
-EQUIP_WIKIDATA_PATH = Path("data", "equip_wikinames.json")
-SKIN_WIKIDATA_PATH = Path("data", "skin_wikidata.json")
-ITEMNAME_OVERRIDES_PATH = Path("data", "item_name_convert.json")
-AUGMENT_CONVERT_CACHE_PATH = Path("data", "augment_convert.json")
+### Constant Filepaths ###
+# static files (only manual changes)
+ITEMNAME_OVERRIDES_PATH = Path("data", "static", "item_name_convert.json")
+SHIPID_CONVERT_OVERRIDE_PATH = Path("data", "static", "shipid_overrides.json")
+
+# dynamic files (generated files)
+SHIPID_CONVERT_CACHE_PATH = Path("data", "dynamic", "shipid_convert.json")
+EQUIP_CONVERT_CACHE_PATH = Path("data", "dynamic", "equip_convert.json")
+EQUIP_WIKIDATA_PATH = Path("data", "dynamic", "equip_wikinames.json")
+SKIN_WIKIDATA_PATH = Path("data", "dynamic", "skin_wikidata.json")
+AUGMENT_CONVERT_CACHE_PATH = Path("data", "dynamic", "augment_convert.json")
 
 
 class Rarity(Enum):

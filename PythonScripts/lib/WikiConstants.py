@@ -1,7 +1,11 @@
 import json
+from pathlib import Path
 
 from . import Constants
 
+
+# filepath for wikiclient settings
+WIKICLIENT_SETTINGS_PATH = Path("data", "static", "wiki_settings.json")
 
 # convert item names to wiki filenames
 itemname_convertpath = Constants.ITEMNAME_OVERRIDES_PATH
