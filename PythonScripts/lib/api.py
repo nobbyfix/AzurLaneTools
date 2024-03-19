@@ -293,7 +293,10 @@ class SharecfgData(ApiData):
 		return key in self._json
 
 	def get(self, key, default = None):
-		return self._json.get(key, default)
+		try:
+			return self[key]
+		except AttributeError:
+			return default
 
 @APIdataclass
 class MergedSharecfgData(ApiData):

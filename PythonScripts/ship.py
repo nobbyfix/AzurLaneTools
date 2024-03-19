@@ -388,7 +388,6 @@ def getGameData(ship_groupid, api: ALJsonAPI, clients: Iterable[Client]):
 	lb3_attrs = {k: [d[k] for d in attr_dicts] for k in attr_dicts[0]}
 	if shipstat[0].nation == Constants.Nation.META:
 		enhance_json = ship_strengthen_meta.load_first(ship_groupid, clients)
-		enhance_json = enhance_json._json
 		enhance_data = {}
 		for k in ["cannon", "air", "reload", "torpedo"]:
 			enhance_data[k] = 0

@@ -313,7 +313,7 @@ def get_chapter(chapterid: int, api: ALJsonAPI, client: Client) -> str:
 	### Nodemap
 	nodemap = ""
 	current_row = -1
-	for row, _, access, nodetype in chapter._json.get("grids"):
+	for row, _, access, nodetype in chapter.get("grids"):
 		if row == current_row:
 			nodemap = "|"+nodemap
 		else:
@@ -333,7 +333,7 @@ def get_chapter(chapterid: int, api: ALJsonAPI, client: Client) -> str:
 
 		# ship drops
 		if award.icon == "Props/54000":
-			shipdrop_awards = award._json["display_icon"]
+			shipdrop_awards = award["display_icon"]
 			for shipdrop_award in shipdrop_awards:
 				shipdrop = Award(*shipdrop_award).load(api, client)
 				shipdrop_wiki = wikifier.wikify_awardable(shipdrop)
@@ -342,7 +342,7 @@ def get_chapter(chapterid: int, api: ALJsonAPI, client: Client) -> str:
 
 		# equipment drops
 		elif award.icon == "Props/55000":
-			equipdrop_awards = award._json["display_icon"]
+			equipdrop_awards = award["display_icon"]
 			for equipdrop_award in equipdrop_awards:
 				equipdrop = Award(*equipdrop_award).load(api, client)
 				equipdrop_wiki = wikifier.wikify_awardable(equipdrop)

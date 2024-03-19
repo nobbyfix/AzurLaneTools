@@ -15,7 +15,7 @@ def shop(api: ALJsonAPI, wikifier: Wikifier, client: Client, eventid: int, pt_fi
 	total_pt = 0
 
 	shopitem_wikitexts = [""]
-	for shopitemid in activity._json["config_data"]:
+	for shopitemid in activity["config_data"]:
 		shopitem = activity_shop_template.load_client(shopitemid, client)
 		award = shopitem.load(api, client)
 		wikiaward = wikifier.wikify_awardable(award)
