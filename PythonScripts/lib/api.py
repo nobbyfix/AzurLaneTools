@@ -338,7 +338,7 @@ class Module(metaclass=ABCMeta):
 	All data requests return None if there is no entry for the dataid for the client.
 	"""
 	# cache to hold reference to parsed apidata so it doesn't have to be parsed again
-	_cache: dict[Client, dict[str, ApiData]] = field(default_factory=dict, init=False, repr=False)
+	_cache: dict[Client, dict[str, ApiData]] = field(default_factory=lambda: {c: {} for c in Client}, init=False, repr=False)
 
 	def _load_from_cache(self, dataid: str, client: Client) -> Optional[ApiData]:
 		"""
@@ -369,7 +369,11 @@ class Module(metaclass=ABCMeta):
 		# try to load from cache first, if None is returned load using internal loader method
 		if data := self._load_from_cache(dataid, client):
 			return data
-		return self._load_client(dataid, client)
+		
+		data = self._load_client(dataid, client)
+		# save to cache
+		self._cache[client][dataid] = data
+		return data
 
 	@abstractmethod
 	def all_client_ids(self, client: Client) -> Iterable[int]:
