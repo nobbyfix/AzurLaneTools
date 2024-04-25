@@ -54,7 +54,7 @@ def load_hash_file(version_type: VersionType, relative_parent_dir: Path) -> Opti
 def save_hash_file(version_type: VersionType, relative_parent_dir: Path, hashrows: Iterable[HashRow]):
 	rowstrings = [f"{row.filepath},{row.size},{row.md5hash}" for row in hashrows if row]
 	content = '\n'.join(rowstrings)
-	with open(Path(relative_parent_dir, version_type.hashes_filename), 'w') as f:
+	with open(Path(relative_parent_dir, version_type.hashes_filename), 'w', encoding="utf8") as f:
 		f.write(content)
 
 def update_version_data(version_type: VersionType, relative_parent_dir: Path, version_string: str, hashrows: Iterable[HashRow]):
