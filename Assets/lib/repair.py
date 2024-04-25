@@ -26,7 +26,7 @@ def hashrows_from_files(client_directory: Path) -> Generator[HashRow, None, None
 
 def repair(cdnurl: str, userconfig: UserConfig, client_directory: Path):
 	current_hashes = hashrows_from_files(client_directory)
-	expected_hashes = itertools.chain(*[versioncontrol.load_hash_file(vtype, client_directory) for vtype in VersionType])
+	expected_hashes = itertools.chain(*filter(lambda x: x is not None, [versioncontrol.load_hash_file(vtype, client_directory) for vtype in VersionType]))
 	comparison_results = updater.compare_hashes(current_hashes, expected_hashes)
 
 	update_results = updater.update_assets(cdnurl, comparison_results, userconfig, client_directory)
