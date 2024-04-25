@@ -1,4 +1,3 @@
-import sys
 import traceback
 from pathlib import Path
 from typing import Iterable, Optional, Union
@@ -48,7 +47,7 @@ def compare_hashes(oldhashes: Iterable[HashRow], newhashes: Iterable[HashRow]) -
 	return results
 
 
-def update_assets(cdnurl: str, comparison_results: dict[str, CompareResult], userconfig: UserConfig, client_directory: Path) -> list[UpdateResult]:
+def update_assets(cdnurl: str, comparison_results: dict[str, CompareResult], userconfig: UserConfig, client_directory: Path, allow_deletion: bool = True) -> list[UpdateResult]:
 	assetbasepath = Path(client_directory, "AssetBundles")
 	update_files = list(filter(lambda r: r.compare_type != CompareType.Unchanged, comparison_results.values()))
 	update_results = [UpdateResult(r, DownloadType.NoChange, BundlePath.construct(assetbasepath, r.new_hash.filepath)) for r in filter(lambda r: r.compare_type == CompareType.Unchanged, comparison_results.values())]
@@ -64,10 +63,13 @@ def update_assets(cdnurl: str, comparison_results: dict[str, CompareResult], use
 				update_results.append(UpdateResult(result, DownloadType.Failed, assetpath))
 
 		elif result.compare_type == CompareType.Deleted:
-			print(f"Deleting {result.current_hash.filepath} ({i}/{fileamount}).")
-			assetpath = BundlePath.construct(assetbasepath, result.current_hash.filepath)
-			remove_asset(assetpath.full)
-			update_results.append(UpdateResult(result, DownloadType.Removed, assetpath))
+			if allow_deletion:
+				print(f"Deleting {result.current_hash.filepath} ({i}/{fileamount}).")
+				assetpath = BundlePath.construct(assetbasepath, result.current_hash.filepath)
+				remove_asset(assetpath.full)
+				update_results.append(UpdateResult(result, DownloadType.Removed, assetpath))
+			else:
+				print(f"Deleting {result.current_hash.filepath} ({i}/{fileamount}) [SKIPPED].")
 	return update_results
 
 def download_hashes(version_result: VersionResult, cdnurl: str, userconfig: UserConfig):
@@ -83,7 +85,7 @@ def download_hashes(version_result: VersionResult, cdnurl: str, userconfig: User
 					return True
 		return userconfig.download_isblacklist
 
-	return filter(_filter, versioncontrol.parse_hash_rows(hashes))
+	return list(filter(_filter, versioncontrol.parse_hash_rows(hashes)))
 
 def filter_hashes(update_results: list[UpdateResult]) -> list[HashRow]:
 	hashes_updated = []

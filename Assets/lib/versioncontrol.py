@@ -25,7 +25,7 @@ def parse_version_string(rawstring: str) -> VersionResult:
 def load_version_string(version_type: VersionType, relative_parent_dir: Path) -> Optional[str]:
 	fpath = Path(relative_parent_dir, version_type.version_filename)
 	if fpath.exists():
-		with open(fpath, 'r') as f:
+		with open(fpath, 'r', encoding='utf8') as f:
 			return f.read()
 
 def save_version_string(version_type: VersionType, relative_parent_dir: Path, content: str):

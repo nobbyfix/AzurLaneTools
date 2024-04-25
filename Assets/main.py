@@ -14,16 +14,21 @@ def execute(args):
 	CLIENT_ASSET_DIR = Path(userconfig.asset_directory, args.client.name)
 	CLIENT_ASSET_DIR.mkdir(parents=True, exist_ok=True)
 
-	if args.repair:
+	if args.check_integrity:
 		repair.repair(clientconfig.cdnurl, userconfig, CLIENT_ASSET_DIR)
 
-	if args.force_refresh:
+	if args.force_refresh and not args.repair:
 		print("All asset types will be checked for different hashes.")
 
 	version_response = protobuf.get_version_response(clientconfig.gateip, clientconfig.gateport)
 	versionlist = [versioncontrol.parse_version_string(v) for v in version_response.pb.version if v.startswith("$")]
 	for vresult in versionlist:
-		if update_assets := updater.update(vresult, clientconfig.cdnurl, userconfig, CLIENT_ASSET_DIR, args.force_refresh):
+		if args.repair:
+			update_assets = repair.repair_hashfile(vresult, clientconfig.cdnurl, userconfig, CLIENT_ASSET_DIR)
+		else:
+			update_assets = updater.update(vresult, clientconfig.cdnurl, userconfig, CLIENT_ASSET_DIR, args.force_refresh)
+
+		if update_assets:
 			versioncontrol.save_difflog(vresult.version_type, update_assets, CLIENT_ASSET_DIR)
 
 
@@ -35,7 +40,9 @@ def main():
 	parser.add_argument("--force-refresh", type=bool, default=False, action=argparse.BooleanOptionalAction,
 		help="compares asset hashes even when the version file is up to date")
 	parser.add_argument("--repair", type=bool, default=False, action=argparse.BooleanOptionalAction,
-		help="checks all present files")
+		help="downloads missing files if the update process failed partially")
+	parser.add_argument("--check-integrity", type=bool, default=False, action=argparse.BooleanOptionalAction,
+		help="checks if all files are correct using the local hash file")
 	args = parser.parse_args()
 
 	args.client = Client[args.client]
