@@ -43,7 +43,7 @@ def repair(cdnurl: str, userconfig: UserConfig, client_directory: Path):
 def repair_hashfile(version_result: VersionResult, cdnurl: str, userconfig: UserConfig, client_directory: Path) -> list[UpdateResult]:
 	newhashes = updater.download_hashes(version_result, cdnurl, userconfig)
 	assetbasepath = Path(client_directory, "AssetBundles")
-
+	
 	oldhashes = []
 	for hrow in newhashes:
 		fp = Path(assetbasepath, hrow.filepath)
@@ -51,6 +51,4 @@ def repair_hashfile(version_result: VersionResult, cdnurl: str, userconfig: User
 		oldhrow = HashRow(hrow.filepath, current_size, current_md5)
 		oldhashes.append(oldhrow)
 	
-	comparison_results = updater.compare_hashes(oldhashes, newhashes)
-	update_results = updater.update_assets(cdnurl, comparison_results, userconfig, client_directory, allow_deletion=False)
-	return update_results
+	return updater._update_from_hashes(version_result, cdnurl, userconfig, client_directory, oldhashes, newhashes, allow_deletion=False)

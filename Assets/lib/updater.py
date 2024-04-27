@@ -107,16 +107,18 @@ def filter_hashes(update_results: list[UpdateResult]) -> list[HashRow]:
 			print(update_result)
 	return hashes_updated
 
-def _update(version_result: VersionResult, cdnurl: str, userconfig: UserConfig, client_directory: Path) -> list[UpdateResult]:
-	newhashes = download_hashes(version_result, cdnurl, userconfig)
-	oldhashes = versioncontrol.load_hash_file(version_result.version_type, client_directory)
+def _update_from_hashes(version_result: VersionResult, cdnurl: str, userconfig: UserConfig, client_directory: Path,
+						oldhashes: Iterable[HashRow], newhashes: Iterable[HashRow], allow_deletion: bool = True) -> list[UpdateResult]:
 	comparison_results = compare_hashes(oldhashes, newhashes)
-
-	update_results = update_assets(cdnurl, comparison_results, userconfig, client_directory)
-
+	update_results = update_assets(cdnurl, comparison_results, userconfig, client_directory, allow_deletion)
 	hashes_updated = filter_hashes(update_results)
 	versioncontrol.update_version_data2(version_result, client_directory, hashes_updated)
 	return update_results
+
+def _update(version_result: VersionResult, cdnurl: str, userconfig: UserConfig, client_directory: Path) -> list[UpdateResult]:
+	newhashes = download_hashes(version_result, cdnurl, userconfig)
+	oldhashes = versioncontrol.load_hash_file(version_result.version_type, client_directory)
+	return _update_from_hashes(version_result, cdnurl, userconfig, client_directory, oldhashes, newhashes)
 
 def update(version_result: VersionResult, cdnurl: str, userconfig: UserConfig, client_directory: Path, force_refresh: bool) -> list[UpdateResult]:
 	oldversion = versioncontrol.load_version_string(version_result.version_type, client_directory)
