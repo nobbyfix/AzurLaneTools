@@ -59,7 +59,7 @@ def unpack(zipfile: ZipFile, client: Client, allow_older_version: bool = False):
 		# update version string, hashes and difflog
 		hashes_updated = updater.filter_hashes(update_results)
 		versioncontrol.update_version_data(versiontype, CLIENT_ASSET_DIR, obbversion, hashes_updated)
-		versioncontrol.save_difflog(versiontype, update_results, CLIENT_ASSET_DIR)
+		versioncontrol.save_difflog(versiontype, obbversion, update_results, CLIENT_ASSET_DIR)
 
 
 def extract_asset(zipfile: ZipFile, filepath: str, target: Path):

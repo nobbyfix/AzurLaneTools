@@ -1,24 +1,25 @@
 #!/usr/bin/env python3.9
-import itertools
+import itertools, json
 from argparse import ArgumentParser
 from pathlib import Path
 import multiprocessing as mp
-from typing import Generator
+from typing import Iterable
 
 from lib import imgrecon, config
-from lib.classes import Client, DownloadType, VersionType
+from lib.classes import Client, VersionType
 
 
-def get_file_list(filepath: Path) -> Generator[str, None, None]:
-	with open(filepath, 'r', encoding='utf8') as f:
-		for line in f.readlines():
-			if line == '': continue
-			yield line.replace('\n', '')
+def get_diff_files(parent_directory: Path, vtype: VersionType, version_string: str = None) -> Iterable[str]:
+	if version_string:
+		p = Path(parent_directory, "difflog", vtype.name.lower(), version_string+".json")
+	else:
+		p = Path(parent_directory, "difflog", vtype.name.lower(), "latest.json")
 
-def get_diff_files(parent_directory: Path, vtype: VersionType, dtype: DownloadType) -> Generator[str, None, None]:
-	fname = f'diff_{vtype.name.lower()}_{dtype.name.lower()}.txt'
-	p = Path(parent_directory, 'difflog', fname)
-	return get_file_list(p)
+	if p.exists():
+		with open(p, "r", encoding="utf8") as f:
+			diffdata = json.load(f)
+			return diffdata["success_files"].keys()
+	return []
 
 
 def restore_painting(image, abpath: Path, imgname: str, do_retry: bool):
@@ -77,7 +78,7 @@ def extract_by_client(client: Client):
 
 	downloaded_files_collection = []
 	for vtype in [VersionType.AZL, VersionType.PAINTING, VersionType.MANGA, VersionType.PIC]:
-		downloaded_files = get_diff_files(client_directory, vtype, DownloadType.Success)
+		downloaded_files = get_diff_files(client_directory, vtype)
 		downloaded_files_collection.append(downloaded_files)
 	downloaded_files_collection = itertools.chain(*downloaded_files_collection)
 

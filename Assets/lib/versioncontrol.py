@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 from typing import Generator, Iterable, Optional
 
@@ -66,11 +67,29 @@ def update_version_data2(version_result: VersionResult, relative_parent_dir: Pat
 	save_hash_file(version_result.version_type, relative_parent_dir, hashrows)
 
 
-def save_difflog(version_type: VersionType, update_results: list[UpdateResult], relative_parent_dir: Path):
-	for dtype in [DownloadType.Success, DownloadType.Removed, DownloadType.Failed]:
-		fileoutpath = Path(relative_parent_dir, 'difflog', f'diff_{version_type.name.lower()}_{dtype.name.lower()}.txt')
-		fileoutpath.parent.mkdir(parents=True, exist_ok=True)
+def save_difflog(version_type: VersionType, version_string: str, update_results: list[UpdateResult], relative_parent_dir: Path):
+	filtered_update_results = list(filter(lambda r: r.download_type != DownloadType.NoChange, update_results))
+	if not filtered_update_results:
+		return
 
-		filtered_results = filter(lambda asset: asset.download_type == dtype, update_results)
-		with open(fileoutpath, 'w', encoding='utf8') as f:
-			f.write('\n'.join([res.path.inner for res in filtered_results]))
+	version_diffdir = Path(relative_parent_dir, "difflog", version_type.name.lower())
+	latest_difflog = Path(version_diffdir, "latest.json")
+	if latest_difflog.exists():
+		with open(latest_difflog, "r", encoding="utf8") as f:
+			latest_data = json.load(f)
+		latest_version = latest_data["version"]
+		latest_difflog.rename(latest_difflog.with_stem(latest_version))
+	
+	version_diffdir.mkdir(parents=True, exist_ok=True)
+	data = {
+		"version": version_string,
+		"major": False,
+		"success_files": {res.path.inner: res.compare_result.compare_type.name for res in filter(lambda r: r.download_type in [DownloadType.Success, DownloadType.Removed], filtered_update_results)},
+		"failed_files": {res.path.inner: res.compare_result.compare_type.name for res in filter(lambda r: r.download_type == DownloadType.Failed, filtered_update_results)},
+	}
+
+	with open(latest_difflog, "w", encoding="utf8") as f:
+		json.dump(data, f)
+
+def save_difflog2(version_result: VersionResult, update_results: list[UpdateResult], relative_parent_dir: Path):
+	save_difflog(version_result.version_type, version_result.version, update_results, relative_parent_dir)

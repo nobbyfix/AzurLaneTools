@@ -75,7 +75,8 @@ def update_assets(cdnurl: str, comparison_results: dict[str, CompareResult], use
 def download_hashes(version_result: VersionResult, cdnurl: str, userconfig: UserConfig):
 	hashes = downloader.download_hashes(cdnurl, version_result.rawstring, userconfig.useragent)
 	if not hashes:
-		print(f"The server did not give a proper response, skipping {version_result.version_type.name}.")
+		print(f"Server returned empty hashfile for {version_result.version_type.name}, skipping.")
+		return
 
 	# hash filter function
 	def _filter(row: HashRow):

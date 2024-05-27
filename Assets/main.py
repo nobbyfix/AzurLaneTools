@@ -29,7 +29,7 @@ def execute(args):
 			update_assets = updater.update(vresult, clientconfig.cdnurl, userconfig, CLIENT_ASSET_DIR, args.force_refresh)
 
 		if update_assets:
-			versioncontrol.save_difflog(vresult.version_type, update_assets, CLIENT_ASSET_DIR)
+			versioncontrol.save_difflog2(vresult, update_assets, CLIENT_ASSET_DIR)
 
 
 def main():
