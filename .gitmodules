@@ -1,9 +1,0 @@
-[submodule "Src"]
-	path = Src
-	url = https://github.com/Dimbreath/AzurLaneData
-[submodule "SrcJson"]
-	path = SrcJson
-	url = https://github.com/nobbyfix/AzurLaneSourceJson
-[submodule "Src2"]
-	path = Src2
-	url = https://github.com/nobbyfix/AzurLaneSource
