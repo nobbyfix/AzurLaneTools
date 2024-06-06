@@ -51,6 +51,10 @@ class FurnitureModule(ApiModule):
 		furniture_shop = furniture_shop_template.load_client(dataid, client)
 		if furniture_data is not None and furniture_shop is not None:
 			return Furniture(furniture_data, furniture_shop)
+		elif furniture_data is not None:
+			return furniture_data
+		elif furniture_shop is not None:
+			return furniture_shop
 
 	def all_client_ids(self, client: Client) -> Iterable[int]:
 		furniture_data_template = self._getmodule("furniture_data_template")
