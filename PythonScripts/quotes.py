@@ -5,7 +5,6 @@ import mwparserfromhell
 from dataclasses import dataclass
 from collections import Counter
 
-import _add_valentine
 from lib import DEFAULT_CLIENTS, Client, ALJsonAPI, WikiHelper, Constants, Utility
 from lib.Utility import rreplace
 
@@ -102,8 +101,6 @@ ShipConverter = api.ship_converter
 wikiclient = WikiHelper.WikiClient().login()
 template_general = WikiHelper.MultilineTemplate('ShipQuote')
 template_en = WikiHelper.MultilineTemplate('ShipQuoteEN')
-
-valentine20, valentine21 = _add_valentine.main(api)
 
 # get all skinids from all versions
 skinids = dict()
