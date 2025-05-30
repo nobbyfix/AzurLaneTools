@@ -26,7 +26,7 @@ def mkdirf(file: Path) -> None:
 	"""
 	mkdir(file.parent)
 
-def output(text: str, filepath: PathLike = None) -> None:
+def output(text: str, filepath: PathLike | None = None) -> None:
 	"""
 	Tries to print the output to console, if it fails write it to the specified file in the output directory.
 	"""

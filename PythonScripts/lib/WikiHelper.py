@@ -1,8 +1,6 @@
-import re
-import json
-import time
+import re, json, time
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 from dataclasses import dataclass, field
 import mwclient
 from mwclient import APIError
@@ -45,7 +43,7 @@ class WikiClient():
 			json.dump(settings, settings_file)	
 
 
-	def login(self) -> 'WikiClient':
+	def login(self) -> "WikiClient":
 		if self.logged_in: return self
 
 		if not self.settings['username']:
@@ -61,7 +59,7 @@ class WikiClient():
 		print('Logged in.')
 		return self
 
-	def execute(self, func: callable, *args, **kwargs):
+	def execute(self, func: Callable, *args, **kwargs):
 		delta_last_execute = time.time() - self.last_execute_time
 		if delta_last_execute < self.execution_delay:
 			time.sleep(delta_last_execute)
@@ -101,7 +99,7 @@ class MultilineTemplate():
 		if val is None: val = ''
 		return f' | {key} = {str(val)}'
 
-	def _fill_section(self, section, content, wiki_content) -> str:
+	def _fill_section(self, section, content, wiki_content) -> str | None:
 		# add all template parameter of current section
 		section_params = []
 		for param in section.get('params', []):
@@ -147,7 +145,7 @@ class MultilineTemplate():
 			comment = comment and comment+'\n'
 			return comment+'\n\n'.join(sub_wikitexts).rstrip('\n')
 
-	def fill(self, content: dict[str, Any], wiki_content: dict[str, Any] = None) -> str:
+	def fill(self, content: dict[str, Any], wiki_content: dict[str, Any] | None = None) -> str:
 		filled_sections = self._fill_section(self.sections, content, wiki_content or {})
 
 		# add all sections with one empty line spacing between them to result wikitext
@@ -162,9 +160,9 @@ def remove_comments(wikitext: str) -> str:
 	return b
 
 PARAMS_RE = re.compile(r'\n\ *\|')
-def parse_multiline_template(wikitext: str, do_remove_comments: bool = True) -> str:
+def parse_multiline_template(wikitext: str, do_remove_comments: bool = True) -> dict[str, str]:
 	if do_remove_comments: wikitext = remove_comments(wikitext)
-	template = dict()
+	template = {}
 	params = PARAMS_RE.split(wikitext[2:-2])
 	for param in params:
 		if '=' in param:
@@ -173,8 +171,8 @@ def parse_multiline_template(wikitext: str, do_remove_comments: bool = True) -> 
 	return template
 
 def put_icon(filename: str, itemname: str = '', size: str = 'x22px', nolink: bool = False) -> str:
-	nolink = 'link=' if nolink else ''
-	args = [filename, size, itemname, nolink]
+	nolinkstr = 'link=' if nolink else ''
+	args = [filename, size, itemname, nolinkstr]
 	args = [arg for arg in args if arg != '']
 	return '[[File:'+'|'.join(args).strip('|')+']]'
 
@@ -188,63 +186,35 @@ parttype = {
 }
 RE_BLUEPRINT_TEMPLATE = re.compile(r"^(T[0-9])\s(\w+)\sRetrofit\sBlueprint")
 RE_PACK_TEMPLATE = re.compile(r"^(\w+)\s(T[0-9])\sTech\sPack")
-def item_icontemplate(name: str) -> str:
+def item_icontemplate(name: str | None) -> str | None:
 	if not name: return ''
 	if m := RE_BLUEPRINT_TEMPLATE.match(name):
 		return "{{Blueprint|"+ m.group(1) + "|" + m.group(2) + "}}"
 
 	if ' Part' in name:
-		name = name.split(' ', 1)
-		ptype = name[1].rsplit(' ', 1)[0]
-		ptype = parttype.get(ptype)
-		return f'{{{{Plate|{name[0]}|{ptype}}}}}'
+		pname = name.split(' ', 1)
+		ptypename = pname[1].rsplit(' ', 1)[0]
+		ptype = parttype.get(ptypename)
+		return f'{{{{Plate|{pname[0]}|{ptype}}}}}'
 	
 	if m := RE_PACK_TEMPLATE.match(name):
 		return "{{Box|"+ m.group(2) + "}}"
 
-	name = {
+	iconname = {
 		'Oil': 'Oil',
 		'Coins': 'Coin',
 		'Wisdom Cube': 'Cube',
 		'Cognitive Chips': 'Module',
 		'Gems': 'Gem',
 	}.get(name)
-	if name: return '{{'+name+'}}'
-
-def item_icontemplate_legacy(name: str) -> str:
-	if ' Retrofit Blueprint' in name:
-		tier = name.split(' ', 1)[0]
-		bptype = name.split(' ', 2)[1]
-		return '{{Blueprint|'+tier+'|'+bptype+'}}'
-
-	if ' Part' in name:
-		name = name.split(' ', 1)
-		parttype = name[1].rsplit(' ', 1)[0]
-		parttype = {
-			'General': 'Aux',
-			'Torpedo': 'Torp',
-			'Aircraft': 'Plane',
-			'Anti-Air Gun': 'AA',
-			'Main Gun': 'Gun',
-			'Random Gear': 'Unknown'
-		}.get(parttype)
-		return f'{{{{Plate|{name[0]}|{parttype}}}}}'
-
-	name = {
-		'Oil': 'Oil',
-		'Coins': 'Coin',
-		'Wisdom Cube': 'Cube',
-		'Cognitive Chips': 'Module',
-		'Gems': 'Gem',
-	}.get(name)
-	if name: return '{{'+name+'}}'
+	if iconname: return '{{'+iconname+'}}'
 
 
 @dataclass
 class WikiAwardable(Awardable):
-	link: str = field(default=None)
-	filelink: str = field(default=None)
-	icontemplate: str = field(default=None)
+	link: str | None = field(default=None)
+	filelink: str | None = field(default=None)
+	icontemplate: str | None = field(default=None)
 
 
 @dataclass
@@ -263,10 +233,13 @@ class Wikifier:
 
 		# type based switches
 		if isinstance(awardable, EquipStat) or (isinstance(awardable, Item) and awardable.type == 9):
-			equip_convert_data = self.api.equip_converter.from_equipid(int(awardable.icon))
-			if not equip_convert_data: equip_convert_data = self.api.equip_converter.from_icon(int(awardable.icon))
-			if not equip_convert_data: equip_convert_data = self.api.equip_converter.from_equipid(awardable.id)
-			if not equip_convert_data: equip_convert_data = self.api.equip_converter.from_equipid(awardable.name)
+			try:
+				awardable_icon_int = int(awardable.icon)
+				equip_convert_data = self.api.equip_converter.from_equipid(awardable_icon_int)
+				if not equip_convert_data: equip_convert_data = self.api.equip_converter.from_icon(awardable_icon_int)
+				if not equip_convert_data: equip_convert_data = self.api.equip_converter.from_equipid(awardable.id)
+				if not equip_convert_data: equip_convert_data = self.api.equip_converter.from_equipid(int(awardable.name))
+			except ValueError: pass
 
 			name = ''
 			if equip_convert_data:

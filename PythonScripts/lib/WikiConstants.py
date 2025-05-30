@@ -32,7 +32,7 @@ def item_name(name: str) -> str:
 
 
 # return page links for certain items
-def item_link(name: str) -> str:
+def item_link(name: str) -> str | None:
 	if not name: return ''
 	if 'Strengthening Unit' in name: return 'Research'
 	if name in ['Cognitive Chips', 'Cognitive Array']: return 'Dockyard#Cognitive_Awakening'

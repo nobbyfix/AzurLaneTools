@@ -57,9 +57,11 @@ def convert_shiptype(typeid: Union[str, int]) -> Union[ShipType, int]:
 @dataclass
 class ChapterTemplate(SharecfgModule):
 	def _instantiate_client(self, dataid: str, data: dict) -> Chapter:
-		previous_chapter = None
-		if pre_chapter_id := data["pre_chapter"]:
-			previous_chapter = SharecfgDataRef(pre_chapter_id, "chapter_template")
+		previous_chapter = []
+		for pre_chapter_id_list in data["pre_chapter"]:
+			for pre_chapter_id in pre_chapter_id_list:
+				if pre_chapter_id != 0:
+					previous_chapter.append(SharecfgDataRef(pre_chapter_id, "chapter_template"))
 
 		enemies = [SharecfgDataRef(enemydata[0], "expedition_data_template") for enemydata in data["expedition_id_weight_list"]]
 		elites = [SharecfgDataRef(enemyid, "expedition_data_template") for enemyid in data["elite_expedition_list"]]

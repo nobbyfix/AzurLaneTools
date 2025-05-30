@@ -185,7 +185,7 @@ class ShopItem(SharecfgData, Award): pass
 @APIdataclass
 class Chapter(SharecfgData):
 	type: int
-	previous_chapter: Optional[SharecfgDataRef]
+	previous_chapter: list[SharecfgDataRef]
 	mob_list: list[SharecfgDataRef]
 	mob_spawn_pattern: list[int]
 	elite_list: list[SharecfgDataRef]
