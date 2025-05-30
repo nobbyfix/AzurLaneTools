@@ -206,12 +206,17 @@ def get_chapter(chapterid: int, api: ALJsonAPI, client: Client) -> str:
 
 	### unlock condition
 	unlock_require = []
+	map_require = []
 	if unlocklevel := chapter.unlocklevel:
 		unlock_require.append("Commander Lv. " + str(unlocklevel))
 	for previous_chapter_entry in chapter.previous_chapter:
 		pre_chapter = previous_chapter_entry.load(api, client)
 		pre_chapter_name = pre_chapter.chapter_name
-		unlock_require.append(f"Clear [[#{pre_chapter_name}|{pre_chapter_name}]]")
+		map_require.append(f"[[#{pre_chapter_name}|{pre_chapter_name}]]")
+	if len(map_require) == 1:
+		unlock_require.append(f"Clear {map_require[0]}")
+	elif len(map_require) > 1:
+		unlock_require.append("Clear either " + " or ".join(map_require))
 	chapter_wiki_template["Requirements"] = " and ".join(unlock_require)
 
 	### associated tasks
