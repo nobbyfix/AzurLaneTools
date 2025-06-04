@@ -2,7 +2,6 @@ import re
 import json
 from pathlib import Path
 from argparse import ArgumentParser
-from typing import Union
 
 from lib import Client, ALJsonAPI, WikiHelper, Utility, DEFAULT_CLIENTS
 
@@ -74,7 +73,7 @@ def story(storyname: str, client: Client):
 
 	return lines_result
 
-def memory(memoryid: Union[int, str], client: Client):
+def memory(memoryid: int | str, client: Client):
 	memory_data = memory_template.load_client(memoryid, client)
 	story_lines = story(memory_data['story'], client)
 
@@ -87,7 +86,7 @@ def memory(memoryid: Union[int, str], client: Client):
 	template_params['Language'] += "\n | "+story_lines
 	return STORY_TEMPLATE.fill(template_params)
 
-def memorygroup(memorygroup_id: Union[int, str], client: Client):
+def memorygroup(memorygroup_id: int | str, client: Client):
 	memorygroup_data = memory_group.load_client(memorygroup_id, client)
 	memory_collection = [f'Chapter {i}=\n'+memory(memoryid, client) for i, memoryid in enumerate(memorygroup_data['memories'], 1)]
 	return tabber_name[client] + " Story=\n<tabber>\n" + "\n|-|\n".join(memory_collection) + "\n</tabber>"

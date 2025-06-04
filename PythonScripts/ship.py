@@ -1,8 +1,6 @@
+import math, re, mwparserfromhell
 from argparse import ArgumentParser
-import math
-from typing import Iterable, Union
-import mwparserfromhell
-import re
+from collections.abc import Iterable
 
 from lib import ALJsonAPI, Client, DEFAULT_CLIENTS, Constants, WikiHelper, Utility
 from lib.apiclasses import CachedAPILoader
@@ -254,7 +252,7 @@ class OldIDLoader(CachedAPILoader):
 		for entry in ship_data_group.load_all(DEFAULT_CLIENTS):
 			self._cache[entry.group_type] = f'{entry.code:03}'
 	
-	def oldid_from_groupid(self, groupid: Union[int, str]) -> int:
+	def oldid_from_groupid(self, groupid: int | str) -> int:
 		return self._cache.get(groupid)
 
 

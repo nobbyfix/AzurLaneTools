@@ -2,7 +2,7 @@ from collections import Counter
 from itertools import chain
 from pathlib import Path
 from time import sleep
-from typing import Any, Callable, Optional
+from typing import Any, Callable
 
 import mwparserfromhell
 
@@ -40,7 +40,7 @@ if not skinids:
 			skinids[groupid] = {shipskindata.id}
 
 
-def eval_counter(count_values: dict, val_check: Callable, error_msg: str) -> Optional[Any]:
+def eval_counter(count_values: dict, val_check: Callable, error_msg: str) -> Any | None:
 	if count_values:
 		mc = Counter(count_values.values()).most_common()
 		if len(mc) > 1:

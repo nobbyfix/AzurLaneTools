@@ -4,7 +4,6 @@ from enum import Enum
 from dataclasses import dataclass, field
 from abc import ABCMeta, abstractmethod
 from collections.abc import Iterable, Callable, Generator, Hashable
-from typing import Union, Optional
 
 
 class _Client(Enum):
@@ -39,7 +38,7 @@ class _Client(Enum):
 		return f"<{self.__class__.__name__}.{self._name_}: '{self.locale_code}'>"
 
 	@classmethod
-	def from_package_name(cls, package_name: str) -> Optional["_Client"]:
+	def from_package_name(cls, package_name: str) -> "_Client" | None:
 		"""
 		Returns a member with *package_name* matching it's `package_name` attribute.
 		Returns `None` if no match exists.
@@ -167,22 +166,22 @@ class JsonLoader(metaclass=ABCMeta):
 				pass
 		return multi_gamecfg
 
-	def load_dungeon(self, dungeon_id: Union[int, str], client: Client) -> dict:
+	def load_dungeon(self, dungeon_id: int | str, client: Client) -> dict:
 		return self.load_gamecfg("dungeon", str(dungeon_id), client)
 
-	def load_multi_dungeon(self, dungeon_id: Union[int, str], clients: Iterable[Client]) -> dict[Client, dict]:
+	def load_multi_dungeon(self, dungeon_id: int | str, clients: Iterable[Client]) -> dict[Client, dict]:
 		return self.load_multi_gamecfg("dungeon", str(dungeon_id), clients)
 
-	def load_buff(self, buff_id: Union[int, str], client: Client) -> dict:
+	def load_buff(self, buff_id: int | str, client: Client) -> dict:
 		return self.load_gamecfg("buff", "buff_"+str(buff_id), client)
 
-	def load_multi_buff(self, buff_id: Union[int, str], clients: Iterable[Client]) -> dict[Client, dict]:
+	def load_multi_buff(self, buff_id: int | str, clients: Iterable[Client]) -> dict[Client, dict]:
 		return self.load_multi_gamecfg("buff", "buff_"+str(buff_id), clients)
 
-	def load_skill(self, skill_id: Union[int, str], client: Client) -> dict:
+	def load_skill(self, skill_id: int | str, client: Client) -> dict:
 		return self.load_gamecfg("skill", "skill_"+str(skill_id), client)
 
-	def load_multi_skill(self, skill_id: Union[int, str], clients: Iterable[Client]) -> dict[Client, dict]:
+	def load_multi_skill(self, skill_id: int | str, clients: Iterable[Client]) -> dict[Client, dict]:
 		return self.load_multi_gamecfg("skill", "skill_"+str(skill_id), clients)
 
 	def load_story(self, story_name: str, client: Client) -> dict:
@@ -258,7 +257,7 @@ class ApiData(Hashable):
 	"""
 	Generic data class returned by all modules.
 	"""
-	id: int
+	id: int | str
 	""" Unique ID of the ApiData within their corresponding module. """
 
 	def __hash__(self) -> int:
@@ -338,9 +337,9 @@ class Module(metaclass=ABCMeta):
 	All data requests return None if there is no entry for the dataid for the client.
 	"""
 	# cache to hold reference to parsed apidata so it doesn't have to be parsed again
-	_cache: dict[Client, dict[str, ApiData]] = field(default_factory=lambda: {c: {} for c in Client}, init=False, repr=False)
+	_cache: dict[Client, dict[str, ApiData | None]] = field(default_factory=lambda: {c: {} for c in Client}, init=False, repr=False)
 
-	def _load_from_cache(self, dataid: str, client: Client) -> Optional[ApiData]:
+	def _load_from_cache(self, dataid: str, client: Client) -> ApiData | None:
 		"""
 		Tries to load the ApiData entry associated with *dataid* from the cache for *client*.
 		If the client is not in the cache or there is no entry for *dataid* for *client*,
@@ -350,7 +349,7 @@ class Module(metaclass=ABCMeta):
 			return self._cache[client].get(dataid)
 
 	@abstractmethod
-	def _load_client(self, dataid: str, client: Client) -> Optional[ApiData]:
+	def _load_client(self, dataid: str, client: Client) -> ApiData | None:
 		"""
 		Tries to load the ApiData entry associated with *dataid* for *client*.
 		If there is no *dataid* associated with *client*, None is returned.
@@ -359,7 +358,7 @@ class Module(metaclass=ABCMeta):
 		The method load_client should be used instead.
 		"""
 
-	def load_client(self, dataid: Union[int, str], client: Client) -> Optional[ApiData]:
+	def load_client(self, dataid: int | str, client: Client) -> ApiData | None:
 		"""
 		Tries to load the ApiData entry associated with *dataid* for *client*.
 		If there is no *dataid* associated with *client*, None is returned.
@@ -381,7 +380,7 @@ class Module(metaclass=ABCMeta):
 		Returns all dataids that are associated with *client* as an iterable.
 		"""
 
-	def all_client(self, client: Client, id_filter: Callable[[Union[int, str]], bool] = None) -> Generator[ApiData]:
+	def all_client(self, client: Client, id_filter: Callable[[int | str], bool] | None = None) -> Generator[ApiData]:
 		"""
 		Returns all ApiData entries associated with *client* as a generator.
 
@@ -401,7 +400,7 @@ class Module(metaclass=ABCMeta):
 			if data := self.load_client(dataid, client):
 				yield data
 
-	def load_first(self, dataid: Union[int, str], clients: Union[Client, Iterable[Client]]) -> Optional[ApiData]:
+	def load_first(self, dataid: int | str, clients: Client | Iterable[Client]) -> ApiData | None:
 		"""
 		Returns the first ApiData entry with *dataid* from the *clients* given.
 		The order used to check depends on the order of the iterable given with *clients*.
@@ -425,7 +424,7 @@ class Module(metaclass=ABCMeta):
 				ids = ids.union(client_ids)
 		return ids
 
-	def load_all(self, clients: Iterable[Client], id_filter: Callable[[Union[int, str]], bool] = None) -> Generator[ApiData]:
+	def load_all(self, clients: Iterable[Client], id_filter: Callable[[int | str], bool] = None) -> Generator[ApiData]:
 		"""
 		Returns all ApiData entries associated with *clients* as a generator.
 		The ApiData returned for a certain dataid will be determined by Module.load_first.
@@ -464,7 +463,7 @@ class SharecfgModule(Module):
 	_settings: SharecfgmoduleDataSettings = field(default_factory=SharecfgmoduleDataSettings, init=False)
 	_all_key_warning: bool = field(default=False, init=False, repr=False)
 
-	def _load_data(self, client: Client) -> Optional[dict]:
+	def _load_data(self, client: Client) -> dict | None:
 		"""
 		Loads the underlying json data using the JsonLoader for *client*.
 		If the file can not be found by the loader, the error will be ignored
@@ -516,7 +515,7 @@ class SharecfgModule(Module):
 		self._data[client] = jsondata
 		return jsondata
 
-	def _load(self, dataid: str, client: Client) -> Optional[dict]:
+	def _load(self, dataid: str, client: Client) -> dict | None:
 		"""
 		Returns the json data for *dataid* associated with *client*.
 		"""
@@ -544,7 +543,7 @@ class SharecfgModule(Module):
 		"""
 		return SharecfgData(id=dataid, json=data)
 
-	def _load_client(self, dataid: str, client: Client) -> Optional[SharecfgData]:
+	def _load_client(self, dataid: str, client: Client) -> SharecfgData | None:
 		"""
 		Tries to load the SharecfgData entry associated with *dataid* for *client*.
 		If there is no *dataid* associated with *client*, None is returned.
@@ -555,7 +554,7 @@ class SharecfgModule(Module):
 		if data := self._load(dataid, client):
 			return self._instantiate_client(dataid, data)
 
-	def all_client_ids(self, client: Client) -> Iterable[Union[int, str]]:
+	def all_client_ids(self, client: Client) -> Iterable[int | str]:
 		"""
 		Returns all dataids that are associated with *client* as an iterable.
 		"""

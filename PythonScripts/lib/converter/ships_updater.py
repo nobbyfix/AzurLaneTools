@@ -1,6 +1,5 @@
 import json
 from os import PathLike
-from typing import Union
 
 from .. import ALJsonAPI, Client
 
@@ -22,7 +21,7 @@ def update_converter(convert_fp: PathLike, override_fp: PathLike, api: ALJsonAPI
 	overrides = load_overrides(override_fp)
 	conversions = {'ship': dict(), 'groupid': dict()}
 
-	def idfilter(dataid: Union[int, str]) -> bool:
+	def idfilter(dataid: int | str) -> bool:
 		try:
 			dataid = int(dataid)
 		except: return True

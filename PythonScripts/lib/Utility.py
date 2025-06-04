@@ -1,6 +1,6 @@
 import sys
 from os import PathLike
-from typing import Any, Iterable
+from typing import Any, MutableSequence
 from pathlib import Path
 
 
@@ -53,7 +53,7 @@ def dict_args_query(dict_input: dict, *args) -> Any:
 			if not dict_input: return
 	return dict_input
 
-def pop_zeros(items: Iterable) -> Iterable:
+def pop_zeros(items: MutableSequence) -> MutableSequence:
 	while items and items[-1] == 0:
 		del items[-1]
 	return items

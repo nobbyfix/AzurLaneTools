@@ -1,7 +1,6 @@
 import json
 from os import PathLike
 from dataclasses import dataclass
-from typing import Union, Optional
 
 
 @dataclass
@@ -9,13 +8,13 @@ class ShipIDConverter:
 	ship_to_id: dict[str, int]
 	id_to_ship: dict[int, str]
 
-	def get_groupid(self, shipname: str) -> Optional[int]:
+	def get_groupid(self, shipname: str) -> int | None:
 		return self.ship_to_id.get(shipname)
 
-	def get_shipname(self, groupid: int) -> Optional[str]:
+	def get_shipname(self, groupid: int) -> str | None:
 		return self.id_to_ship.get(groupid)
 
-	def convert(self, key: Union[str, int]) -> Union[str, int, None]:
+	def convert(self, key: int | str) -> int | str | None:
 		"""Returns either a groupid or shipname depending on the key.
 		get_groupid and get_shipname should be prefered.
 

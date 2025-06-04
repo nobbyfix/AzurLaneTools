@@ -1,7 +1,6 @@
 import json
 from os import PathLike
 from dataclasses import dataclass
-from typing import Union, Optional
 
 
 @dataclass
@@ -18,19 +17,19 @@ class AugmentConverter:
 	shipid_to_data: dict[int, AugmentConvertResult]
 	wikiname_to_data: dict[str, AugmentConvertResult]
 
-	def from_augmentid(self, augmentid: int) -> Optional[AugmentConvertResult]:
+	def from_augmentid(self, augmentid: int) -> AugmentConvertResult | None:
 		return self.id_to_data.get(augmentid)
 
-	def from_icon(self, icon: str) -> Optional[AugmentConvertResult]:
+	def from_icon(self, icon: str) -> AugmentConvertResult | None:
 		return self.icon_to_data.get(icon)
 
-	def from_shipid(self, shipid: int) -> Optional[AugmentConvertResult]:
+	def from_shipid(self, shipid: int) -> AugmentConvertResult | None:
 		return self.shipid_to_data.get(shipid)
 
-	def from_wikiname(self, wikiname: str) -> Optional[AugmentConvertResult]:
+	def from_wikiname(self, wikiname: str) -> AugmentConvertResult | None:
 		return self.wikiname_to_data.get(wikiname)
 
-	def convert(self, key: Union[str, int]) -> Optional[AugmentConvertResult]:
+	def convert(self, key: int | str) -> AugmentConvertResult | None:
 		"""Returns either an AugmentConvertResult from the key.
 		from_augmentid, from_shipid or from_wikiname should be prefered.
 

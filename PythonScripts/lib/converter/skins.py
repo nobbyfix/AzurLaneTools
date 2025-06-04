@@ -1,7 +1,6 @@
-from dataclasses import dataclass
 import json
+from dataclasses import dataclass
 from os import PathLike
-from typing import Union, Optional
 
 
 @dataclass
@@ -16,10 +15,10 @@ class SkinConvertResult:
 class SkinsConverter:
 	painting_to_data: dict[str, SkinConvertResult]
 
-	def from_painting(self, paintingname: str) -> Optional[SkinConvertResult]:
+	def from_painting(self, paintingname: str) -> SkinConvertResult | None:
 		return self.painting_to_data.get(paintingname)
 
-	def convert(self, key: Union[str, int]) -> Optional[SkinConvertResult]:
+	def convert(self, key: int | str) -> SkinConvertResult | None:
 		"""Returns either an SkinConvertResult from the key.
 		from_painting should be prefered.
 

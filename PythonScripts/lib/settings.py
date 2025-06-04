@@ -23,7 +23,7 @@ def read_settings(path: Path = SETTINGS_FILEPATH):
     with open(path, "rb") as f:
         return tomllib.load(f)
 
-def read_and_parse_settings(path: Path = None) -> APISettings:
+def read_and_parse_settings(path: Path | None = None) -> APISettings:
     settings_data = read_settings(path) if path else read_settings()
 
     return APISettings(

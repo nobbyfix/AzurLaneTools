@@ -1,6 +1,5 @@
 from pathlib import Path
 from enum import Enum
-from typing import Optional
 
 
 ### Constant Filepaths ###
@@ -54,7 +53,7 @@ class Rarity(Enum):
 		return self.label
 
 	@classmethod
-	def from_id(cls, rarity_num: int, is_research: bool = False) -> Optional["Rarity"]:
+	def from_id(cls, rarity_num: int, is_research: bool = False) -> "Rarity" | None:
 		"""
 		Returns a `Rarity` member with *rarity_num* matching it's `rarity` attribute.
 		Returns `None` if no match exists.
@@ -121,7 +120,7 @@ class Nation(Enum):
 		return self.value
 
 	@classmethod
-	def from_id(cls, nation_id: int) -> Optional["Nation"]:
+	def from_id(cls, nation_id: int) -> "Nation" | None:
 		"""
 		Returns a `Nation` member with *nation_id* matching it's `id` attribute.
 		Returns `None` if no match exists.
@@ -143,11 +142,11 @@ class Attribute(Enum):
 	DURABILITY		= (0,	"Health",		"Health")
 	CANNON			= (1,	"Fire",			"Firepower")
 	TORPEDO			= (2,	"Torp",			"Torpedo")
-	ANTIAIRCRAFT		= (3,	"AA",			"AA")
-	AIR			= (4,	"Air",			"Aviation")
+	ANTIAIRCRAFT	= (3,	"AA",			"AA")
+	AIR				= (4,	"Air",			"Aviation")
 	RELOAD			= (5,	"Reload",		"Reload")
 	ARMOR			= (6,	"Armor_Debug",		"Armor")
-	HIT			= (7,	"Acc",			"Accuracy")
+	HIT				= (7,	"Acc",			"Accuracy")
 	DODGE			= (8,	"Evade",		"Evasion")
 	SPEED			= (9,	"Speed",		"Speed")
 	LUCK			= (10,	"Luck",			"Luck")
@@ -183,34 +182,34 @@ class ShipType(Enum):
 	typetext: str
 	"""The text displaying the abbreviation of the shiptype or multiple types for shiptype bundles."""
 
-	DD	= (1,	"Destroyer",			"Destroyers",			"DD",	"DD")
-	CL	= (2,	"Light Cruiser",		"Light cruisers",		"CL",	"CL")
-	CA	= (3,	"Heavy Cruiser",		"Heavy cruisers",		"CA",	"CA")
-	BC	= (4,	"Battlecruiser",		"Battlecruisers",		"BC",	"BC")
-	BB	= (5,	"Battleship",			"Battleships",			"BB",	"BB")
-	CVL	= (6,	"Light Aircraft Carrier",	"Light aircraft carriers",	"CVL",	"CVL")
-	CV	= (7,	"Aircraft Carrier",		"Aircraft carriers",		"CV",	"CV")
-	SS	= (8,	"Submarine",			"Submarines",			"SS",	"SS")
-	CAV	= (9,	"Aviation Cruiser",		"Aviation cruisers",		"CAV",	"CAV")
-	BBV	= (10,	"Aviation Battleship",		"Aviation battleships",  	"BBV",	"BBV")
-	CT	= (11,	"Torpedo Cruiser",		"Torpedo cruisers",		"CT",	"CT")
-	AR	= (12,	"Repair Ship",			"Repair ships",			"AR",	"AR")
-	BM	= (13,	"Monitor",			"Monitors",			"BM",	"BM")
-	SSV	= (17,	"Submarine Carrier",		"Submarine carriers",		"SSV",	"SSV")
-	CB	= (18,	"Large Cruiser",		"Large cruisers",		"CB",	"CB")
-	AE	= (19,	"Munition Ship",		"Munition ships",		"AE",	"AE")
-	DDG_V	= (20,	"DDG",				"Guided-missile destroyers",	"DDG",	"DDG")
-	DDG_M	= (21,	"DDG",				"Guided-missile destroyers",	"DDG",	"DDG")
-	IX_S	= (22,	"Sailing Frigate (Submarine)",		"Sailing Frigate",		"IXs",	"IX")
-	IX_V	= (23, "Sailing Frigate (Vanguard)",		"Sailing Frigate",		"IXv",	"IX")
-	IX_M	= (24, "Sailing Frigate (Main)",			"Sailing Frigate",		"IXm",	"IX")
-	ZHAN	= (-1,	"",				"",				"BC",	"BC or BB")
-	HANG	= (-1,	"",				"",				"CVL",	"CV or CVL")
-	QIAN	= (-1,	"",				"",				"SS",	"SS or SSV or IX")
-	ZHONG	= (-1,	"",				"",				"CB",	"CB or CA")
-	FANQIAN	= (-1,	"",				"",				"DD",	"DD or DDG or CL")
-	QUZHU	= (-1,	"",				"",				"DD",	"DD or DDG")
-	FEGNFAN	= (-1,	"",				"",				"IXs",	"IX")
+	DD		= (1,	"Destroyer",					"Destroyers",					"DD",	"DD")
+	CL		= (2,	"Light Cruiser",				"Light cruisers",				"CL",	"CL")
+	CA		= (3,	"Heavy Cruiser",				"Heavy cruisers",				"CA",	"CA")
+	BC		= (4,	"Battlecruiser",				"Battlecruisers",				"BC",	"BC")
+	BB		= (5,	"Battleship",					"Battleships",					"BB",	"BB")
+	CVL		= (6,	"Light Aircraft Carrier",		"Light aircraft carriers",		"CVL",	"CVL")
+	CV		= (7,	"Aircraft Carrier",				"Aircraft carriers",			"CV",	"CV")
+	SS		= (8,	"Submarine",					"Submarines",					"SS",	"SS")
+	CAV		= (9,	"Aviation Cruiser",				"Aviation cruisers",			"CAV",	"CAV")
+	BBV		= (10,	"Aviation Battleship",			"Aviation battleships",  		"BBV",	"BBV")
+	CT		= (11,	"Torpedo Cruiser",				"Torpedo cruisers",				"CT",	"CT")
+	AR		= (12,	"Repair Ship",					"Repair ships",					"AR",	"AR")
+	BM		= (13,	"Monitor",						"Monitors",						"BM",	"BM")
+	SSV		= (17,	"Submarine Carrier",			"Submarine carriers",			"SSV",	"SSV")
+	CB		= (18,	"Large Cruiser",				"Large cruisers",				"CB",	"CB")
+	AE		= (19,	"Munition Ship",				"Munition ships",				"AE",	"AE")
+	DDG_V	= (20,	"DDG",							"Guided-missile destroyers",	"DDG",	"DDG")
+	DDG_M	= (21,	"DDG",							"Guided-missile destroyers",	"DDG",	"DDG")
+	IX_S	= (22,	"Sailing Frigate (Submarine)",	"Sailing Frigate",				"IXs",	"IX")
+	IX_V	= (23,	"Sailing Frigate (Vanguard)",	"Sailing Frigate",				"IXv",	"IX")
+	IX_M	= (24,	"Sailing Frigate (Main)",		"Sailing Frigate",				"IXm",	"IX")
+	ZHAN	= (-1,	"",								"",								"BC",	"BC or BB")
+	HANG	= (-1,	"",								"",								"CVL",	"CV or CVL")
+	QIAN	= (-1,	"",								"",								"SS",	"SS or SSV or IX")
+	ZHONG	= (-1,	"",								"",								"CB",	"CB or CA")
+	FANQIAN	= (-1,	"",								"",								"DD",	"DD or DDG or CL")
+	QUZHU	= (-1,	"",								"",								"DD",	"DD or DDG")
+	FEGNFAN	= (-1,	"",								"",								"IXs",	"IX")
 
 	def __init__(self, typeid, typename, catname, templatename, typetext):
 		# add attributes to enum objects
@@ -228,7 +227,7 @@ class ShipType(Enum):
 			self.__fullname2member_map__[typename.lower()] = self
 
 	@classmethod
-	def from_id(cls, type_id: int) -> Optional["ShipType"]:
+	def from_id(cls, type_id: int) -> "ShipType" | None:
 		"""
 		Returns a `ShipType` member with *type_id* matching it's `id` attribute.
 		Returns `None` if no match exists.
@@ -236,7 +235,7 @@ class ShipType(Enum):
 		return cls.__id2member_map__.get(type_id)
 
 	@classmethod
-	def from_type(cls, type_name: str) -> Optional["ShipType"]:
+	def from_type(cls, type_name: str) -> "ShipType" | None:
 		"""
 		Returns a `ShipType` member with *type_name* matching it's `name` attribute, ignoring capitalization.
 		Returns `None` if no match exists.
@@ -244,7 +243,7 @@ class ShipType(Enum):
 		return cls.__name2member_map__.get(type_name)
 
 	@classmethod
-	def from_name(cls, type_name: str) -> Optional["ShipType"]:
+	def from_name(cls, type_name: str) -> "ShipType" | None:
 		"""
 		Returns a `ShipType` member with *type_name* matching it's `typename` attribute.
 		Returns `None` if no match exists.
@@ -254,7 +253,7 @@ class ShipType(Enum):
 
 class Armor(Enum):
 	__label2member_map__: dict[str, "Armor"] = {}
-	id: id
+	id: int
 	"""ID of the armor type as used in the game."""
 	label: str
 	"""Name of the armor type."""
@@ -285,14 +284,14 @@ class Armor(Enum):
 		return self.value
 
 	@classmethod
-	def from_id(cls, armor_id: int) -> Optional["Armor"]:
+	def from_id(cls, armor_id: int) -> "Armor" | None:
 		"""
 		Returns an Armor member with matching *armor_id* if match exists, otherwise None.
 		"""
 		return cls._value2member_map_.get(armor_id)
 
 	@classmethod
-	def from_label(cls, armor_label: str) -> Optional["Armor"]:
+	def from_label(cls, armor_label: str) -> "Armor" | None:
 		"""
 		Returns an Armor member with matching *armor_label* if match exists, otherwise None.
 		"""

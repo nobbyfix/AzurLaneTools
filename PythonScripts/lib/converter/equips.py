@@ -1,7 +1,6 @@
 import json
 from os import PathLike
 from dataclasses import dataclass
-from typing import Union, Optional
 
 
 @dataclass
@@ -18,19 +17,19 @@ class EquipConverter:
 	gamename_to_data: dict[str, EquipConvertResult]
 	wikiname_to_data: dict[str, EquipConvertResult]
 
-	def from_equipid(self, equipid: int) -> Optional[EquipConvertResult]:
+	def from_equipid(self, equipid: int) -> EquipConvertResult | None:
 		return self.id_to_data.get(equipid)
 
-	def from_icon(self, icon: int) -> Optional[EquipConvertResult]:
+	def from_icon(self, icon: int) -> EquipConvertResult | None:
 		return self.icon_to_data.get(icon)
 
-	def from_gamename(self, gamename: str) -> Optional[EquipConvertResult]:
+	def from_gamename(self, gamename: str) -> EquipConvertResult | None:
 		return self.gamename_to_data.get(gamename)
 
-	def from_wikiname(self, wikiname: str) -> Optional[EquipConvertResult]:
+	def from_wikiname(self, wikiname: str) -> EquipConvertResult | None:
 		return self.wikiname_to_data.get(wikiname)
 
-	def convert(self, key: Union[str, int]) -> Optional[EquipConvertResult]:
+	def convert(self, key: int | str) -> EquipConvertResult | None:
 		"""Returns either an EquipConvertResult from the key.
 		from_equipid, from_gamename or from_wikiname should be prefered.
 

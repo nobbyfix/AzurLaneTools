@@ -1,6 +1,5 @@
 import logging
 from dataclasses import dataclass
-from typing import Union
 from collections.abc import Iterable
 
 from . import Client, SharecfgModule, Utility
@@ -46,7 +45,7 @@ class BackyardThemeTemplate(SharecfgModule):
 		)
 
 
-def convert_shiptype(typeid: Union[str, int]) -> Union[ShipType, int]:
+def convert_shiptype(typeid: int | str) -> ShipType | int:
 	if typeid == 0:
 		return 0
 	if isinstance(typeid, str):
@@ -89,7 +88,7 @@ class ChapterTemplate(SharecfgModule):
 
 @dataclass
 class EquipDataStatistics(SharecfgModule):
-	def _instantiate_client(self, dataid: str, data: dict) -> Union[EquipStat, EquipStatUpgrade]:
+	def _instantiate_client(self, dataid: str, data: dict) -> EquipStat | EquipStatUpgrade:
 		if "base" in data:
 			return EquipStatUpgrade(
 				json=data,
@@ -217,7 +216,7 @@ class ShipMetaSkilltask(SharecfgModule):
 
 @dataclass
 class ShipSkinExpression(SharecfgModule):
-	def all_client_ids(self, client: Client) -> Iterable[Union[int, str]]:
+	def all_client_ids(self, client: Client) -> Iterable[int | str]:
 		if clientdata := self._load_data(client):
 			return clientdata.keys()
 

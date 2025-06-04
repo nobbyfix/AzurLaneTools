@@ -1,6 +1,6 @@
 from argparse import ArgumentParser
 from difflib import get_close_matches
-from typing import Iterable
+from collections.abc import Iterable
 
 from lib import ALJsonAPI, Client, WikiHelper, Utility
 from lib.Constants import ShipType as ship_types

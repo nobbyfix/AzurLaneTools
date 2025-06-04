@@ -1,6 +1,6 @@
 from collections import Counter
 from argparse import ArgumentParser
-from typing import Iterable
+from collections.abc import Iterable
 
 from lib import ALJsonAPI, Client, WikiHelper, Utility
 from lib.apiclasses import Furniture

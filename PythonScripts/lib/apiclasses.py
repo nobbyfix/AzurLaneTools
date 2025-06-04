@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from abc import ABCMeta, abstractmethod
 from collections.abc import Iterable
-from typing import Any, Optional, Union
+from typing import Any
 
 from .api import ApiModule, Client, APIdataclass, ApiData, SharecfgData, MergedSharecfgData, Module, SharecfgModule
 from .Constants import Armor, Nation, Rarity, Attribute, ShipType
@@ -22,14 +22,14 @@ class DataRef(metaclass=ABCMeta):
 		Loads the Module referenced.
 		"""
 
-	def load(self, api: "ALJsonAPI", client: Client) -> ApiData:
+	def load(self, api: "ALJsonAPI", client: Client) -> ApiData | None:
 		"""
 		Loads the ApiData referenced from the module for *client*.
 		"""
 		module = self._get_module(api)
 		return module.load_client(self.id, client)
 
-	def load_first(self, api: "ALJsonAPI", clients: Iterable[Client]) -> ApiData:
+	def load_first(self, api: "ALJsonAPI", clients: Iterable[Client]) -> ApiData | None:
 		"""
 		Loads the first ApiData referenced from the module for *clients*.
 		"""
@@ -129,9 +129,9 @@ class ShipID:
 	"""
 	Helper class that automatically converts shipids into the the three useful formats.
 	"""
-	fullid: Optional[int]
+	fullid: int | None
 	groupid: int
-	singleid: Optional[int]
+	singleid: int | None
 
 	def __init__(self, groupid: int = 0, fullid: int = 0):
 		if groupid and fullid:
@@ -192,8 +192,8 @@ class Chapter(SharecfgData):
 	elite_spawn_pattern: list[int]
 	siren_list: list[SharecfgDataRef]
 	siren_spawn_pattern: list[int]
-	boss: Optional[SharecfgDataRef]
-	fleet_limitation: list[list[list[Union[ShipType, int]]]]
+	boss: SharecfgDataRef | None
+	fleet_limitation: list[list[list[ShipType | int]]]
 	awards: list[AwardDisplay]
 
 @APIdataclass
@@ -211,7 +211,7 @@ class Expedition(SharecfgData):
 
 @APIdataclass
 class FurnitureData(SharecfgData, Awardable):
-	theme: Optional[SharecfgDataRef]
+	theme: SharecfgDataRef | None
 
 @APIdataclass
 class Item(SharecfgData, Awardable): pass
@@ -222,7 +222,7 @@ class Code(SharecfgData): pass
 @APIdataclass
 class Resource(SharecfgData):
 	name: str
-	item: Optional[ApiDataRef]
+	item: ApiDataRef | None
 
 @APIdataclass
 class ShipStat(SharecfgData):
@@ -239,13 +239,13 @@ class ShipStat(SharecfgData):
 @APIdataclass
 class ShipSkin(SharecfgData):
 	shipid: ShipID
-	background: Optional[int]
-	background_special: Optional[int]
+	background: int | None
+	background_special: int | None
 
 @APIdataclass
 class Task(SharecfgData):
 	awards: list[Award]
-	target_id: Union[int, list[int], list[tuple[int, int]]]
+	target_id: int | list[int] | list[tuple[int, int]]
 
 @APIdataclass
 class Metatask(SharecfgData): pass
@@ -279,7 +279,7 @@ class ShipReward(Awardable):
 
 @APIdataclass
 class Furniture(MergedSharecfgData, Awardable):
-	theme: Optional[SharecfgDataRef]
+	theme: SharecfgDataRef | None
 
 @APIdataclass
 class ExtendedEquipStat(MergedSharecfgData): pass

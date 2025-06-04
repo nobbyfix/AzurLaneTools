@@ -1,6 +1,5 @@
 import re
 from pathlib import Path
-from typing import Union
 
 from .api import Client, JsonLoader, nobbyfix_JsonLoader, AzurLaneTools_JsonLoader, Module, ApiModule, SharecfgModule
 from . import settings, apimodules, sharecfgmodules, Constants
@@ -34,7 +33,7 @@ class ALJsonAPI:
 	equip_converter: equips.EquipConverter
 	augment_converter: augments.AugmentConverter
 
-	def __init__(self, loader: JsonLoader = None, source_path: Path = None, settings_path: Path = None) -> None:
+	def __init__(self, loader: JsonLoader | None = None, source_path: Path | None = None, settings_path: Path | None = None) -> None:
 		"""
 		Initializes the JsonAPI. Uses the JsonLoader as set in the settings file at "data/settings.toml".
 		Path of the settings file can be overridden using *settings_path*.
@@ -105,7 +104,7 @@ class ALJsonAPI:
 		module = moduleclass(name=name, _loader=self.loader)
 		return module
 
-	def _get_module(self, name: str, is_api: bool = False) -> Union[SharecfgModule, ApiModule]:
+	def _get_module(self, name: str, is_api: bool = False) -> SharecfgModule | ApiModule:
 		"""
 		Returns an instance of either a SharecfgModule or ApiModule called *name*.
 		If *is_api* is set to true, an ApiModule will be returned, if False a SharecfgModule.

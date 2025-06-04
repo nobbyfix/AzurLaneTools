@@ -1,5 +1,4 @@
 from argparse import ArgumentParser
-from typing import Union
 
 from lib import ALJsonAPI, Client, WikiHelper, Utility
 from lib.apiclasses import BackyardTheme
@@ -46,7 +45,7 @@ def equipment_theme(client, theme: BackyardTheme) -> str:
 	skinlist = equipment_theme_skinlist(client, theme['ids'])
 	return WikiHelper.simple_template('EquipSkinHeader', [theme.name])+'\n'+skinlist+'\n|}'
 
-def get_theme_from_id(client: Client, themeid: Union[str, int]) -> BackyardTheme:
+def get_theme_from_id(client: Client, themeid: str | int) -> BackyardTheme:
 	equip_skin_theme_template = api.get_sharecfgmodule('equip_skin_theme_template')
 	theme = equip_skin_theme_template.load_client(themeid, client)
 	if not theme:

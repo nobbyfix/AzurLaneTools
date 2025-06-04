@@ -1,6 +1,5 @@
 import re
 import enum
-from typing import Union
 import mwparserfromhell
 from dataclasses import dataclass
 from collections import Counter
@@ -122,7 +121,7 @@ def format_or_list(values: list) -> str:
 
 
 
-def getGameQuoteSingleBase(client: Client, fullid: Union[int, str]) -> SkinQuotes:
+def getGameQuoteSingleBase(client: Client, fullid: int | str) -> SkinQuotes:
 	"""Returns a dict containing ALL quotes of a single skin.
 	The keys are named after parameters complying with Template:ShipQuote for easy convertability.
 	"""
@@ -214,7 +213,7 @@ def getGameQuoteSingleBase(client: Client, fullid: Union[int, str]) -> SkinQuote
 
 	return SkinQuotes(skinquotes, skinname, QuoteType.BASE)
 
-def getGameQuoteSingleEX(client: Client, fullid: Union[int, str]) -> SkinQuotes:
+def getGameQuoteSingleEX(client: Client, fullid: int | str) -> SkinQuotes:
 	"""Returns a dict containing ALL quotes of a single EXTRA skin.
 	The keys are named after parameters complying with Template:ShipQuote for easy convertability.
 	"""
@@ -251,7 +250,7 @@ def getGameQuoteSingleEX(client: Client, fullid: Union[int, str]) -> SkinQuotes:
 	else: raise NotImplementedError(f'Unknown affection value {counter_result[0][0]}.')
 	return SkinQuotes(skinquotes, '', quote_type)
 
-def getGameQuoteSingle(client: Client, fullid: Union[int, str]) -> dict[QuoteType, SkinQuotes]:
+def getGameQuoteSingle(client: Client, fullid: int | str) -> dict[QuoteType, SkinQuotes]:
 	result = {}
 	if basequotes := getGameQuoteSingleBase(client, fullid):
 		result[basequotes.quote_type] = basequotes

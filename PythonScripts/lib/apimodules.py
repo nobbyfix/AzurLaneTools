@@ -1,6 +1,5 @@
 import itertools
 from dataclasses import dataclass
-from typing import Optional
 from collections.abc import Iterable
 
 from . import Client, ApiModule
@@ -9,7 +8,7 @@ from .apiclasses import Item, ShipReward, Furniture, ExtendedEquipStat, EquipSta
 
 @dataclass
 class PlayerResourceReward(ApiModule):
-	def _load_client(self, dataid: str, client: Client) -> Optional[Item]:
+	def _load_client(self, dataid: str, client: Client) -> Item | None:
 		player_resource = self._getmodule("player_resource")
 		resource = player_resource._load_client(dataid, client)
 		if resource:
@@ -23,7 +22,7 @@ class PlayerResourceReward(ApiModule):
 
 @dataclass
 class ShipRewardModule(ApiModule):
-	def _load_client(self, dataid: str, client: Client) -> Optional[ShipReward]:
+	def _load_client(self, dataid: str, client: Client) -> ShipReward | None:
 		ship_data_statistics = self._getmodule("ship_data_statistics")
 		shipstat = ship_data_statistics._load_client(dataid, client)
 		if shipstat:
@@ -43,7 +42,7 @@ class ShipRewardModule(ApiModule):
 
 @dataclass
 class FurnitureModule(ApiModule):
-	def _load_client(self, dataid: str, client: Client) -> Optional[Furniture]:
+	def _load_client(self, dataid: str, client: Client) -> Furniture | None:
 		furniture_data_template = self._getmodule("furniture_data_template")
 		furniture_shop_template = self._getmodule("furniture_shop_template")
 
@@ -62,7 +61,7 @@ class FurnitureModule(ApiModule):
 
 @dataclass
 class ExtendedEquipDataStatistics(ApiModule):
-	def _load_client(self, dataid: str, client: Client) -> Optional[ExtendedEquipStat]:
+	def _load_client(self, dataid: str, client: Client) -> ExtendedEquipStat | None:
 		equip_data_statistics = self._getmodule("equip_data_statistics")
 
 		def_data = equip_data_statistics.load_client(dataid, client)
@@ -79,7 +78,7 @@ class ExtendedEquipDataStatistics(ApiModule):
 
 @dataclass
 class AllItemDataStatistics(ApiModule):
-	def _load_client(self, dataid: str, client: Client) -> Optional[Item]:
+	def _load_client(self, dataid: str, client: Client) -> Item | None:
 		item_data_statistics = self._getmodule("item_data_statistics")
 		item_virtual_data_statistics = self._getmodule("item_virtual_data_statistics")
 

@@ -1,10 +1,9 @@
 import re
 import math
-import collections.abc
 from collections import Counter
+from collections.abc import Iterable
 from argparse import ArgumentParser
 from itertools import chain
-from typing import Iterable, Optional, Union
 
 from lib import ALJsonAPI, Client, Utility, WikiHelper, Constants
 from lib.apiclasses import Award, CachedAPILoader, ShipReward, Task
@@ -101,7 +100,7 @@ star_strings = {
 def flatten(*args) -> Iterable:
 	iterables = []
 	for arg in args:
-		if isinstance(arg, collections.abc.Iterable):
+		if isinstance(arg, Iterable):
 			iterables.extend(arg)
 		else:
 			iterables.append(arg)
@@ -174,7 +173,7 @@ class EnemyNameLoader(CachedAPILoader):
 		return icon	
 
 
-def star_requirement(num: int, value: Optional[int] = None) -> str:
+def star_requirement(num: int, value: int | None = None) -> str:
 	if num == 0:
 		return
 
@@ -183,7 +182,7 @@ def star_requirement(num: int, value: Optional[int] = None) -> str:
 		return star_text.format(value)
 	return star_text
 
-def fleet_retriction(fleet_limit: list[list[Union[Constants.ShipType, int]]]) -> str:
+def fleet_retriction(fleet_limit: list[list[Constants.ShipType | int]]) -> str:
 	countedtypes = Counter(chain(*fleet_limit))
 	types_str = []
 	for shiptype, amount in countedtypes.items():
