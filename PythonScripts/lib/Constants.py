@@ -28,17 +28,18 @@ class Rarity(Enum):
 	letter: str
 	"""Single letter used on the wiki in some templates."""
 
-	NORMAL0		= (0,	"Normal",	"E")
-	NORMAL		= (1,	"Normal",	"E")
-	RARE		= (2,	"Rare",		"B")
-	ELITE		= (3,	"Elite",	"P")
-	SUPER_RARE	= (4,	"Super Rare",	"G")
-	PRIORITY	= (4,	"Priority",	"G")
-	ULTRA_RARE	= (5,	"Ultra Rare",	"R")
-	LEGENDARY	= (5,	"Legendary",	"R")
-	DECISIVE	= (5,	"Decisive",	"R")
-	GIFT		= (8,	"Super Rare",	"G")
-	GIFT2		= (9,	"Super Rare",	"G")
+	NORMAL0			= (0,	"Normal",		"E")
+	NORMAL			= (1,	"Normal",		"E")
+	RARE			= (2,	"Rare",			"B")
+	ELITE			= (3,	"Elite",		"P")
+	SUPER_RARE		= (4,	"Super Rare",	"G")
+	PRIORITY		= (4,	"Priority",		"G")
+	ULTRA_RARE		= (5,	"Ultra Rare",	"R")
+	LEGENDARY		= (5,	"Legendary",	"R")
+	DECISIVE		= (5,	"Decisive",		"R")
+	VALENTINE_GIFT	= (8,	"Normal",		"E")
+	GIFT_OTHER		= (9,	"Super Rare",	"G")
+	UNKNOWN18		= (17,	"???",			"?")
 
 	def __init__(self, rarity, label, letter) -> None:
 		# add attributes to enum objects
@@ -60,12 +61,15 @@ class Rarity(Enum):
 
 		For `rarity_num=4`, `Rarity.SUPER_RARE` will be returned over `Rarity.PRIORITY`.
 		For `rarity_num=5`, `Rarity.ULTRA_RARE` will be returned over `Rarity.LEGENDARY` and `Rarity.DECISIVE`.
-		
+		For `rarity_num=7`, `Rarity.SUPER_RARE` will be returned, as there is only a single item (likely in error).
+
 		If *is_research* is set True, `Rarity.PRIORITY` and `Rarity.DECISIVE` will be prioritised.
 		"""
 		if is_research:
 			if rarity := {4: Rarity.PRIORITY, 5: Rarity.DECISIVE}.get(rarity_num):
 				return rarity
+		if rarity_num == 7:
+			return Rarity.SUPER_RARE
 		return cls.__num2member_map__.get(rarity_num)
 
 
@@ -90,6 +94,7 @@ class Nation(Enum):
 	IRIS_LIBRE			= (8,	"Iris Libre")
 	VICHYA_DOMINION		= (9,	"Vichya Dominion")
 	IRIS_ORTHODOXY		= (10,	"Iris Orthodoxy")
+	TULIPA				= (11,	"Kingdom of Tulipa")
 	TEMPESTA			= (96,	"Tempesta")
 	META				= (97,	"META")
 	UNIVERSAL2			= (98,	"Universal")
@@ -103,7 +108,8 @@ class Nation(Enum):
 	IDOLMASTER			= (107,	"The Idolmaster")
 	SSSS				= (108,	"SSSS")
 	ATELIER_RYZA		= (109,	"Atelier Ryza")
-	SENRAN_KAGURA		= (110, "Senran Kagura")
+	SENRAN_KAGURA		= (110,	"Senran Kagura")
+	TO_LOVE_RU			= (111,	"To LOVE-Ru")
 
 	def __new__(cls, nation_id, label):
 		obj = object.__new__(cls)
