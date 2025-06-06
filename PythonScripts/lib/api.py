@@ -375,7 +375,7 @@ class Module(metaclass=ABCMeta):
 		return data
 
 	@abstractmethod
-	def all_client_ids(self, client: Client) -> Iterable[int]:
+	def all_client_ids(self, client: Client) -> Iterable[int | str]:
 		"""
 		Returns all dataids that are associated with *client* as an iterable.
 		"""
@@ -413,7 +413,7 @@ class Module(metaclass=ABCMeta):
 				if data := self.load_client(dataid, client):
 					return data
 
-	def all_ids(self, clients: Iterable[Client]) -> set[int]:
+	def all_ids(self, clients: Iterable[Client]) -> set[int | str]:
 		"""
 		Returns a set of all dataids associated with the *clients* given.
 		Note that not all clients hava data associated with all returned ids.

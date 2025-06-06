@@ -82,7 +82,7 @@ class ALJsonAPI:
 		if not moduleclass:
 			raise UnknownModuleError(f"The ApiModule {name} does not exist.")
 
-		# if the module exists, create and instance and return it
+		# if the module exists, create an instance and return it
 		module = moduleclass(_api=self)
 		return module
 

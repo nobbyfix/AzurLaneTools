@@ -15,7 +15,7 @@ class PlayerResourceReward(ApiModule):
 			item = resource.item.load(self._api, client)
 			return item
 
-	def all_client_ids(self, client: Client) -> Iterable[int]:
+	def all_client_ids(self, client: Client) -> Iterable[int | str]:
 		player_resource = self._getmodule("player_resource")
 		client_ids = [resource.id for resource in player_resource.all_client(client) if resource.item]
 		return client_ids
@@ -35,7 +35,7 @@ class ShipRewardModule(ApiModule):
 			)
 			return shipreward
 
-	def all_client_ids(self, client: Client) -> Iterable[int]:
+	def all_client_ids(self, client: Client) -> Iterable[int | str]:
 		ship_data_statistics = self._getmodule("ship_data_statistics")
 		client_ids = [sid for sid in ship_data_statistics.all_client_ids(client) if int(sid)%10 == 1]
 		return client_ids
@@ -55,7 +55,7 @@ class FurnitureModule(ApiModule):
 		elif furniture_shop is not None:
 			return furniture_shop
 
-	def all_client_ids(self, client: Client) -> Iterable[int]:
+	def all_client_ids(self, client: Client) -> Iterable[int | str]:
 		furniture_data_template = self._getmodule("furniture_data_template")
 		return furniture_data_template.all_client_ids(client)
 
@@ -89,13 +89,13 @@ class AllItemDataStatistics(ApiModule):
 		else:
 			return item_virtual_data
 
-	def all_client_ids(self, client: Client) -> Iterable[int]:
+	def all_client_ids(self, client: Client) -> Iterable[int | str]:
 		item_data_statistics = self._getmodule("item_data_statistics")
 		item_virtual_data_statistics = self._getmodule("item_virtual_data_statistics")
 		return itertools.chain(item_data_statistics.all_client_ids(client), item_virtual_data_statistics.all_client_ids(client))
 
 
-__all__ = {
+_all_ = {
 	"player_resource_reward": PlayerResourceReward,
 	"ship_reward": ShipRewardModule,
 	"furniture": FurnitureModule,
@@ -103,5 +103,8 @@ __all__ = {
 	"all_item_data_statistics": AllItemDataStatistics,
 }
 
-def import_module(modulename: str) -> ApiModule:
-	return __all__.get(modulename)
+def import_module(modulename: str) -> type[ApiModule] | None:
+	return _all_.get(modulename)
+
+__all__ = [cls.__name__ for cls in _all_.values()]
+__all__.append(import_module.__name__)

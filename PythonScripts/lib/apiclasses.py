@@ -77,10 +77,22 @@ class AwardDisplay:
 	13		DROP_TYPE_WORLD_COLLECTION
 	19		DROP_TYPE_LOVE_LETTER
 	22		DROP_TYPE_META_PT
+	23		DROP_TYPE_SKIN_TIMELIMIT
+	26		DROP_TYPE_DORM3D_FURNITURE
+	27		DROP_TYPE_DORM3D_GIFT
+	28		DROP_TYPE_DORM3D_SKIN
+	29		DROP_TYPE_LIVINGAREA_COVER
+	31		DROP_TYPE_COMBAT_UI_STYLE
+	33		DROP_TYPE_ACTIVITY_MEDAL
+	41		DROP_TYPE_ISLAND_ITEM
+	42		DROP_TYPE_ISLAND_OVERFLOWITEM
+	43		DROP_TYPE_ISLAND_ABILITY
+
 	1000	DROP_TYPE_USE_ACTIVITY_DROP
 	1001	DROP_TYPE_RYZA_DROP
 	1002	DROP_TYPE_WORKBENCH_DROP
 	1003	DROP_TYPE_FEAST_DROP
+	1005	DROP_TYPE_HOLIDAY_VILLA
 	"""
 	# see "const.lua" for all drop types and "model/vo/drop.lua" for which the data source is
 	def resolve(self) -> DataRef:
@@ -102,12 +114,12 @@ class AwardDisplay:
 		if self.type == 100: return SharecfgDataRef(id=self.refid, module="drop_data_restore")
 		raise NotImplementedError(f"Cannot resolve award of type {self.type}: Unknown or unimplemented type.")
 
-	def load(self, api: "ALJsonAPI", client: Client) -> Awardable:
+	def load(self, api: "ALJsonAPI", client: Client) -> Awardable | None:
 		dataref = self.resolve()
 		awardable = dataref.load(api, client)
 		return awardable
 	
-	def load_first(self, api: "ALJsonAPI", client: Iterable[Client]) -> Awardable:
+	def load_first(self, api: "ALJsonAPI", client: Iterable[Client]) -> Awardable | None:
 		dataref = self.resolve()
 		awardable = dataref.load_first(api, client)
 		return awardable

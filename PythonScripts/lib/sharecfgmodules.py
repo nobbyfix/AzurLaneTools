@@ -109,7 +109,7 @@ class ExpeditionDataTemplate(SharecfgModule):
 		elif len(awarddata) == 3:
 			return AwardDisplayLabeled(*awarddata)
 		else:
-			print(f"WARNING: Found AwardDisplay with more/less than 2 arguments (dataid: {dataid})")
+			print(f"WARNING: Found AwardDisplay with more/less than 2 or 3 arguments (dataid: {dataid})")
 			print(f"WARNING: AwardDisplay raw data <{awarddata}>")
 
 	def _instantiate_client(self, dataid: str, data: dict) -> Expedition:
