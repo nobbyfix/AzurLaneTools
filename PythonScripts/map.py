@@ -31,7 +31,11 @@ property_limit_sign = {
 }
 
 # "model/const/chapterconst.lua" with slot0.AttachX
+# negative node types are not from the game file
 node_type_letter = {
+	-100: "unknown-landbase", # unknown landbases
+	-3: "v", # airfield
+	-2: "o", # lighthouse
 	-1: "x", # land
 	0: " ", # water
 	1: "s", # start
@@ -314,16 +318,35 @@ def get_chapter(chapterid: int, api: ALJsonAPI, client: Client) -> str:
 			stat_strs.append(f"{property_limit_text[ltype]} {property_limit_sign[lsign]} {lamount}")
 		chapter_wiki_template["StatRestrictions"] = ", ".join(stat_strs)
 
+
 	### Nodemap
+	additional_nodemap_fields = {}
+	# filter lighthouse
+	for item in chapter.float_items:
+		if item[2] == "suligao_1x1_dengta_close":
+			additional_nodemap_fields[(item[0], item[1])] = -2
+
+	# filter landbases
+	land_based_template = api.get_sharecfgmodule("land_based_template")
+	for landbased in chapter.land_based:
+		land_base_data = land_based_template.load_client(landbased[2], client)
+		if land_base_data.type == 5:
+			additional_nodemap_fields[(landbased[0], landbased[1])] = -3
+		else:
+			additional_nodemap_fields[(landbased[0], landbased[1])] = -100
+
+	# build nodemap
 	nodemap = ""
 	current_row = -1
-	for row, _, access, nodetype in chapter.get("grids"):
+	for row, column, access, nodetype in chapter.get("grids"):
 		if row == current_row:
 			nodemap = "|"+nodemap
 		else:
 			if nodemap: nodemap = "\n	|" + nodemap
 			current_row = row
 		if not access: nodetype = -1
+		if add_field_letter := additional_nodemap_fields.get((row, column)):
+			nodetype = add_field_letter
 		nodemap = node_type_letter[nodetype] + nodemap
 	chapter_wiki_template["NodeMap"] = "{{MapTable\n	|"+nodemap+"\n  }}"
 
