@@ -102,7 +102,7 @@ class Nation(Enum):
 	NEPTUNIA			= (101,	"Neptunia")
 	BILIBILI			= (102,	"Bilibili")
 	UTAWARERUMONO		= (103,	"Utawarerumono")
-	KIZUNA_AI			= (104,	"Kizuna AI")
+	KIZUNA_AI			= (104,	"KizunaAI")
 	HOLOLIVE			= (105,	"Hololive")
 	VENUS_VACATION		= (106,	"Venus Vacation")
 	IDOLMASTER			= (107,	"The Idolmaster")

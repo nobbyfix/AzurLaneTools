@@ -3,6 +3,7 @@ from pathlib import Path
 from enum import Enum
 from dataclasses import dataclass, field
 from abc import ABCMeta, abstractmethod
+from collections import defaultdict
 from collections.abc import Iterable, Callable, Generator, Hashable
 
 
@@ -217,7 +218,7 @@ class AzurLaneTools_JsonLoader(JsonLoader):
 
 	def __init__(self, source_directory: Path) -> None:
 		super().__init__(source_directory)
-		self._gamecfg_cache = {c: {} for c in Client}
+		self._gamecfg_cache = defaultdict(dict)
 
 	def load_sharecfg(self, sharecfg_name: str, client: Client) -> dict:
 		jsonpath = Path(self.source_directory, client.name, "ShareCfg", sharecfg_name+".json")
