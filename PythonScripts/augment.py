@@ -2,8 +2,8 @@ from argparse import ArgumentParser
 from collections.abc import Iterable
 from difflib import get_close_matches
 
-from lib import ALJsonAPI, Client, Utility, WikiHelper
-from lib.Constants import ShipType as ship_types
+from alapi import ALJsonAPI, Client, Utility, WikiHelper
+from alapi.Constants import ShipType as ship_types
 
 attributes = {
 	"durability": ["Health", "HealthMax", "HealthOPS"],

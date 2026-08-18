@@ -1,8 +1,8 @@
 from argparse import ArgumentParser
 
-from lib import ALJsonAPI, Client, Utility
-from lib.apiclasses import ShipReward
-from lib.WikiHelper import Wikifier, put_icon, simple_template
+from alapi import ALJsonAPI, Client, Utility
+from alapi.apiclasses import ShipReward
+from alapi.WikiHelper import Wikifier, put_icon, simple_template
 
 
 class MilestoneQuery:

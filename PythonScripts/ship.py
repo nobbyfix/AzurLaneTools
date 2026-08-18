@@ -4,9 +4,9 @@ import re
 from argparse import ArgumentParser
 from collections.abc import Iterable
 
-from lib import DEFAULT_CLIENTS, ALJsonAPI, Client, Constants, Utility, WikiHelper
-from lib.apiclasses import CachedAPILoader
-from lib.Constants import ShipType
+from alapi import DEFAULT_CLIENTS, ALJsonAPI, Client, Constants, Utility, WikiHelper
+from alapi.apiclasses import CachedAPILoader
+from alapi.Constants import ShipType
 
 SKILL_TYPE = {
 	1: "Offense",

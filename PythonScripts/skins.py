@@ -5,8 +5,8 @@ from pathlib import Path
 from time import sleep
 from typing import Any, Callable
 
-from lib import DEFAULT_CLIENTS, ALJsonAPI, Client, Constants, Utility, WikiHelper
-from lib.converter import ships
+from alapi import DEFAULT_CLIENTS, ALJsonAPI, Client, Constants, Utility, WikiHelper
+from alapi.converter import ships
 
 api = ALJsonAPI()
 ship_skin_template = api.get_sharecfgmodule("ship_skin_template")

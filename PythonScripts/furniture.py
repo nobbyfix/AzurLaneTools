@@ -2,8 +2,8 @@ from argparse import ArgumentParser
 from collections import Counter
 from collections.abc import Iterable
 
-from lib import ALJsonAPI, Client, Utility, WikiHelper
-from lib.apiclasses import Furniture
+from alapi import ALJsonAPI, Client, Utility, WikiHelper
+from alapi.apiclasses import Furniture
 
 FURNITURE_TYPE = {
 	1: "Wallpaper",  # TYPE_WALLPAPER
@@ -19,6 +19,9 @@ FURNITURE_TYPE = {
 	11: "Moving Object",  # TYPE_MOVEABLE
 	12: "Transport",  # TYPE_TRANSPORT
 	13: "Special",  # TYPE_RANDOM_CONTROLLER
+	14: "Special",  # TYPE_FOLLOWER
+	15: "Special",  # TYPE_LUTE
+	16: "Special",  # TYPE_RANDOM_SLOT
 }
 
 INTERACTION = {

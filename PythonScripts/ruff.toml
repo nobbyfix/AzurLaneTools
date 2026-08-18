@@ -10,4 +10,4 @@ ignore = ["E741", "F403"]
 
 [lint.isort]
 section-order = ["third-party", "local-folder"]
-known-local-folder = ["lib"]
+known-local-folder = ["alapi"]

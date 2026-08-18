@@ -2,7 +2,8 @@ import logging
 from collections.abc import Iterable
 from dataclasses import dataclass
 
-from . import Client, SharecfgModule, Utility
+from . import Utility
+from .api import Client, SharecfgModule
 from .apiclasses import (
 	ApiDataRef,
 	Award,
@@ -295,7 +296,7 @@ class TaskMetaDataTemplate(SharecfgModule):
 		return Metatask(json=data)
 
 
-__all__ = {
+__modules__ = {
 	"activity_7_day_sign": Activity7DaySign,
 	"activity_event_pt": ActivityEventPt,
 	"activity_shop_template": ActivityShopTemplate,
@@ -317,5 +318,9 @@ __all__ = {
 }
 
 
-def import_module(modulename: str) -> SharecfgModule:
-	return __all__.get(modulename)
+def import_module(modulename: str) -> type[SharecfgModule] | None:
+	return __modules__.get(modulename)
+
+
+__all__ = [cls.__name__ for cls in __modules__.values()]
+__all__.append(import_module.__name__)

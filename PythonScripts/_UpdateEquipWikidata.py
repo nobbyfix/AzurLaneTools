@@ -1,7 +1,7 @@
 import json
 
-from lib import Constants
-from lib.WikiHelper import WikiClient
+from alapi import Constants
+from alapi.WikiHelper import WikiClient
 
 
 def request_equips(wikiclient: WikiClient, offset=0):

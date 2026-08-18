@@ -1,5 +1,5 @@
-from lib import ALJsonAPI, Constants
-from lib.converter import ships_updater
+from alapi import ALJsonAPI, Constants
+from alapi.converter import ships_updater
 
 
 def main():

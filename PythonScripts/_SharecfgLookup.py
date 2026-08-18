@@ -1,4 +1,4 @@
-from lib import ALJsonAPI, Client
+from alapi import ALJsonAPI, Client
 
 
 def main():

@@ -4,8 +4,8 @@ import re
 from collections import Counter
 from dataclasses import dataclass
 
-from lib import DEFAULT_CLIENTS, ALJsonAPI, Client, Constants, Utility, WikiHelper
-from lib.Utility import rreplace
+from alapi import DEFAULT_CLIENTS, ALJsonAPI, Client, Constants, Utility, WikiHelper
+from alapi.Utility import rreplace
 
 VOICE_TYPE_CONVERT = {
 	"skill": "SkillActivation",

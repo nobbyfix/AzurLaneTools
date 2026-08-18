@@ -3,7 +3,7 @@ import re
 from argparse import ArgumentParser
 from pathlib import Path
 
-from lib import DEFAULT_CLIENTS, ALJsonAPI, Client, Utility, WikiHelper
+from alapi import DEFAULT_CLIENTS, ALJsonAPI, Client, Utility, WikiHelper
 
 api = ALJsonAPI()
 memory_group = api.get_sharecfgmodule("memory_group")

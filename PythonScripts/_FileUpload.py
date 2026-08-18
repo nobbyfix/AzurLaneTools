@@ -3,7 +3,7 @@ from enum import Enum, auto
 from mwclient import APIError
 from pathlib import Path
 
-from lib import WikiHelper
+from alapi import WikiHelper
 
 
 class UploadResult(Enum):

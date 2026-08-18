@@ -4,8 +4,8 @@ from collections.abc import Iterable
 from difflib import get_close_matches
 from ship import get_skilldesc
 
-from lib import ALJsonAPI, Client, Utility, WikiHelper
-from lib.Constants import Nation, ShipType
+from alapi import ALJsonAPI, Client, Utility, WikiHelper
+from alapi.Constants import Nation, ShipType
 
 attributes = {
 	"durability": ["Health", "Health"],

@@ -1,7 +1,7 @@
 from argparse import ArgumentParser
 
-from lib import ALJsonAPI, Client, Utility, WikiHelper
-from lib.apiclasses import Award, ShipReward
+from alapi import ALJsonAPI, Client, Utility, WikiHelper
+from alapi.apiclasses import Award, ShipReward
 
 
 def award_to_display(award: Award, wikifier: WikiHelper.Wikifier, client: Client) -> str:

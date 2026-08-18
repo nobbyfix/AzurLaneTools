@@ -15,7 +15,7 @@ if sys.version_info < (3, 15):
 JsonDict: TypeAlias = frozendict[Any, Any]
 
 
-@dataclass
+@dataclass(eq=False)
 class ClientDataMixin:
 	"""
 	Data fields shared by all :class:`Client` enum members.
@@ -101,7 +101,7 @@ class JsonLoader(metaclass=ABCMeta):
 		return f"{self.__class__.__name__}('{self.source_directory}')"
 
 	def json_load(self, file) -> Any:
-		json.load(file, cls=FrozenDictDecoder)
+		return json.load(file, cls=FrozenDictDecoder)
 
 	@abstractmethod
 	def load_sharecfg(self, sharecfg_name: str, client: Client) -> JsonDict:

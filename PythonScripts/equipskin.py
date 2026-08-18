@@ -1,7 +1,7 @@
 from argparse import ArgumentParser
 
-from lib import ALJsonAPI, Client, Utility, WikiHelper
-from lib.apiclasses import BackyardTheme
+from alapi import ALJsonAPI, Client, Utility, WikiHelper
+from alapi.apiclasses import BackyardTheme
 
 EQUIPMENTTYPE_USAGE = {
 	1: "{{DD}} DD Main Gun",

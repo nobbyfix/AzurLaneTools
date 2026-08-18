@@ -5,8 +5,8 @@ from collections import Counter
 from collections.abc import Iterable
 from itertools import chain
 
-from lib import ALJsonAPI, Client, Constants, Utility, WikiHelper
-from lib.apiclasses import Award, CachedAPILoader, ShipReward, Task
+from alapi import ALJsonAPI, Client, Constants, Utility, WikiHelper
+from alapi.apiclasses import Award, CachedAPILoader, ShipReward, Task
 
 TIER_EQUIP_NAME = re.compile(r"^(T[0-9]\s).*")
 DESIGN_EQUIP_NAME = re.compile(r".*(\s(T[0-9]\s)Design)")

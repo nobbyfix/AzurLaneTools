@@ -2,7 +2,7 @@ import itertools
 from collections.abc import Iterable
 from dataclasses import dataclass
 
-from . import ApiModule, Client
+from .api import ApiModule, Client
 from .apiclasses import EquipStatUpgrade, ExtendedEquipStat, Furniture, Item, ShipReward
 
 
@@ -94,7 +94,7 @@ class AllItemDataStatistics(ApiModule):
 		return itertools.chain(item_data_statistics.all_client_ids(client), item_virtual_data_statistics.all_client_ids(client))
 
 
-_all_ = {
+__modules__ = {
 	"player_resource_reward": PlayerResourceReward,
 	"ship_reward": ShipRewardModule,
 	"furniture": FurnitureModule,
@@ -104,8 +104,8 @@ _all_ = {
 
 
 def import_module(modulename: str) -> type[ApiModule] | None:
-	return _all_.get(modulename)
+	return __modules__.get(modulename)
 
 
-__all__ = [cls.__name__ for cls in _all_.values()]
+__all__ = [cls.__name__ for cls in __modules__.values()]
 __all__.append(import_module.__name__)

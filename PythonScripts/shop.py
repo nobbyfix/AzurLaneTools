@@ -1,7 +1,7 @@
 from argparse import ArgumentParser
 
-from lib import ALJsonAPI, Client, Utility
-from lib.WikiHelper import MultilineTemplate, Wikifier, simple_template
+from alapi import ALJsonAPI, Client, Utility
+from alapi.WikiHelper import MultilineTemplate, Wikifier, simple_template
 
 template_shop = MultilineTemplate("EventShop")
 

@@ -1,5 +1,5 @@
-from lib import ALJsonAPI, Constants
-from lib.converter import augments_updater
+from alapi import ALJsonAPI, Constants
+from alapi.converter import augments_updater
 
 
 def main():
