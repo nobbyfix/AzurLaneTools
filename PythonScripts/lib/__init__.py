@@ -44,17 +44,12 @@ class ALJsonAPI:
 	equip_converter: equips.EquipConverter
 	augment_converter: augments.AugmentConverter
 
-	def __init__(
-		self, loader: JsonLoader | None = None, source_path: Path | None = None, settings_path: Path | None = None
-	) -> None:
+	def __init__(self, loader: JsonLoader | None = None, settings_path: Path | None = None) -> None:
 		"""
 		Initializes the JsonAPI. Uses the JsonLoader as set in the settings file at "data/settings.toml".
 		Path of the settings file can be overridden using *settings_path*.
 		For usage of a different/custom JsonLoader, *loader* can be set, which will ignore the settings file.
 		"""
-		if source_path:
-			raise DeprecationWarning("Initialisation of ALJsonAPI using 'source_path' should be removed.")
-
 		if loader:
 			self.loader = loader
 		else:
@@ -114,7 +109,7 @@ class ALJsonAPI:
 			moduleclass = SharecfgModule
 
 		# create the instance and return it
-		module = moduleclass(name=name, _loader=self.loader)
+		module = moduleclass(name=name, _loader=self.loader)  # pyright: ignore [reportCallIssue]
 		return module
 
 	def _get_module(self, name: str, is_api: bool = False) -> SharecfgModule | ApiModule:
@@ -160,7 +155,7 @@ class ALJsonAPI:
 		results = NAMECODE.findall(inputstring)
 		for namecode_string, namecode_num in results:
 			# get the replacement string 'code' for the found namecode number for *client*
-			code = name_code.load_client(namecode_num, client)
-			# replace the namecode placeholder in the inputstring with the 'code'
-			inputstring = inputstring.replace(namecode_string, code.name)
+			if code := name_code.load_client(namecode_num, client):
+				# replace the namecode placeholder in the inputstring with the 'code'
+				inputstring = inputstring.replace(namecode_string, code.name)
 		return inputstring
