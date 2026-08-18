@@ -1,21 +1,42 @@
 import logging
-from dataclasses import dataclass
 from collections.abc import Iterable
+from dataclasses import dataclass
 
 from . import Client, SharecfgModule, Utility
-from .apiclasses import (ApiDataRef, LoginRewards, SharecfgDataRef, AwardDisplay, AwardDisplayLabeled, Award, BackyardTheme,
-	Chapter, Code, EquipStat, EquipStatUpgrade, Expedition, FurnitureData, Item, MetashipSkill,
-	MetataskRef, Metatask, Milestone, Resource, ShipID, ShipSkin, ShipStat, ShopItem, Task)
-from .Constants import Armor, Rarity, Nation, Attribute, ShipType
+from .apiclasses import (
+	ApiDataRef,
+	Award,
+	AwardDisplay,
+	AwardDisplayLabeled,
+	BackyardTheme,
+	Chapter,
+	Code,
+	EquipStat,
+	EquipStatUpgrade,
+	Expedition,
+	FurnitureData,
+	Item,
+	LoginRewards,
+	MetashipSkill,
+	Metatask,
+	MetataskRef,
+	Milestone,
+	Resource,
+	SharecfgDataRef,
+	ShipID,
+	ShipSkin,
+	ShipStat,
+	ShopItem,
+	Task,
+)
+from .Constants import Armor, Attribute, Nation, Rarity, ShipType
 
 
 @dataclass
 class Activity7DaySign(SharecfgModule):
 	def _instantiate_client(self, dataid: str, data: dict) -> LoginRewards:
-		return LoginRewards(
-			json=data,
-			front_drops=[Award(*awarddata) for awarddata in data["front_drops"]]
-		)
+		return LoginRewards(json=data, front_drops=[Award(*awarddata) for awarddata in data["front_drops"]])
+
 
 @dataclass
 class ActivityEventPt(SharecfgModule):
@@ -25,6 +46,7 @@ class ActivityEventPt(SharecfgModule):
 			point=ApiDataRef(data["pt"], "player_resource_reward"),
 			rewards=[Award(*awarddata) for awarddata in data["drop_client"]],
 		)
+
 
 @dataclass
 class ActivityShopTemplate(SharecfgModule):
@@ -36,13 +58,11 @@ class ActivityShopTemplate(SharecfgModule):
 			amount=data["num"],
 		)
 
+
 @dataclass
 class BackyardThemeTemplate(SharecfgModule):
 	def _instantiate_client(self, dataid: str, data: dict) -> BackyardTheme:
-		return BackyardTheme(
-			json=data,
-			furniture=[ApiDataRef(fid, "furniture") for fid in data["ids"]]
-		)
+		return BackyardTheme(json=data, furniture=[ApiDataRef(fid, "furniture") for fid in data["ids"]])
 
 
 def convert_shiptype(typeid: int | str) -> ShipType | int:
@@ -52,6 +72,7 @@ def convert_shiptype(typeid: int | str) -> ShipType | int:
 		return ShipType.from_type(typeid)
 	if typeid != 0:
 		return ShipType.from_id(typeid)
+
 
 @dataclass
 class ChapterTemplate(SharecfgModule):
@@ -81,25 +102,26 @@ class ChapterTemplate(SharecfgModule):
 			siren_list=sirens,
 			siren_spawn_pattern=Utility.pop_zeros(data["ai_refresh"]),
 			boss=boss,
-			fleet_limitation=[[[convert_shiptype(tid) for tid in subfleet] for subfleet in fleet] for fleet in data["limitation"]],
-			awards=[AwardDisplay(*award) for award in data["awards"]]
+			fleet_limitation=[
+				[[convert_shiptype(tid) for tid in subfleet] for subfleet in fleet] for fleet in data["limitation"]
+			],
+			awards=[AwardDisplay(*award) for award in data["awards"]],
 		)
 		return chapter
+
 
 @dataclass
 class EquipDataStatistics(SharecfgModule):
 	def _instantiate_client(self, dataid: str, data: dict) -> EquipStat | EquipStatUpgrade:
 		if "base" in data:
-			return EquipStatUpgrade(
-				json=data,
-				base=SharecfgDataRef(data["base"], "equip_data_statistics")
-			)
+			return EquipStatUpgrade(json=data, base=SharecfgDataRef(data["base"], "equip_data_statistics"))
 
 		return EquipStat(
 			json=data,
-			rarity=Rarity.from_id(data["rarity"]-1),
+			rarity=Rarity.from_id(data["rarity"] - 1),
 			nation=Nation.from_id(data["nationality"]),
 		)
+
 
 @dataclass
 class ExpeditionDataTemplate(SharecfgModule):
@@ -119,6 +141,7 @@ class ExpeditionDataTemplate(SharecfgModule):
 			award_display=[self.parse_awarddata(awarddata, dataid) for awarddata in data["award_display"]],
 		)
 
+
 @dataclass
 class FurnitureDataTemplate(SharecfgModule):
 	def _instantiate_client(self, dataid: str, data: dict) -> FurnitureData:
@@ -132,6 +155,7 @@ class FurnitureDataTemplate(SharecfgModule):
 			theme=theme,
 		)
 
+
 @dataclass
 class ItemDataStatistics(SharecfgModule):
 	def _instantiate_client(self, dataid: str, data: dict) -> Item:
@@ -140,8 +164,11 @@ class ItemDataStatistics(SharecfgModule):
 			rarity=Rarity.from_id(data["rarity"]),
 		)
 
+
 @dataclass
-class ItemVirtualDataStatistics(ItemDataStatistics): pass
+class ItemVirtualDataStatistics(ItemDataStatistics):
+	pass
+
 
 @dataclass
 class NameCode(SharecfgModule):
@@ -151,31 +178,33 @@ class NameCode(SharecfgModule):
 	def _process_data(self, client: Client, jsondata) -> None:
 		# start enumeration at one, since lua tables start keys at one
 		# the key also needs to be converted into a string to comply with SharecfgModule behaviour
-		#jsondata = {str(i): data for i, data in enumerate(jsondata, 1)}
+		# jsondata = {str(i): data for i, data in enumerate(jsondata, 1)}
 		if isinstance(jsondata, dict):
 			jsondata = jsondata.values()
-		jsondata = {str(data['id']): data for data in jsondata}
+		jsondata = {str(data["id"]): data for data in jsondata}
 		super()._process_data(client, jsondata)
 
 	def _instantiate_client(self, dataid: str, data: dict) -> Code:
-			return Code(json=data)
+		return Code(json=data)
 
 	# needs custom implementation, because name_code has no "all" field
 	def all_client_ids(self, client: Client) -> Iterable[int]:
 		self._load_data(client)
 		return self._data[client].keys()
 
+
 @dataclass
 class PlayerResource(SharecfgModule):
 	def _instantiate_client(self, dataid: str, data: dict) -> Resource:
-			item = None
-			if (itemid := data["itemid"]) != 0:
-				item = ApiDataRef(itemid, "all_item_data_statistics")
+		item = None
+		if (itemid := data["itemid"]) != 0:
+			item = ApiDataRef(itemid, "all_item_data_statistics")
 
-			return Resource(
-				json=data,
-				item=item,
-			)
+		return Resource(
+			json=data,
+			item=item,
+		)
+
 
 @dataclass
 class ShipDataStatistics(SharecfgModule):
@@ -189,7 +218,7 @@ class ShipDataStatistics(SharecfgModule):
 		return ShipStat(
 			json=data,
 			shipid=ShipID(fullid=data["id"]),
-			rarity=Rarity.from_id(data["rarity"]-1),
+			rarity=Rarity.from_id(data["rarity"] - 1),
 			nation=Nation.from_id(data["nationality"]),
 			type=ShipType.from_id(data["type"]),
 			armor=Armor.from_id(data["armor_type"]),
@@ -198,13 +227,13 @@ class ShipDataStatistics(SharecfgModule):
 			skin=SharecfgDataRef(data["skin_id"], "ship_skin_template"),
 		)
 
+
 @dataclass
 class ShipMetaSkilltask(SharecfgModule):
 	def _instantiate_client(self, dataid: str, data: dict) -> MetashipSkill:
 		tasks = []
 		for taskdata in data["skill_levelup_task"]:
-			taskref = MetataskRef(id=taskdata[0], module="task_meta_data_template",
-				repeat_limit=taskdata[1], xp_gain=taskdata[2])
+			taskref = MetataskRef(id=taskdata[0], module="task_meta_data_template", repeat_limit=taskdata[1], xp_gain=taskdata[2])
 			tasks.append(taskref)
 
 		return MetashipSkill(
@@ -214,11 +243,13 @@ class ShipMetaSkilltask(SharecfgModule):
 			tasks=tasks,
 		)
 
+
 @dataclass
 class ShipSkinExpression(SharecfgModule):
 	def all_client_ids(self, client: Client) -> Iterable[int | str]:
 		if clientdata := self._load_data(client):
 			return clientdata.keys()
+
 
 @dataclass
 class ShipSkinTemplate(SharecfgModule):
@@ -236,6 +267,7 @@ class ShipSkinTemplate(SharecfgModule):
 			background=background,
 			background_special=background_special,
 		)
+
 
 @dataclass
 class TaskDataTemplate(SharecfgModule):
@@ -255,6 +287,7 @@ class TaskDataTemplate(SharecfgModule):
 			awards=[Award(*awarddata) for awarddata in award_display],
 			target_id=targetid,
 		)
+
 
 @dataclass
 class TaskMetaDataTemplate(SharecfgModule):
@@ -282,6 +315,7 @@ __all__ = {
 	"task_data_template": TaskDataTemplate,
 	"task_meta_data_template": TaskMetaDataTemplate,
 }
+
 
 def import_module(modulename: str) -> SharecfgModule:
 	return __all__.get(modulename)

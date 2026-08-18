@@ -1,6 +1,6 @@
 import json
-from os import PathLike
 from dataclasses import dataclass
+from os import PathLike
 
 
 @dataclass
@@ -9,6 +9,7 @@ class EquipConvertResult:
 	icon: int
 	gamename: str
 	wikiname: str
+
 
 @dataclass
 class EquipConverter:
@@ -41,11 +42,11 @@ def load_converter(filepath: PathLike) -> EquipConverter:
 	"""Returns the converter using the cached converter data.
 
 	:param filepath: path to the converter data cache file"""
-	with open(filepath, 'r', encoding="utf8") as file:
+	with open(filepath, "r", encoding="utf8") as file:
 		equip_data = json.load(file)
 
-	id_to_data = {int(eqid): EquipConvertResult(*data.values()) for eqid, data in equip_data['gameid'].items()}
-	icon_to_data = {int(icon): EquipConvertResult(*data.values()) for icon, data in equip_data['icon'].items()}
-	gamename_to_data = {gamename: EquipConvertResult(*data.values()) for gamename, data in equip_data['gamename'].items()}
-	wikiname_to_data = {wikiname: EquipConvertResult(*data.values()) for wikiname, data in equip_data['wikiname'].items()}
+	id_to_data = {int(eqid): EquipConvertResult(*data.values()) for eqid, data in equip_data["gameid"].items()}
+	icon_to_data = {int(icon): EquipConvertResult(*data.values()) for icon, data in equip_data["icon"].items()}
+	gamename_to_data = {gamename: EquipConvertResult(*data.values()) for gamename, data in equip_data["gamename"].items()}
+	wikiname_to_data = {wikiname: EquipConvertResult(*data.values()) for wikiname, data in equip_data["wikiname"].items()}
 	return EquipConverter(id_to_data, icon_to_data, gamename_to_data, wikiname_to_data)

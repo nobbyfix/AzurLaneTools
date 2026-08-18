@@ -1,6 +1,5 @@
-from pathlib import Path
 from enum import Enum
-
+from pathlib import Path
 
 ### Constant Filepaths ###
 # static files (only manual changes)
@@ -19,6 +18,7 @@ class Rarity(Enum):
 	"""
 	Enum class that allows conversion of rarity values between the game data and wiki.
 	"""
+
 	__num2member_map__: dict[int, "Rarity"] = {}
 
 	rarity: int
@@ -28,18 +28,18 @@ class Rarity(Enum):
 	letter: str
 	"""Single letter used on the wiki in some templates."""
 
-	NORMAL0			= (0,	"Normal",		"E")
-	NORMAL			= (1,	"Normal",		"E")
-	RARE			= (2,	"Rare",			"B")
-	ELITE			= (3,	"Elite",		"P")
-	SUPER_RARE		= (4,	"Super Rare",	"G")
-	PRIORITY		= (4,	"Priority",		"G")
-	ULTRA_RARE		= (5,	"Ultra Rare",	"R")
-	LEGENDARY		= (5,	"Legendary",	"R")
-	DECISIVE		= (5,	"Decisive",		"R")
-	VALENTINE_GIFT	= (8,	"Normal",		"E")
-	GIFT_OTHER		= (9,	"Super Rare",	"G")
-	UNKNOWN18		= (17,	"???",			"?")
+	NORMAL0 = (0, "Normal", "E")
+	NORMAL = (1, "Normal", "E")
+	RARE = (2, "Rare", "B")
+	ELITE = (3, "Elite", "P")
+	SUPER_RARE = (4, "Super Rare", "G")
+	PRIORITY = (4, "Priority", "G")
+	ULTRA_RARE = (5, "Ultra Rare", "R")
+	LEGENDARY = (5, "Legendary", "R")
+	DECISIVE = (5, "Decisive", "R")
+	VALENTINE_GIFT = (8, "Normal", "E")
+	GIFT_OTHER = (9, "Super Rare", "G")
+	UNKNOWN18 = (17, "???", "?")
 
 	def __init__(self, rarity, label, letter) -> None:
 		# add attributes to enum objects
@@ -78,45 +78,46 @@ class Nation(Enum):
 	"""
 	Enum class that allows conversion of nation values between the game data and wiki.
 	"""
+
 	id: int
 	"""Nation id used in the game."""
 	label: str
 	"""Name of the nation used on the wiki."""
 
-	UNIVERSAL			= (0,	"Universal")
-	EAGLE_UNION			= (1,	"Eagle Union")
-	ROYAL_NAVY			= (2,	"Royal Navy")
-	SAKURA_EMPIRE		= (3,	"Sakura Empire")
-	IRON_BLOOD			= (4,	"Iron Blood")
-	DRAGON_EMPERY		= (5,	"Dragon Empery")
-	SARDEGNA_EMPIRE		= (6,	"Sardegna Empire")
-	NORTHERN_PARLIAMENT	= (7,	"Northern Parliament")
-	IRIS_LIBRE			= (8,	"Iris Libre")
-	VICHYA_DOMINION		= (9,	"Vichya Dominion")
-	IRIS_ORTHODOXY		= (10,	"Iris Orthodoxy")
-	TULIPA				= (11,	"Kingdom of Tulipa")
-	TEMPESTA			= (96,	"Tempesta")
-	META				= (97,	"META")
-	UNIVERSAL2			= (98,	"Universal")
-	SIREN				= (99,	"Siren")
-	NEPTUNIA			= (101,	"Neptunia")
-	BILIBILI			= (102,	"Bilibili")
-	UTAWARERUMONO		= (103,	"Utawarerumono")
-	KIZUNA_AI			= (104,	"KizunaAI")
-	HOLOLIVE			= (105,	"Hololive")
-	VENUS_VACATION		= (106,	"Venus Vacation")
-	IDOLMASTER			= (107,	"The Idolmaster")
-	SSSS				= (108,	"SSSS")
-	ATELIER_RYZA		= (109,	"Atelier Ryza")
-	SENRAN_KAGURA		= (110,	"Senran Kagura")
-	TO_LOVE_RU			= (111,	"To LOVE-Ru")
+	UNIVERSAL = (0, "Universal")
+	EAGLE_UNION = (1, "Eagle Union")
+	ROYAL_NAVY = (2, "Royal Navy")
+	SAKURA_EMPIRE = (3, "Sakura Empire")
+	IRON_BLOOD = (4, "Iron Blood")
+	DRAGON_EMPERY = (5, "Dragon Empery")
+	SARDEGNA_EMPIRE = (6, "Sardegna Empire")
+	NORTHERN_PARLIAMENT = (7, "Northern Parliament")
+	IRIS_LIBRE = (8, "Iris Libre")
+	VICHYA_DOMINION = (9, "Vichya Dominion")
+	IRIS_ORTHODOXY = (10, "Iris Orthodoxy")
+	TULIPA = (11, "Kingdom of Tulipa")
+	TEMPESTA = (96, "Tempesta")
+	META = (97, "META")
+	UNIVERSAL2 = (98, "Universal")
+	SIREN = (99, "Siren")
+	NEPTUNIA = (101, "Neptunia")
+	BILIBILI = (102, "Bilibili")
+	UTAWARERUMONO = (103, "Utawarerumono")
+	KIZUNA_AI = (104, "KizunaAI")
+	HOLOLIVE = (105, "Hololive")
+	VENUS_VACATION = (106, "Venus Vacation")
+	IDOLMASTER = (107, "The Idolmaster")
+	SSSS = (108, "SSSS")
+	ATELIER_RYZA = (109, "Atelier Ryza")
+	SENRAN_KAGURA = (110, "Senran Kagura")
+	TO_LOVE_RU = (111, "To LOVE-Ru")
 
 	def __new__(cls, nation_id, label):
 		obj = object.__new__(cls)
 		obj._value_ = nation_id
 		obj.label = label
 		return obj
-	
+
 	def __str__(self) -> str:
 		return self.label
 
@@ -138,6 +139,7 @@ class Attribute(Enum):
 	"""
 	Enum class that allows conversion of ship attributes between the game data and wiki.
 	"""
+
 	pos: int
 	"""The position of the attribute in the ship statistics array."""
 	wiki_param_name: str
@@ -145,18 +147,18 @@ class Attribute(Enum):
 	wiki_template_name: str
 	"""The name of the template displaying the attribute icon on the wiki."""
 
-	DURABILITY		= (0,	"Health",		"Health")
-	CANNON			= (1,	"Fire",			"Firepower")
-	TORPEDO			= (2,	"Torp",			"Torpedo")
-	ANTIAIRCRAFT	= (3,	"AA",			"AA")
-	AIR				= (4,	"Air",			"Aviation")
-	RELOAD			= (5,	"Reload",		"Reload")
-	ARMOR			= (6,	"Armor_Debug",		"Armor")
-	HIT				= (7,	"Acc",			"Accuracy")
-	DODGE			= (8,	"Evade",		"Evasion")
-	SPEED			= (9,	"Speed",		"Speed")
-	LUCK			= (10,	"Luck",			"Luck")
-	ANTISUB			= (11,	"ASW",			"ASW")
+	DURABILITY = (0, "Health", "Health")
+	CANNON = (1, "Fire", "Firepower")
+	TORPEDO = (2, "Torp", "Torpedo")
+	ANTIAIRCRAFT = (3, "AA", "AA")
+	AIR = (4, "Air", "Aviation")
+	RELOAD = (5, "Reload", "Reload")
+	ARMOR = (6, "Armor_Debug", "Armor")
+	HIT = (7, "Acc", "Accuracy")
+	DODGE = (8, "Evade", "Evasion")
+	SPEED = (9, "Speed", "Speed")
+	LUCK = (10, "Luck", "Luck")
+	ANTISUB = (11, "ASW", "ASW")
 
 	def __init__(self, pos, param_name, template_name) -> None:
 		# add attributes to enum objects
@@ -173,6 +175,7 @@ class ShipType(Enum):
 	"""
 	Enum class that allows conversion of shiptype values between the game data and wiki.
 	"""
+
 	__id2member_map__: dict[int, "ShipType"] = {}
 	__name2member_map__: dict[str, "ShipType"] = {}
 	__fullname2member_map__: dict[str, "ShipType"] = {}
@@ -188,34 +191,34 @@ class ShipType(Enum):
 	typetext: str
 	"""The text displaying the abbreviation of the shiptype or multiple types for shiptype bundles."""
 
-	DD		= (1,	"Destroyer",					"Destroyers",					"DD",	"DD")
-	CL		= (2,	"Light Cruiser",				"Light cruisers",				"CL",	"CL")
-	CA		= (3,	"Heavy Cruiser",				"Heavy cruisers",				"CA",	"CA")
-	BC		= (4,	"Battlecruiser",				"Battlecruisers",				"BC",	"BC")
-	BB		= (5,	"Battleship",					"Battleships",					"BB",	"BB")
-	CVL		= (6,	"Light Aircraft Carrier",		"Light aircraft carriers",		"CVL",	"CVL")
-	CV		= (7,	"Aircraft Carrier",				"Aircraft carriers",			"CV",	"CV")
-	SS		= (8,	"Submarine",					"Submarines",					"SS",	"SS")
-	CAV		= (9,	"Aviation Cruiser",				"Aviation cruisers",			"CAV",	"CAV")
-	BBV		= (10,	"Aviation Battleship",			"Aviation battleships",  		"BBV",	"BBV")
-	CT		= (11,	"Torpedo Cruiser",				"Torpedo cruisers",				"CT",	"CT")
-	AR		= (12,	"Repair Ship",					"Repair ships",					"AR",	"AR")
-	BM		= (13,	"Monitor",						"Monitors",						"BM",	"BM")
-	SSV		= (17,	"Submarine Carrier",			"Submarine carriers",			"SSV",	"SSV")
-	CB		= (18,	"Large Cruiser",				"Large cruisers",				"CB",	"CB")
-	AE		= (19,	"Munition Ship",				"Munition ships",				"AE",	"AE")
-	DDG_V	= (20,	"DDG",							"Guided-missile destroyers",	"DDG",	"DDG")
-	DDG_M	= (21,	"DDG",							"Guided-missile destroyers",	"DDG",	"DDG")
-	IX_S	= (22,	"Sailing Frigate (Submarine)",	"Sailing Frigate",				"IXs",	"IX")
-	IX_V	= (23,	"Sailing Frigate (Vanguard)",	"Sailing Frigate",				"IXv",	"IX")
-	IX_M	= (24,	"Sailing Frigate (Main)",		"Sailing Frigate",				"IXm",	"IX")
-	ZHAN	= (-1,	"",								"",								"BC",	"BC or BB")
-	HANG	= (-1,	"",								"",								"CVL",	"CV or CVL")
-	QIAN	= (-1,	"",								"",								"SS",	"SS or SSV or IX")
-	ZHONG	= (-1,	"",								"",								"CB",	"CB or CA")
-	FANQIAN	= (-1,	"",								"",								"DD",	"DD or DDG or CL")
-	QUZHU	= (-1,	"",								"",								"DD",	"DD or DDG")
-	FEGNFAN	= (-1,	"",								"",								"IXs",	"IX")
+	DD = (1, "Destroyer", "Destroyers", "DD", "DD")
+	CL = (2, "Light Cruiser", "Light cruisers", "CL", "CL")
+	CA = (3, "Heavy Cruiser", "Heavy cruisers", "CA", "CA")
+	BC = (4, "Battlecruiser", "Battlecruisers", "BC", "BC")
+	BB = (5, "Battleship", "Battleships", "BB", "BB")
+	CVL = (6, "Light Aircraft Carrier", "Light aircraft carriers", "CVL", "CVL")
+	CV = (7, "Aircraft Carrier", "Aircraft carriers", "CV", "CV")
+	SS = (8, "Submarine", "Submarines", "SS", "SS")
+	CAV = (9, "Aviation Cruiser", "Aviation cruisers", "CAV", "CAV")
+	BBV = (10, "Aviation Battleship", "Aviation battleships", "BBV", "BBV")
+	CT = (11, "Torpedo Cruiser", "Torpedo cruisers", "CT", "CT")
+	AR = (12, "Repair Ship", "Repair ships", "AR", "AR")
+	BM = (13, "Monitor", "Monitors", "BM", "BM")
+	SSV = (17, "Submarine Carrier", "Submarine carriers", "SSV", "SSV")
+	CB = (18, "Large Cruiser", "Large cruisers", "CB", "CB")
+	AE = (19, "Munition Ship", "Munition ships", "AE", "AE")
+	DDG_V = (20, "DDG", "Guided-missile destroyers", "DDG", "DDG")
+	DDG_M = (21, "DDG", "Guided-missile destroyers", "DDG", "DDG")
+	IX_S = (22, "Sailing Frigate (Submarine)", "Sailing Frigate", "IXs", "IX")
+	IX_V = (23, "Sailing Frigate (Vanguard)", "Sailing Frigate", "IXv", "IX")
+	IX_M = (24, "Sailing Frigate (Main)", "Sailing Frigate", "IXm", "IX")
+	ZHAN = (-1, "", "", "BC", "BC or BB")
+	HANG = (-1, "", "", "CVL", "CV or CVL")
+	QIAN = (-1, "", "", "SS", "SS or SSV or IX")
+	ZHONG = (-1, "", "", "CB", "CB or CA")
+	FANQIAN = (-1, "", "", "DD", "DD or DDG or CL")
+	QUZHU = (-1, "", "", "DD", "DD or DDG")
+	FEGNFAN = (-1, "", "", "IXs", "IX")
 
 	def __init__(self, typeid, typename, catname, templatename, typetext):
 		# add attributes to enum objects
@@ -264,9 +267,9 @@ class Armor(Enum):
 	label: str
 	"""Name of the armor type."""
 
-	LIGHT	= (1,	"Light")
-	MEDIUM	= (2,	"Medium")
-	HEAVY	= (3,	"Heavy")
+	LIGHT = (1, "Light")
+	MEDIUM = (2, "Medium")
+	HEAVY = (3, "Heavy")
 
 	def __new__(cls, armor_id, label):
 		obj = object.__new__(cls)

@@ -1,6 +1,6 @@
 import json
-from os import PathLike
 from dataclasses import dataclass
+from os import PathLike
 
 
 @dataclass
@@ -9,6 +9,7 @@ class AugmentConvertResult:
 	icon: str
 	shipid: int
 	wikiname: str
+
 
 @dataclass
 class AugmentConverter:
@@ -41,11 +42,11 @@ def load_converter(filepath: PathLike) -> AugmentConverter:
 	"""Returns the converter using the cached converter data.
 
 	:param filepath: path to the converter data cache file"""
-	with open(filepath, 'r', encoding="utf8") as file:
+	with open(filepath, "r", encoding="utf8") as file:
 		augment_data = json.load(file)
 
-	id_to_data = {int(augid): AugmentConvertResult(*data.values()) for augid, data in augment_data['gameid'].items()}
-	icon_to_data = {icon: AugmentConvertResult(*data.values()) for icon, data in augment_data['icon'].items()}
-	shipid_to_data = {int(shipid): AugmentConvertResult(*data.values()) for shipid, data in augment_data['shipid'].items()}
-	wikiname_to_data = {wikiname: AugmentConvertResult(*data.values()) for wikiname, data in augment_data['wikiname'].items()}
+	id_to_data = {int(augid): AugmentConvertResult(*data.values()) for augid, data in augment_data["gameid"].items()}
+	icon_to_data = {icon: AugmentConvertResult(*data.values()) for icon, data in augment_data["icon"].items()}
+	shipid_to_data = {int(shipid): AugmentConvertResult(*data.values()) for shipid, data in augment_data["shipid"].items()}
+	wikiname_to_data = {wikiname: AugmentConvertResult(*data.values()) for wikiname, data in augment_data["wikiname"].items()}
 	return AugmentConverter(id_to_data, icon_to_data, shipid_to_data, wikiname_to_data)

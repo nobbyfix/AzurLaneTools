@@ -1,4 +1,4 @@
-from lib import Client, ALJsonAPI
+from lib import ALJsonAPI, Client
 
 
 def main():
@@ -10,14 +10,18 @@ def main():
 
 		try:
 			module = api.get_sharecfgmodule(modulename)
-		except: pass
+		except:
+			pass
 		if not module:
 			try:
 				module = api.get_apimodule(modulename)
-			except: pass
+			except:
+				pass
 
-		if module: break
-		else: print("FAILED: Module does not exist.")
+		if module:
+			break
+		else:
+			print("FAILED: Module does not exist.")
 
 	while True:
 		dataid = input("ID: ")
@@ -31,6 +35,7 @@ def main():
 				print(module.load_first(dataid, Client)._json)
 		except:
 			print("FAILED: Maybe the module does not have this id?")
+
 
 if __name__ == "__main__":
 	main()

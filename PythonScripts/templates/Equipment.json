@@ -5,18 +5,104 @@
 		"sections": [
 			{
 				"comment": "<!-- General Data -->",
-				"params": ["Name", "AltNames", "CNName", "JPName", "KRName", "ENName", "Image", "BaseID", "Type", "Stars", "Nationality", "Tech"]
+				"params": [
+					"Name",
+					"AltNames",
+					"CNName",
+					"JPName",
+					"KRName",
+					"ENName",
+					"Image",
+					"BaseID",
+					"Type",
+					"Stars",
+					"Nationality",
+					"Tech"
+				]
 			},
 			{
 				"comment": "<!-- Ship Stats Modifier -->",
-				"params": ["Health", "HealthMax", "HealthOPS", "Torpedo", "TorpMax", "TorpOPS", "Firepower", "FPMax", "FPOPS", "Aviation", "AvMax", "AvOPS", "Evasion", "EvasionMax", "EvasionOPS", "ASW", "ASWMax", "ASWOPS", "Oxygen", "OxygenMax", "OxygenOPS", "AA", "AAMax", "AAOPS", "Acc", "AccMax", "AccOPS", "Spd", "SpdMax", "SpdOPS", "Luck", "LuckMax", "LuckOPS", "Reload", "ReloadMax", "ReloadOPS"]
+				"params": [
+					"Health",
+					"HealthMax",
+					"HealthOPS",
+					"Torpedo",
+					"TorpMax",
+					"TorpOPS",
+					"Firepower",
+					"FPMax",
+					"FPOPS",
+					"Aviation",
+					"AvMax",
+					"AvOPS",
+					"Evasion",
+					"EvasionMax",
+					"EvasionOPS",
+					"ASW",
+					"ASWMax",
+					"ASWOPS",
+					"Oxygen",
+					"OxygenMax",
+					"OxygenOPS",
+					"AA",
+					"AAMax",
+					"AAOPS",
+					"Acc",
+					"AccMax",
+					"AccOPS",
+					"Spd",
+					"SpdMax",
+					"SpdOPS",
+					"Luck",
+					"LuckMax",
+					"LuckOPS",
+					"Reload",
+					"ReloadMax",
+					"ReloadOPS"
+				]
 			},
 			{
 				"comment": "<!-- Equipment Stats -->",
 				"sections": [
 					{
 						"comment": "",
-						"params": ["Damage", "DamageMax", "DamageOPS", "RoF", "RoFMax", "RoFOPS", "Int", "IntMax", "IntOPS", "Number", "Angle", "WepRangeMin", "WepRange", "ProjRange", "ProjSpeed", "Spread", "FiringSpread", "PatternSpread", "Coef", "CoefMax", "ArmorModL", "ArmorModM", "ArmorModH", "PlaneHP", "PlaneHPMax", "PlaneHPOPS", "OpSiren", "Shells", "Salvoes", "VolleyTime", "Characteristic", "PlaneSpeed", "CrashDamage", "DodgeLimit", "PlaneDodge"]
+						"params": [
+							"Damage",
+							"DamageMax",
+							"DamageOPS",
+							"RoF",
+							"RoFMax",
+							"RoFOPS",
+							"Int",
+							"IntMax",
+							"IntOPS",
+							"Number",
+							"Angle",
+							"WepRangeMin",
+							"WepRange",
+							"ProjRange",
+							"ProjSpeed",
+							"Spread",
+							"FiringSpread",
+							"PatternSpread",
+							"Coef",
+							"CoefMax",
+							"ArmorModL",
+							"ArmorModM",
+							"ArmorModH",
+							"PlaneHP",
+							"PlaneHPMax",
+							"PlaneHPOPS",
+							"OpSiren",
+							"Shells",
+							"Salvoes",
+							"VolleyTime",
+							"Characteristic",
+							"PlaneSpeed",
+							"CrashDamage",
+							"DodgeLimit",
+							"PlaneDodge"
+						]
 					},
 					{
 						"comment": "",
@@ -29,7 +115,45 @@
 				"sections": [
 					{
 						"comment": "",
-						"params": ["UseOverride", "DD", "DDNote", "CL", "CLNote", "CA", "CANote", "CB", "CBNote", "BB", "BBNote", "BC", "BCNote", "BM", "BMNote", "BBV", "BBVNote", "CV", "CVNote", "CVL", "CVLNote", "AR", "ARNote", "AE", "AENote", "SS", "SSNote", "SSV", "SSVNote", "IX", "IXNote", "IXs", "IXsNote", "IXv", "IXvNote", "IXm", "IXmNote"]
+						"params": [
+							"UseOverride",
+							"DD",
+							"DDNote",
+							"CL",
+							"CLNote",
+							"CA",
+							"CANote",
+							"CB",
+							"CBNote",
+							"BB",
+							"BBNote",
+							"BC",
+							"BCNote",
+							"BM",
+							"BMNote",
+							"BBV",
+							"BBVNote",
+							"CV",
+							"CVNote",
+							"CVL",
+							"CVLNote",
+							"AR",
+							"ARNote",
+							"AE",
+							"AENote",
+							"SS",
+							"SSNote",
+							"SSV",
+							"SSVNote",
+							"IX",
+							"IXNote",
+							"IXs",
+							"IXsNote",
+							"IXv",
+							"IXvNote",
+							"IXm",
+							"IXmNote"
+						]
 					}
 				]
 			},
@@ -38,7 +162,14 @@
 				"sections": [
 					{
 						"comment": "",
-						"params": ["DropLocation", "BulletPattern", "Notes", "Research", "LabFrom", "LabTo"]
+						"params": [
+							"DropLocation",
+							"BulletPattern",
+							"Notes",
+							"Research",
+							"LabFrom",
+							"LabTo"
+						]
 					}
 				]
 			}
@@ -135,7 +266,7 @@
 		},
 		"Notes": {
 			"type": "keep"
-   	 	}
+		}
 	},
 	"prefer-wiki-data": []
 }

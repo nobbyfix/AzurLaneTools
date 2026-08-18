@@ -1,6 +1,6 @@
 import json
-from os import PathLike
 from dataclasses import dataclass
+from os import PathLike
 
 
 @dataclass
@@ -23,11 +23,12 @@ class ShipIDConverter:
 		shipname = self.get_shipname(key)
 		return groupid or shipname
 
+
 def load_converter(filepath: PathLike) -> ShipIDConverter:
 	"""Returns the converter using the cached converter data.
 
 	:param filepath: path to the converter data cache file"""
-	with open(filepath, 'r') as file:
+	with open(filepath, "r") as file:
 		ship_data = json.load(file)
-	groupid_convert = {int(groupid): name for groupid, name in ship_data['groupid'].items()}
-	return ShipIDConverter(ship_data['ship'], groupid_convert)
+	groupid_convert = {int(groupid): name for groupid, name in ship_data["groupid"].items()}
+	return ShipIDConverter(ship_data["ship"], groupid_convert)

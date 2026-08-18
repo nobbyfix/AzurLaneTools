@@ -1,18 +1,27 @@
 import re
 from pathlib import Path
 
-from .api import Client, JsonLoader, nobbyfix_JsonLoader, AzurLaneTools_JsonLoader, Module, ApiModule, SharecfgModule
-from . import settings, apimodules, sharecfgmodules, Constants
-from .converter import ships, equips, augments
-
+from . import Constants, apimodules, settings, sharecfgmodules
+from .api import (
+	ApiModule,
+	AzurLaneTools_JsonLoader,
+	Client,
+	JsonLoader,
+	Module,
+	Nagami_JsonLoader,
+	SharecfgModule,
+	nobbyfix_JsonLoader,
+)
+from .converter import augments, equips, ships
 
 ### USEFUL CONSTANTS
 DEFAULT_CLIENTS = [Client.EN, Client.CN, Client.JP]
-NAMECODE = re.compile(r'(\{namecode:(\d+)\})')
+NAMECODE = re.compile(r"(\{namecode:(\d+)\})")
 
 jsonloaders = {
 	"nobbyfix": nobbyfix_JsonLoader,
 	"AzurLaneTools": AzurLaneTools_JsonLoader,
+	"Nagami": Nagami_JsonLoader,
 }
 
 
@@ -21,10 +30,12 @@ class UnknownModuleError(Exception):
 	Exception thrown when a modules is requested but does not exist.
 	"""
 
+
 class ALJsonAPI:
 	"""
 	General purpose class to interact with json gamedata.
 	"""
+
 	_apimodules: dict[str, ApiModule]
 	_sharecfgmodules: dict[str, SharecfgModule]
 	loader: JsonLoader
@@ -33,7 +44,9 @@ class ALJsonAPI:
 	equip_converter: equips.EquipConverter
 	augment_converter: augments.AugmentConverter
 
-	def __init__(self, loader: JsonLoader | None = None, source_path: Path | None = None, settings_path: Path | None = None) -> None:
+	def __init__(
+		self, loader: JsonLoader | None = None, source_path: Path | None = None, settings_path: Path | None = None
+	) -> None:
 		"""
 		Initializes the JsonAPI. Uses the JsonLoader as set in the settings file at "data/settings.toml".
 		Path of the settings file can be overridden using *settings_path*.
@@ -41,7 +54,7 @@ class ALJsonAPI:
 		"""
 		if source_path:
 			raise DeprecationWarning("Initialisation of ALJsonAPI using 'source_path' should be removed.")
-		
+
 		if loader:
 			self.loader = loader
 		else:
@@ -99,7 +112,7 @@ class ALJsonAPI:
 		# if that module does not exists, the generic module class will be used
 		if not moduleclass:
 			moduleclass = SharecfgModule
-		
+
 		# create the instance and return it
 		module = moduleclass(name=name, _loader=self.loader)
 		return module
@@ -116,7 +129,7 @@ class ALJsonAPI:
 		"""
 		# determine which instance cache to use depending on *is_api*
 		used_cache = self._apimodules if is_api else self._sharecfgmodules
-		
+
 		# if there is an instance already in the cache, return it
 		if name in used_cache:
 			return used_cache[name]
@@ -133,7 +146,7 @@ class ALJsonAPI:
 
 	def get_sharecfgmodule(self, name: str) -> SharecfgModule:
 		return self._get_module(name)
-	
+
 	def get_module(self, name: str) -> Module:
 		return self.get_sharecfgmodule(name) or self.get_apimodule(name)
 
@@ -143,7 +156,7 @@ class ALJsonAPI:
 		"""
 		Replaces namecode references in a string with their respective codes for *client*.
 		"""
-		name_code = self.get_sharecfgmodule('name_code')
+		name_code = self.get_sharecfgmodule("name_code")
 		results = NAMECODE.findall(inputstring)
 		for namecode_string, namecode_num in results:
 			# get the replacement string 'code' for the found namecode number for *client*

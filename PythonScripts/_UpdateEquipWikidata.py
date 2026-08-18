@@ -5,15 +5,18 @@ from lib.WikiHelper import WikiClient
 
 
 def request_equips(wikiclient: WikiClient, offset=0):
-	result = wikiclient.execute(wikiclient.mwclient.api,
+	result = wikiclient.execute(
+		wikiclient.mwclient.api,
 		action="cargoquery",
 		format="json",
 		limit=500,
 		tables="equipment",
 		fields="equipment.Name,equipment.BaseID",
 		where="equipment.Type != 'Augment Module'",
-		offset=offset)
-	return result['cargoquery']
+		offset=offset,
+	)
+	return result["cargoquery"]
+
 
 def download_equip_data():
 	wikiclient = WikiClient().login()
@@ -33,6 +36,7 @@ def main():
 	equipdata = download_equip_data()
 	with open(cache_fp, "w", encoding="utf8") as file:
 		json.dump(equipdata, file)
+
 
 if __name__ == "__main__":
 	main()

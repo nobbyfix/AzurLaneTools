@@ -1,43 +1,38 @@
 import json
-import html
 from os import PathLike
 
 from .. import ALJsonAPI, Client
-from ..apiclasses import EquipStat
 
 
 def load_wikinames(filepath: PathLike) -> dict[int, str]:
-	with open(filepath, 'r') as file:
+	with open(filepath, "r") as file:
 		wikidata = json.load(file)
 
-	conversions = {}
 	for entry in wikidata:
-		data = entry['title']
-		image = int(data['Image'].strip(".png"))
-		if image in conversions: continue
-		name = html.unescape(data['Name'])
-		conversions[image] = name
-	return conversions
+		data = entry["title"]
+		shipname = data["ShipName"]
+		skinid = data["SkinID"]
+		category = data.get("SkinCategory", "")
+		yield (shipname, skinid, category)
 
 
 def update_converter(convert_fp: PathLike, wiki_namecache_fp: PathLike, api: ALJsonAPI):
 	"""Updates the cached version of the converter data."""
-	equip_data_statistics = api.get_module("equip_data_statistics")
+	ship_skin_template = api.get_sharecfgmodule("ship_skin_template")
 
 	# retrieve converter data
-	overrides = load_wikinames(wiki_namecache_fp)
-	conversions = {'gameid': dict(), 'gamename': dict(), 'wikiname': dict()}
+	wikidata = load_wikinames(wiki_namecache_fp)
+	conversions = {"painting": dict()}
 
-	for equipstat in equip_data_statistics.load_all(Client):
-		if not isinstance(equipstat, EquipStat): continue
+	for shipskin in ship_skin_template.load_all(Client):
 		gameid = equipstat.id
 		gamename = equipstat.name
-		wikiname = overrides.get(gameid) or ''
+		wikiname = overrides.get(gameid) or ""
 
-		conversions['gameid'][str(gameid)] = { "gamename": gamename, "wikiname": wikiname }
-		conversions['gamename'][gamename] = { "gameid": gameid, "wikiname": wikiname }
-		conversions['wikiname'][wikiname] = { "gameid": gameid, "gamename": gamename }
+		conversions["gameid"][str(gameid)] = {"gamename": gamename, "wikiname": wikiname}
+		conversions["gamename"][gamename] = {"gameid": gameid, "wikiname": wikiname}
+		conversions["wikiname"][wikiname] = {"gameid": gameid, "gamename": gamename}
 
 	# save data to file
-	with open(convert_fp, 'w', encoding="utf8") as f:
+	with open(convert_fp, "w", encoding="utf8") as f:
 		json.dump(conversions, f, ensure_ascii=False)

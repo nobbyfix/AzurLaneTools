@@ -1,7 +1,7 @@
 import sys
-from pathlib import Path
 from enum import Enum, auto
 from mwclient import APIError
+from pathlib import Path
 
 from lib import WikiHelper
 
@@ -20,58 +20,59 @@ def do_upload(wikiclient: WikiHelper.WikiClient, *args, **kwargs) -> UploadResul
 		result = wikiclient.execute(wikiclient.mwclient.upload, *args, **kwargs)
 	except APIError as error:
 		# handle additional duplicate error otherwise raise the exception again
-		if error.code == 'fileexists-no-change':
-			print('Is duplicate, skipping.')
+		if error.code == "fileexists-no-change":
+			print("Is duplicate, skipping.")
 			return UploadResult.FAILURE_SAME
 		raise error
 
 	# handle other return type
-	if 'upload' in result:
-		result = result['upload']
+	if "upload" in result:
+		result = result["upload"]
 
 	if result:
-		if result['result'] == 'Success':
-			print('Done.')
+		if result["result"] == "Success":
+			print("Done.")
 			return UploadResult.SUCCESS
 
-		if result['result'] == 'Warning':
-			if 'exists' in result['warnings']:
-				if not (('no-change' in result['warnings']) or ('duplicate-version' in result['warnings'])):
+		if result["result"] == "Warning":
+			if "exists" in result["warnings"]:
+				if not (("no-change" in result["warnings"]) or ("duplicate-version" in result["warnings"])):
 					return UploadResult.WARNING_EXIST
 				print("Warning (exists):")
 				print(result)
-			elif 'was-deleted' in result['warnings']:
+			elif "was-deleted" in result["warnings"]:
 				print("Waning: File was previously deleted.")
 				i = input("Retry uploading? (y/n): ")
-				if i.lower() == 'y':
+				if i.lower() == "y":
 					return UploadResult.WARNING_DELETED
-			elif 'page-exists' in result['warnings']:
+			elif "page-exists" in result["warnings"]:
 				print("Waning: File page already exists, but has no file.")
 				i = input("Retry uploading? (y/n): ")
-				if i.lower() == 'y':
+				if i.lower() == "y":
 					return UploadResult.WARNING_EXIST
-			elif 'exists-normalized' in result['warnings']:
+			elif "exists-normalized" in result["warnings"]:
 				return UploadResult.WARNING_SIMILAR_NAME
 			else:
 				print("Warning:")
 				print(result)
 
 		else:
-			print('Failed with Unknown Error:')
+			print("Failed with Unknown Error:")
 			print(result)
 
 	else:
-		print('Failed to upload.')
+		print("Failed to upload.")
 	return UploadResult.FAILURE
 
+
 def upload_file(wikiclient: WikiHelper.WikiClient, filepath: Path):
-	print(f'Uploading {filepath.name}... ', end='')
-	result = do_upload(wikiclient, open(filepath, 'rb'), filename=filepath.name)
+	print(f"Uploading {filepath.name}... ", end="")
+	result = do_upload(wikiclient, open(filepath, "rb"), filename=filepath.name)
 	while True:
 		if result in (UploadResult.SUCCESS, UploadResult.FAILURE, UploadResult.FAILURE_SAME):
 			break
 		if result in (UploadResult.WARNING_EXIST, UploadResult.WARNING_DELETED, UploadResult.WARNING_SIMILAR_NAME):
-			result = do_upload(wikiclient, open(filepath, 'rb'), filename=filepath.name, ignore=True)
+			result = do_upload(wikiclient, open(filepath, "rb"), filename=filepath.name, ignore=True)
 
 
 def main():
@@ -89,6 +90,7 @@ def main():
 				upload_file(wikiclient, fp)
 		else:
 			upload_file(wikiclient, argpath)
+
 
 if __name__ == "__main__":
 	main()

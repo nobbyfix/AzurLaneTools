@@ -1,7 +1,7 @@
 import sys
 from os import PathLike
-from typing import Any, MutableSequence
 from pathlib import Path
+from typing import Any, MutableSequence
 
 
 def rreplace(s: str, old: str, new: str, occurrence: int) -> str:
@@ -11,6 +11,7 @@ def rreplace(s: str, old: str, new: str, occurrence: int) -> str:
 	li = s.rsplit(old, occurrence)
 	return new.join(li)
 
+
 def mkdir(directory: Path) -> None:
 	"""
 	faster than simply calling os.makedirs with exists_ok=True
@@ -19,12 +20,14 @@ def mkdir(directory: Path) -> None:
 	if not directory.exists():
 		directory.mkdir(parents=True, exist_ok=True)
 
+
 def mkdirf(file: Path) -> None:
 	"""
 	faster than simply calling os.makedirs with exists_ok=True
 	if the same directory gets checked even after its creation
 	"""
 	mkdir(file.parent)
+
 
 def output(text: str, filepath: PathLike | None = None) -> None:
 	"""
@@ -39,9 +42,10 @@ def output(text: str, filepath: PathLike | None = None) -> None:
 			fpath = Path("output", Path(sys.argv[0]).stem + ".wikitext")
 
 		mkdirf(fpath)
-		with open(fpath, 'w', encoding='utf8') as f:
+		with open(fpath, "w", encoding="utf8") as f:
 			f.write(text)
 		print("Failed to print to console, output has been written into output directory.")
+
 
 def dict_args_query(dict_input: dict, *args) -> Any:
 	"""
@@ -50,8 +54,10 @@ def dict_args_query(dict_input: dict, *args) -> Any:
 	for arg in args:
 		if isinstance(dict_input, dict):
 			dict_input = dict_input.get(arg)
-			if not dict_input: return
+			if not dict_input:
+				return
 	return dict_input
+
 
 def pop_zeros(items: MutableSequence) -> MutableSequence:
 	while items and items[-1] == 0:

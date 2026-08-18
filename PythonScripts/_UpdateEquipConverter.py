@@ -8,5 +8,6 @@ def main():
 	wikicache_fp = Constants.EQUIP_WIKIDATA_PATH
 	equips_updater.update_converter(equipcache_fp, wikicache_fp, api)
 
+
 if __name__ == "__main__":
 	main()

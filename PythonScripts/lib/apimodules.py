@@ -1,9 +1,9 @@
 import itertools
-from dataclasses import dataclass
 from collections.abc import Iterable
+from dataclasses import dataclass
 
-from . import Client, ApiModule
-from .apiclasses import Item, ShipReward, Furniture, ExtendedEquipStat, EquipStatUpgrade
+from . import ApiModule, Client
+from .apiclasses import EquipStatUpgrade, ExtendedEquipStat, Furniture, Item, ShipReward
 
 
 @dataclass
@@ -20,6 +20,7 @@ class PlayerResourceReward(ApiModule):
 		client_ids = [resource.id for resource in player_resource.all_client(client) if resource.item]
 		return client_ids
 
+
 @dataclass
 class ShipRewardModule(ApiModule):
 	def _load_client(self, dataid: str, client: Client) -> ShipReward | None:
@@ -27,18 +28,14 @@ class ShipRewardModule(ApiModule):
 		shipstat = ship_data_statistics._load_client(dataid, client)
 		if shipstat:
 			shipskin = shipstat.skin.load(self._api, client)
-			shipreward = ShipReward(
-				name=shipstat.name,
-				rarity=shipstat.rarity,
-				icon=shipskin.painting,
-				shipid=shipstat.shipid
-			)
+			shipreward = ShipReward(name=shipstat.name, rarity=shipstat.rarity, icon=shipskin.painting, shipid=shipstat.shipid)
 			return shipreward
 
 	def all_client_ids(self, client: Client) -> Iterable[int | str]:
 		ship_data_statistics = self._getmodule("ship_data_statistics")
-		client_ids = [sid for sid in ship_data_statistics.all_client_ids(client) if int(sid)%10 == 1]
+		client_ids = [sid for sid in ship_data_statistics.all_client_ids(client) if int(sid) % 10 == 1]
 		return client_ids
+
 
 @dataclass
 class FurnitureModule(ApiModule):
@@ -59,6 +56,7 @@ class FurnitureModule(ApiModule):
 		furniture_data_template = self._getmodule("furniture_data_template")
 		return furniture_data_template.all_client_ids(client)
 
+
 @dataclass
 class ExtendedEquipDataStatistics(ApiModule):
 	def _load_client(self, dataid: str, client: Client) -> ExtendedEquipStat | None:
@@ -75,6 +73,7 @@ class ExtendedEquipDataStatistics(ApiModule):
 	def all_client_ids(self, client: Client) -> Iterable[int]:
 		equip_data_statistics = self._getmodule("equip_data_statistics")
 		return equip_data_statistics.all_client_ids(client)
+
 
 @dataclass
 class AllItemDataStatistics(ApiModule):
@@ -103,8 +102,10 @@ _all_ = {
 	"all_item_data_statistics": AllItemDataStatistics,
 }
 
+
 def import_module(modulename: str) -> type[ApiModule] | None:
 	return _all_.get(modulename)
+
 
 __all__ = [cls.__name__ for cls in _all_.values()]
 __all__.append(import_module.__name__)

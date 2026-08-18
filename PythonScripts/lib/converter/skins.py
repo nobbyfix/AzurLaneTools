@@ -11,6 +11,7 @@ class SkinConvertResult:
 	painting: str
 	prefab: str
 
+
 @dataclass
 class SkinsConverter:
 	painting_to_data: dict[str, SkinConvertResult]
@@ -25,12 +26,16 @@ class SkinsConverter:
 		:param key: an paintingname"""
 		return self.from_painting(key)
 
+
 def load_converter(filepath: PathLike) -> SkinsConverter:
 	"""Returns the converter using the cached converter data.
 
 	:param filepath: path to the converter data cache file"""
-	with open(filepath, 'r', encoding="utf8") as file:
+	with open(filepath, "r", encoding="utf8") as file:
 		skin_data = json.load(file)
 
-	painting_to_data = {p: SkinConvertResult(data['gameid'], data['shipname'], data['category'], p, data['prefab']) for p, data in skin_data['painting'].items()}
+	painting_to_data = {
+		p: SkinConvertResult(data["gameid"], data["shipname"], data["category"], p, data["prefab"])
+		for p, data in skin_data["painting"].items()
+	}
 	return SkinsConverter(painting_to_data)

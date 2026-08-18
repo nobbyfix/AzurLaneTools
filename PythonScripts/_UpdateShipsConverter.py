@@ -8,5 +8,6 @@ def main():
 	override_fp = Constants.SHIPID_CONVERT_OVERRIDE_PATH
 	ships_updater.update_converter(convert_fp, override_fp, api)
 
+
 if __name__ == "__main__":
 	main()

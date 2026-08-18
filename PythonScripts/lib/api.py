@@ -1,10 +1,10 @@
 import json
-from pathlib import Path
-from enum import Enum
-from dataclasses import dataclass, field
 from abc import ABCMeta, abstractmethod
 from collections import defaultdict
-from collections.abc import Iterable, Callable, Generator, Hashable
+from collections.abc import Callable, Generator, Hashable, Iterable
+from dataclasses import dataclass, field
+from enum import Enum
+from pathlib import Path
 
 
 class _Client(Enum):
@@ -31,9 +31,11 @@ class _Client(Enum):
 		# add enum objects to member maps
 		if package_name is not None:
 			if package_name in self.__packagename2member_map__:
-				print(f"Created enum instance with duplicate package name '{package_name}': '{value}' for class '{self.__class__.__name__}'.")
+				print(
+					f"Created enum instance with duplicate package name '{package_name}': '{value}' for class '{self.__class__.__name__}'."
+				)
 			else:
-				self.__packagename2member_map__[package_name] = self		
+				self.__packagename2member_map__[package_name] = self
 
 	def __repr__(self) -> str:
 		return f"<{self.__class__.__name__}.{self._name_}: '{self.locale_code}'>"
@@ -46,23 +48,26 @@ class _Client(Enum):
 		"""
 		return cls.__packagename2member_map__.get(package_name)
 
+
 class Client(_Client):
 	"""
 	Enum class that implements all available azur lane client variants.
 
 	When used as iterator, the default order is EN > CN > JP > KR > TW.
 	"""
-	EN = (1, True, 'en-US', 'com.YoStarEN.AzurLane')
-	CN = (3, True, 'zh-CN', None)
-	JP = (2, True, 'ja-JP', 'com.YoStarJP.AzurLane')
-	KR = (4, True, 'ko-KR', 'kr.txwy.and.blhx')
-	TW = (5, True, 'zh-TW', 'com.hkmanjuu.azurlane.gp')
+
+	EN = (1, True, "en-US", "com.YoStarEN.AzurLane")
+	CN = (3, True, "zh-CN", None)
+	JP = (2, True, "ja-JP", "com.YoStarJP.AzurLane")
+	KR = (4, True, "ko-KR", "kr.txwy.and.blhx")
+	TW = (5, True, "zh-TW", "com.hkmanjuu.azurlane.gp")
 
 
 class JsonLoader(metaclass=ABCMeta):
 	"""
 	Abstract class providing an interface for loading sharecfg and gamecfg json files.
 	"""
+
 	source_directory: Path
 	""" The path to the directory containg the json source files. """
 
@@ -85,7 +90,7 @@ class JsonLoader(metaclass=ABCMeta):
 		"""
 		Returns the contents of a single sharecfg json file.
 
-		sharecfg_name - name of the sharecfg file to return contents from  
+		sharecfg_name - name of the sharecfg file to return contents from
 		client - the client to load the sharecfg file from
 		"""
 
@@ -95,7 +100,7 @@ class JsonLoader(metaclass=ABCMeta):
 		with data being the client's decoded json content. If the sharecfg file for a client can not be found,
 		it will not be inside the returned dict.
 
-		sharecfg_name - name of the sharecfg files to return contents from  
+		sharecfg_name - name of the sharecfg files to return contents from
 		clients - iterable containing clients to load the sharecfg files from
 		"""
 		multi_sharecfg = {}
@@ -112,7 +117,7 @@ class JsonLoader(metaclass=ABCMeta):
 		"""
 		Returns the contents of a single sharecfgdata json file.
 
-		sharecfg_name - name of the sharecfgdata file to return contents from  
+		sharecfg_name - name of the sharecfgdata file to return contents from
 		client - the client to load the sharecfgdata file from
 		"""
 
@@ -122,7 +127,7 @@ class JsonLoader(metaclass=ABCMeta):
 		with data being the client's decoded json content. If the sharecfgdata file for a client can not be found,
 		it will not be inside the returned dict.
 
-		sharecfg_name - name of the sharecfgdata files to return contents from  
+		sharecfg_name - name of the sharecfgdata files to return contents from
 		clients - iterable containing clients to load the sharecfgdata files from
 		"""
 		multi_sharecfg = {}
@@ -138,11 +143,11 @@ class JsonLoader(metaclass=ABCMeta):
 	def load_gamecfg(self, gamecfg_type: str, gamecfg_name: str, client: Client) -> dict:
 		"""
 		Returns the contents of a single gamecfg json file.
-		
+
 		It is recommended to rather use the type specific methods to load gamecfg data.
 
-		gamecfg_type - type of the gamecfg data ("dungeon", "buff", "skill", "story")  
-		gamecfg_name - name of the gamecfg file to return contents from  
+		gamecfg_type - type of the gamecfg data ("dungeon", "buff", "skill", "story")
+		gamecfg_name - name of the gamecfg file to return contents from
 		client - the client to load the gamecfg file from
 		"""
 
@@ -151,11 +156,11 @@ class JsonLoader(metaclass=ABCMeta):
 		Returns the contents of multiple gamecfg json files as a dict with format {client: data},
 		with data being the client's decoded json content. If the gamecfg file for a client can not be found,
 		it will not be inside the returned dict.
-		
+
 		It is recommended to rather use the type specific methods to load gamecfg data.
 
-		gamecfg_type - type of the gamecfg data ("dungeon", "buff", "skill", "story")  
-		gamecfg_name - name of the gamecfg files to return contents from  
+		gamecfg_type - type of the gamecfg data ("dungeon", "buff", "skill", "story")
+		gamecfg_name - name of the gamecfg files to return contents from
 		clients - iterable containing clients to load the gamecfg files from
 		"""
 		multi_gamecfg = {}
@@ -174,16 +179,16 @@ class JsonLoader(metaclass=ABCMeta):
 		return self.load_multi_gamecfg("dungeon", str(dungeon_id), clients)
 
 	def load_buff(self, buff_id: int | str, client: Client) -> dict:
-		return self.load_gamecfg("buff", "buff_"+str(buff_id), client)
+		return self.load_gamecfg("buff", "buff_" + str(buff_id), client)
 
 	def load_multi_buff(self, buff_id: int | str, clients: Iterable[Client]) -> dict[Client, dict]:
-		return self.load_multi_gamecfg("buff", "buff_"+str(buff_id), clients)
+		return self.load_multi_gamecfg("buff", "buff_" + str(buff_id), clients)
 
 	def load_skill(self, skill_id: int | str, client: Client) -> dict:
-		return self.load_gamecfg("skill", "skill_"+str(skill_id), client)
+		return self.load_gamecfg("skill", "skill_" + str(skill_id), client)
 
 	def load_multi_skill(self, skill_id: int | str, clients: Iterable[Client]) -> dict[Client, dict]:
-		return self.load_multi_gamecfg("skill", "skill_"+str(skill_id), clients)
+		return self.load_multi_gamecfg("skill", "skill_" + str(skill_id), clients)
 
 	def load_story(self, story_name: str, client: Client) -> dict:
 		return self.load_gamecfg("story", story_name, client)
@@ -191,13 +196,21 @@ class JsonLoader(metaclass=ABCMeta):
 	def load_multi_story(self, story_name: str, clients: Iterable[Client]) -> dict[Client, dict]:
 		return self.load_multi_gamecfg("story", story_name, clients)
 
+	def load_card(self, card_id: int | str, client: Client) -> dict[Client, dict]:
+		return self.load_gamecfg("card", "card_" + str(card_id), client)
+
+	def load_multi_card(self, card_id: int | str, clients: Iterable[Client]) -> dict[Client, dict]:
+		return self.load_multi_gamecfg("card", "card_" + str(card_id), clients)
+
+
 class nobbyfix_JsonLoader(JsonLoader):
 	"""
 	Implementation of the JsonLoader for this json repository:
 	https://github.com/nobbyfix/AzurLaneSourceJson
 	"""
+
 	def load_sharecfg(self, sharecfg_name: str, client: Client) -> dict:
-		jsonpath = Path(self.source_directory, client.name, "sharecfg", sharecfg_name+".json")
+		jsonpath = Path(self.source_directory, client.name, "sharecfg", sharecfg_name + ".json")
 		with open(jsonpath, "r", encoding="utf8") as f:
 			return json.load(f)
 
@@ -205,15 +218,17 @@ class nobbyfix_JsonLoader(JsonLoader):
 		raise NotImplementedError("!!! Repo has no sharecfgdata files !!!")
 
 	def load_gamecfg(self, gamecfg_type: str, gamecfg_name: str, client: Client) -> dict:
-		jsonpath = Path(self.source_directory, client.name, gamecfg_type, gamecfg_name+".json")
+		jsonpath = Path(self.source_directory, client.name, gamecfg_type, gamecfg_name + ".json")
 		with open(jsonpath, "r", encoding="utf8") as f:
 			return json.load(f)
+
 
 class AzurLaneTools_JsonLoader(JsonLoader):
 	"""
 	Implementation of the JsonLoader for this json repository:
 	https://github.com/AzurLaneTools/AzurLaneData
 	"""
+
 	_gamecfg_cache: dict[Client, dict[str, dict]]
 
 	def __init__(self, source_directory: Path) -> None:
@@ -221,12 +236,12 @@ class AzurLaneTools_JsonLoader(JsonLoader):
 		self._gamecfg_cache = defaultdict(dict)
 
 	def load_sharecfg(self, sharecfg_name: str, client: Client) -> dict:
-		jsonpath = Path(self.source_directory, client.name, "ShareCfg", sharecfg_name+".json")
+		jsonpath = Path(self.source_directory, client.name, "ShareCfg", sharecfg_name + ".json")
 		with open(jsonpath, "r", encoding="utf8") as f:
 			return json.load(f)
 
 	def load_sharecfgdata(self, sharecfg_name: str, client: Client) -> dict:
-		jsonpath = Path(self.source_directory, client.name, "sharecfgdata", sharecfg_name+".json")
+		jsonpath = Path(self.source_directory, client.name, "sharecfgdata", sharecfg_name + ".json")
 		with open(jsonpath, "r", encoding="utf8") as f:
 			return json.load(f)
 
@@ -248,27 +263,67 @@ class AzurLaneTools_JsonLoader(JsonLoader):
 		return self._gamecfg_cache[client][gamecfg_type][gamecfg_name]
 
 
+class Nagami_JsonLoader(JsonLoader):
+	"""
+	Implementation of the JsonLoader for this json repository:
+	https://github.com/JustNagami/al-json
+	"""
+
+	_gamecfg_cache: dict[Client, dict[str, dict]]
+
+	def load_sharecfg(self, sharecfg_name: str, client: Client) -> dict:
+		jsonpath = Path(self.source_directory, client.name, "sharecfg", sharecfg_name + ".json")
+		with open(jsonpath, "r", encoding="utf8") as f:
+			return json.load(f)
+
+	def load_sharecfgdata(self, sharecfg_name: str, client: Client) -> dict:
+		jsonpath = Path(self.source_directory, client.name, "sharecfgdata", sharecfg_name + ".json")
+		with open(jsonpath, "r", encoding="utf8") as f:
+			return json.load(f)
+
+	def load_gamecfg(self, gamecfg_type: str, gamecfg_name: str, client: Client) -> dict:
+		if client == Client.JP and gamecfg_type == "story":
+			gamecfg_type = "storyjp"
+
+		if gamecfg_type not in self._gamecfg_cache[client]:
+			if gamecfg_type in ["buff", "skill", "card"]:
+				jsonpath = Path(self.source_directory, client.name, gamecfg_type + "Cfg.json")
+			elif gamecfg_type in ["activity", "backyardtheme", "dorm", "dungeon", "story", "storyjp", "useragreems"]:
+				jsonpath = Path(self.source_directory, client.name, "GameCfg", gamecfg_type + ".json")
+			else:
+				raise NotImplementedError(f"The gamecfg_type '{gamecfg_type}' is not implemented.")
+
+			with open(jsonpath, "r", encoding="utf8") as f:
+				jsondata = json.load(f)
+			self._gamecfg_cache[client][gamecfg_type] = jsondata
+		return self._gamecfg_cache[client][gamecfg_type][gamecfg_name]
+
+
 APIdataclass = lambda cls, *args: dataclass(cls, init=False, eq=False, *args)
 """
 Allows for simpler coding style, since all apiclasses need these params set.
 """
+
 
 @dataclass(eq=False)
 class ApiData(Hashable):
 	"""
 	Generic data class returned by all modules.
 	"""
+
 	id: int | str
 	""" Unique ID of the ApiData within their corresponding module. """
 
 	def __hash__(self) -> int:
 		return hash(self.id)
 
+
 @APIdataclass
 class SharecfgData(ApiData):
 	"""
 	Data class returned by sharecfg modules.
 	"""
+
 	_json: dict = field(repr=False)
 
 	def __init__(self, json: dict, **kwargs) -> None:
@@ -292,17 +347,19 @@ class SharecfgData(ApiData):
 	def __contains__(self, key):
 		return key in self._json
 
-	def get(self, key, default = None):
+	def get(self, key, default=None):
 		try:
 			return self[key]
 		except AttributeError:
 			return default
+
 
 @APIdataclass
 class MergedSharecfgData(ApiData):
 	"""
 	Data class returned by ApiModules that merges multiple SharecfgData instances.
 	"""
+
 	_scfgdata: list[SharecfgData] = field(repr=False)
 
 	def __init__(self, *args: SharecfgData, **kwargs) -> None:
@@ -337,8 +394,11 @@ class Module(metaclass=ABCMeta):
 
 	All data requests return None if there is no entry for the dataid for the client.
 	"""
+
 	# cache to hold reference to parsed apidata so it doesn't have to be parsed again
-	_cache: dict[Client, dict[str, ApiData | None]] = field(default_factory=lambda: {c: {} for c in Client}, init=False, repr=False)
+	_cache: dict[Client, dict[str, ApiData | None]] = field(
+		default_factory=lambda: {c: {} for c in Client}, init=False, repr=False
+	)
 
 	def _load_from_cache(self, dataid: str, client: Client) -> ApiData | None:
 		"""
@@ -369,7 +429,7 @@ class Module(metaclass=ABCMeta):
 		# try to load from cache first, if None is returned load using internal loader method
 		if data := self._load_from_cache(dataid, client):
 			return data
-		
+
 		data = self._load_client(dataid, client)
 		# save to cache
 		self._cache[client][dataid] = data
@@ -446,17 +506,20 @@ class Module(metaclass=ABCMeta):
 			if data := self.load_first(dataid, clients):
 				yield data
 
+
 @dataclass
 class SharecfgmoduleDataSettings:
 	is_sublisted: bool = False
 	is_sharecfgdata: bool = False
 	is_sharecfgdata2: bool = False
 
+
 @dataclass
 class SharecfgModule(Module):
 	"""
 	Implementation of the Module class for sharecfg files.
 	"""
+
 	name: str
 	"""Name of the Module. Matches with the name of the file containing the underlying data."""
 	_loader: JsonLoader = field(repr=False)
@@ -497,7 +560,7 @@ class SharecfgModule(Module):
 				self._data[client] |= sharecfgdata
 			except FileNotFoundError:
 				print(f"Failed to load sharecfgdata '{sharecfgdataname}' for module '{self.name}'.")
-		
+
 		if self._settings.is_sharecfgdata2:
 			sharecfgdataname = self.name
 			try:
@@ -510,7 +573,7 @@ class SharecfgModule(Module):
 		if jsondata == []:
 			jsondata = {}
 			self._settings.is_sharecfgdata2 = True
-		
+
 		self._settings.is_sublisted = "indexs" in jsondata
 		self._settings.is_sharecfgdata = "__name" in jsondata
 		self._data[client] = jsondata
@@ -528,7 +591,7 @@ class SharecfgModule(Module):
 			# do sublist loading if the sharecfg file is sublisted
 			if self._settings.is_sublisted:
 				if sublistid := clientdata["indexs"].get(dataid):
-					sublistname = clientdata["subList"][sublistid-1]
+					sublistname = clientdata["subList"][sublistid - 1]
 					sublistpath = f"{clientdata['subFolderName'].lower()}/{sublistname}"
 					try:
 						sublist_jsondata = self._loader.load_sharecfg(sublistpath, client)
@@ -561,12 +624,12 @@ class SharecfgModule(Module):
 		"""
 		if ids := self._load("all", client):
 			return ids
-		
+
 		# print warning that "all" key is missing
 		if not self._all_key_warning:
 			print(f"WARNING: \"all\" key not present for client '{client.name}' in module '{self.name}'.")
 			self._all_key_warning = True
-		
+
 		# use the key view of the entire client dict for missing "all" key
 		if data := self._load_data(client):
 			return data.keys()
@@ -581,6 +644,7 @@ class ApiModule(Module, metaclass=ABCMeta):
 	Since there is no shared standard between ApiModules how data is loaded,
 	the loader functions have to be implemented on the individual modules themselves.
 	"""
+
 	_api: "ALJsonAPI"
 
 	def _getmodule(self, modulename: str) -> SharecfgModule:

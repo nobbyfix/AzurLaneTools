@@ -8,7 +8,7 @@ def load_overrides(filepath: PathLike) -> dict[int, str]:
 	"""Loads all all shipname overrides from the given file.
 
 	:param filepath: path to the overrides file"""
-	with open(filepath, 'r', encoding='utf8') as file:
+	with open(filepath, "r", encoding="utf8") as file:
 		json_data = json.load(file)
 	return {int(groupid): name for groupid, name in json_data.items()}
 
@@ -19,15 +19,19 @@ def update_converter(convert_fp: PathLike, override_fp: PathLike, api: ALJsonAPI
 
 	# retrieve converter data
 	overrides = load_overrides(override_fp)
-	conversions = {'ship': dict(), 'groupid': dict()}
+	conversions = {"ship": dict(), "groupid": dict()}
 
 	def idfilter(dataid: int | str) -> bool:
 		try:
 			dataid = int(dataid)
-		except: return True
-		if dataid%10 != 1: return True
-		if dataid//1000 == 900: return True
-		if dataid == 901001: return True
+		except:
+			return True
+		if dataid % 10 != 1:
+			return True
+		if dataid // 1000 == 900:
+			return True
+		if dataid == 901001:
+			return True
 		return False
 
 	for shipstat in ship_data_statistics.load_all(Client, idfilter):
@@ -40,9 +44,9 @@ def update_converter(convert_fp: PathLike, override_fp: PathLike, api: ALJsonAPI
 			shipname = shipstat.name
 
 		# add data onto conversions dict
-		conversions['ship'][shipname] = groupid
-		conversions['groupid'][groupid] = shipname
+		conversions["ship"][shipname] = groupid
+		conversions["groupid"][groupid] = shipname
 
 	# save data to file
-	with open(convert_fp, 'w') as f:
+	with open(convert_fp, "w") as f:
 		json.dump(conversions, f)

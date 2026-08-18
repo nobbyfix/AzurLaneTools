@@ -1,19 +1,18 @@
-import re
 import math
+import re
+from argparse import ArgumentParser
 from collections import Counter
 from collections.abc import Iterable
-from argparse import ArgumentParser
 from itertools import chain
 
-from lib import ALJsonAPI, Client, Utility, WikiHelper, Constants
+from lib import ALJsonAPI, Client, Constants, Utility, WikiHelper
 from lib.apiclasses import Award, CachedAPILoader, ShipReward, Task
-
 
 TIER_EQUIP_NAME = re.compile(r"^(T[0-9]\s).*")
 DESIGN_EQUIP_NAME = re.compile(r".*(\s(T[0-9]\s)Design)")
 
 property_limit_text = {
-	"level" : "Average Level",
+	"level": "Average Level",
 	"durability": "{{Health}} Total HP",
 	"cannon": "{{Firepower}} Total Firepower",
 	"torpedo": "{{Torpedo}} Total Torpedo",
@@ -33,34 +32,34 @@ property_limit_sign = {
 # "model/const/chapterconst.lua" with slot0.AttachX
 # negative node types are not from the game file
 node_type_letter = {
-	-100: "unknown-landbase", # unknown landbases
-	-3: "v", # airfield
-	-2: "o", # lighthouse
-	-1: "x", # land
-	0: " ", # water
-	1: "s", # start
-	2: "q", # question
-	3: "a", # ammo
-	4: "c", # combat
-	5: "ambush", # ambush
-	6: "e", # enemy
-	7: "m", # matime_escort: mine
-	8: "b", # boss
-	9: "story", # story
-	11: "areaboss", # areaboss
-	12: "p", # siren (champion)
-	14: "torpedofleet", # torpedo-fleet
-	15: "sirenpatrol", # siren (champion)-patrol
-	16: "u", # submarine
-	17: "f", # matime_escort: transport
-	18: "d", # matime_escort: transport_target
-	19: "siren-submarine", # siren (champion)-submarine
-	20: "oni", # oni
-	21: "oni-target", # oni-target
-	24: "bomb-enemy", # bomb-enemy
-	25: "barrier", # barrier
-	26: "huge supply", # huge supply
-	100: "h", # harbour
+	-100: "unknown-landbase",  # unknown landbases
+	-3: "v",  # airfield
+	-2: "o",  # lighthouse
+	-1: "x",  # land
+	0: " ",  # water
+	1: "s",  # start
+	2: "q",  # question
+	3: "a",  # ammo
+	4: "c",  # combat
+	5: "ambush",  # ambush
+	6: "e",  # enemy
+	7: "m",  # matime_escort: mine
+	8: "b",  # boss
+	9: "story",  # story
+	11: "areaboss",  # areaboss
+	12: "p",  # siren (champion)
+	14: "torpedofleet",  # torpedo-fleet
+	15: "sirenpatrol",  # siren (champion)-patrol
+	16: "u",  # submarine
+	17: "f",  # matime_escort: transport
+	18: "d",  # matime_escort: transport_target
+	19: "siren-submarine",  # siren (champion)-submarine
+	20: "oni",  # oni
+	21: "oni-target",  # oni-target
+	24: "bomb-enemy",  # bomb-enemy
+	25: "barrier",  # barrier
+	26: "huge supply",  # huge supply
+	100: "h",  # harbour
 }
 
 drop_const = {
@@ -74,7 +73,9 @@ drop_const = {
 		54047: "{{Blueprint|T3|Battleship}} T1-T3 Battleship Retrofit Blueprint",
 		54048: "{{Blueprint|T3|Carrier}} T1-T3 Carrier Retrofit Blueprint",
 	},
-	"coredata": { 59900: "{{Core data}} Core Data", },
+	"coredata": {
+		59900: "{{Core data}} Core Data",
+	},
 	"part": {
 		54011: "{{Plate|T1}} T1 Upgrade Parts",
 		54012: "{{Plate|T2}} T1-T2 Upgrade Parts",
@@ -87,7 +88,9 @@ drop_const = {
 		54023: "{{Box|T3}} T1-T3 Tech Boxes",
 		54024: "{{Box|T4}} T1-T4 Tech Boxes",
 	},
-	"coins": { 59001: "{{Coin}} Coins", },
+	"coins": {
+		59001: "{{Coin}} Coins",
+	},
 }
 
 # for star strings, see "model/const/chapterconst.lua#GetAchieveDesc"
@@ -96,7 +99,7 @@ star_strings = {
 	2: "Defeat {} escort fleets",
 	3: "Defeat all enemies",
 	4: "Deployed ships ≤ {}",
-	#5: "%s not deployed",
+	# 5: "%s not deployed",
 	6: "Clear with a Full Combo",
 }
 
@@ -122,8 +125,10 @@ def find_chapter_tasks(chapterid: int, api: ALJsonAPI, client: Client) -> tuple[
 	for task in task_data_template.all_client(client):
 		taskid_it = flatten(task.target_id)
 		if chapterid in taskid_it:
-			if task.sub_type == 1020: clear_task = task
-			elif task.sub_type == 1021: threestar_task = task
+			if task.sub_type == 1020:
+				clear_task = task
+			elif task.sub_type == 1021:
+				threestar_task = task
 			# break loop if both tasks are already found
 			if clear_task and threestar_task:
 				break
@@ -136,8 +141,9 @@ def get_task_awards(task: Task, api: ALJsonAPI, client: Client, wikifier: WikiHe
 		awardable = award.load(api, client)
 
 		wiki_awardable = wikifier.wikify_awardable(awardable)
-		outicon = wiki_awardable.icontemplate or WikiHelper.put_icon(filename=wiki_awardable.filelink+".png",
-			itemname=wiki_awardable.name, nolink=True)
+		outicon = wiki_awardable.icontemplate or WikiHelper.put_icon(
+			filename=wiki_awardable.filelink + ".png", itemname=wiki_awardable.name, nolink=True
+		)
 		outname = wiki_awardable.name
 		if isinstance(awardable, ShipReward):
 			outname = f"[[{outname}]]"
@@ -153,7 +159,7 @@ class EnemyNameLoader(CachedAPILoader):
 				priority = False
 				if entry_prev := self._cache.get(entry.icon):
 					entry_prev, priority = entry_prev
-				
+
 				if not priority:
 					if "name" in entry:
 						self._cache[entry.icon] = (entry, entry.name in self._api.ship_converter.ship_to_id)
@@ -162,19 +168,19 @@ class EnemyNameLoader(CachedAPILoader):
 							self._cache[entry.icon] = (entry_prev, False)
 						else:
 							self._cache[entry.icon] = (entry, False)
-	
+
 	def name_from_icon(self, icon: str) -> str:
 		if entry := self._cache.get(icon):
 			entry, priority = entry
 			name = entry.get("name") or entry.prefab
 			if priority:
-				name = "[["+ name + "]]"
+				name = "[[" + name + "]]"
 
 			if "type" in entry:
 				return name + " {{" + Constants.ShipType.from_id(entry.type).templatename + "}}"
 
 			return name
-		return icon	
+		return icon
 
 
 def star_requirement(num: int, value: int | None = None) -> str:
@@ -186,11 +192,13 @@ def star_requirement(num: int, value: int | None = None) -> str:
 		return star_text.format(value)
 	return star_text
 
+
 def fleet_retriction(fleet_limit: list[list[Constants.ShipType | int]]) -> str:
 	countedtypes = Counter(chain(*fleet_limit))
 	types_str = []
 	for shiptype, amount in countedtypes.items():
-		if shiptype == 0: continue
+		if shiptype == 0:
+			continue
 		types_str.append(f"{amount} {{{{{shiptype.templatename}}}}} {shiptype.typetext}")
 	return ", ".join(types_str)
 
@@ -224,12 +232,14 @@ def get_chapter(chapterid: int, api: ALJsonAPI, client: Client) -> str:
 
 	### associated tasks
 	clear_task, threestar_task = find_chapter_tasks(chapterid, api, client)
-	if clear_task: chapter_wiki_template["ClearReward"] = get_task_awards(clear_task, api, client, wikifier)
-	if threestar_task: chapter_wiki_template["3StarReward"] = get_task_awards(threestar_task, api, client, wikifier)
+	if clear_task:
+		chapter_wiki_template["ClearReward"] = get_task_awards(clear_task, api, client, wikifier)
+	if threestar_task:
+		chapter_wiki_template["3StarReward"] = get_task_awards(threestar_task, api, client, wikifier)
 
 	### normal and elite mob info
-	exp = [ -1, -1, -1 ]
-	level = [ 9999, -1 ]
+	exp = [-1, -1, -1]
+	level = [9999, -1]
 	for enemyref in chain(chapter.mob_list, chapter.elite_list):
 		enemy = enemyref.load(api, client)
 		# small fleets are type 1, 4, 7
@@ -237,10 +247,13 @@ def get_chapter(chapterid: int, api: ALJsonAPI, client: Client) -> str:
 		# large fleets are type 3, 6, 9
 		# cargo fleets are type 10
 		# skip all other types for now
-		if not 1 <= enemy.type <= 10: continue
-		exp[(enemy.type-1)%3] = enemy.exp
-		if enemy.level < level[0]: level[0] = enemy.level
-		if enemy.level > level[1]: level[1] = enemy.level
+		if not 1 <= enemy.type <= 10:
+			continue
+		exp[(enemy.type - 1) % 3] = enemy.exp
+		if enemy.level < level[0]:
+			level[0] = enemy.level
+		if enemy.level > level[1]:
+			level[1] = enemy.level
 
 	# set template params for normal mob fleet xp and level
 	if level[0] == level[1]:
@@ -249,7 +262,7 @@ def get_chapter(chapterid: int, api: ALJsonAPI, client: Client) -> str:
 		chapter_wiki_template["MobLevel"] = f"{level[0]}-{level[1]}"
 	for i, xpval in enumerate(exp):
 		if xpval != -1:
-			chapter_wiki_template[f"MobExp{i+1}"] = exp[i]
+			chapter_wiki_template[f"MobExp{i + 1}"] = exp[i]
 
 	# add mob spawn order
 	if chapter.mob_list:
@@ -261,14 +274,18 @@ def get_chapter(chapterid: int, api: ALJsonAPI, client: Client) -> str:
 	if chapter.siren_list:
 		# get siren xp and level values
 		exp = -1
-		level = [ 9999, -1 ]
+		level = [9999, -1]
 		for enemyref in chapter.siren_list:
-			if enemyref.id in [0, 1]: continue
+			if enemyref.id in [0, 1]:
+				continue
 			# if enemyref.id == 1: continue # possibly needed, from legacy code
 			enemy = enemyref.load(api, client)
-			if enemy.exp > exp: exp = enemy.exp
-			if enemy.level < level[0]: level[0] = enemy.level
-			if enemy.level > level[1]: level[1] = enemy.level
+			if enemy.exp > exp:
+				exp = enemy.exp
+			if enemy.level < level[0]:
+				level[0] = enemy.level
+			if enemy.level > level[1]:
+				level[1] = enemy.level
 
 		# add xp and level values and spawn order to template data
 		if level[0] == level[1]:
@@ -283,12 +300,12 @@ def get_chapter(chapterid: int, api: ALJsonAPI, client: Client) -> str:
 	enemynameloader = EnemyNameLoader(api)
 	if chapter.boss and chapter.boss.id != 0:
 		boss_enemy = chapter.boss.load(api, client)
-		#bossicons = set(chapter.icon).union(set(boss_enemy.icons))
+		# bossicons = set(chapter.icon).union(set(boss_enemy.icons))
 		chapter_wiki_template["Boss"] = " and ".join([enemynameloader.name_from_icon(icon) for icon in chapter.icon])
 		chapter_wiki_template["BossLevel"] = boss_enemy.level
 		chapter_wiki_template["BossExp"] = boss_enemy.exp
 	chapter_wiki_template["BossBattleReq"] = chapter.boss_refresh or "0"
-	chapter_wiki_template["BossBattleClear"] = math.ceil(100/(chapter.progress_boss or 1))
+	chapter_wiki_template["BossBattleClear"] = math.ceil(100 / (chapter.progress_boss or 1))
 
 	# other general chapter info
 	chapter_wiki_template["AvoidRequire"] = chapter.avoid_require
@@ -308,16 +325,15 @@ def get_chapter(chapterid: int, api: ALJsonAPI, client: Client) -> str:
 		# fleet type limitations
 		for i in range(max(2, len(chapter.fleet_limitation))):
 			if len(chapter.fleet_limitation) > i:
-				chapter_wiki_template[f"Fleet{i+1}"] = fleet_retriction(chapter.fleet_limitation[i])
+				chapter_wiki_template[f"Fleet{i + 1}"] = fleet_retriction(chapter.fleet_limitation[i])
 			else:
-				chapter_wiki_template[f"Fleet{i+1}"] = "Not available"
+				chapter_wiki_template[f"Fleet{i + 1}"] = "Not available"
 
 		# stat restrictions
 		stat_strs = []
 		for ltype, lsign, lamount in chapter.property_limitation:
 			stat_strs.append(f"{property_limit_text[ltype]} {property_limit_sign[lsign]} {lamount}")
 		chapter_wiki_template["StatRestrictions"] = ", ".join(stat_strs)
-
 
 	### Nodemap
 	additional_nodemap_fields = {}
@@ -340,15 +356,17 @@ def get_chapter(chapterid: int, api: ALJsonAPI, client: Client) -> str:
 	current_row = -1
 	for row, column, access, nodetype in chapter.get("grids"):
 		if row == current_row:
-			nodemap = "|"+nodemap
+			nodemap = "|" + nodemap
 		else:
-			if nodemap: nodemap = "\n	|" + nodemap
+			if nodemap:
+				nodemap = "\n	|" + nodemap
 			current_row = row
-		if not access: nodetype = -1
+		if not access:
+			nodetype = -1
 		if add_field_letter := additional_nodemap_fields.get((row, column)):
 			nodetype = add_field_letter
 		nodemap = node_type_letter[nodetype] + nodemap
-	chapter_wiki_template["NodeMap"] = "{{MapTable\n	|"+nodemap+"\n  }}"
+	chapter_wiki_template["NodeMap"] = "{{MapTable\n	|" + nodemap + "\n  }}"
 
 	### drops
 	shipdrops = [""]
@@ -364,7 +382,7 @@ def get_chapter(chapterid: int, api: ALJsonAPI, client: Client) -> str:
 			for shipdrop_award in shipdrop_awards:
 				shipdrop = Award(*shipdrop_award).load(api, client)
 				shipdrop_wiki = wikifier.wikify_awardable(shipdrop)
-				dropicon = WikiHelper.simple_template("IconHover", [shipdrop_wiki.name, shipdrop_wiki.rarity.rarity+1])
+				dropicon = WikiHelper.simple_template("IconHover", [shipdrop_wiki.name, shipdrop_wiki.rarity.rarity + 1])
 				shipdrops.append(dropicon)
 
 		# equipment drops
@@ -381,8 +399,9 @@ def get_chapter(chapterid: int, api: ALJsonAPI, client: Client) -> str:
 				else:
 					equipdrop_name = equipdrop_wiki.name
 
-				dropicon = WikiHelper.simple_template("EquipmentBox", [equipdrop_wiki.rarity.rarity+1,
-					equipdrop_name, equipdrop_wiki.link, equipdrop_wiki.icon])
+				dropicon = WikiHelper.simple_template(
+					"EquipmentBox", [equipdrop_wiki.rarity.rarity + 1, equipdrop_name, equipdrop_wiki.link, equipdrop_wiki.icon]
+				)
 				equipdrops.append(dropicon)
 
 		# other map drops
@@ -399,7 +418,8 @@ def get_chapter(chapterid: int, api: ALJsonAPI, client: Client) -> str:
 	map_drop_output = ""
 	for drop_key in drop_const:
 		if drop_key in map_drop_output_list:
-			if map_drop_output: map_drop_output += ", "
+			if map_drop_output:
+				map_drop_output += ", "
 			map_drop_output += map_drop_output_list[drop_key]
 
 	chapter_wiki_template["ShipDrops"] = "\n".join(shipdrops)
@@ -410,15 +430,13 @@ def get_chapter(chapterid: int, api: ALJsonAPI, client: Client) -> str:
 
 def main():
 	parser = ArgumentParser()
-	parser.add_argument("-c", "--client", required=True, choices=Client.__members__,
-						help="client to gather information from")
+	parser.add_argument("-c", "--client", required=True, choices=Client.__members__, help="client to gather information from")
 	mapgroup = parser.add_mutually_exclusive_group(required=True)
-	mapgroup.add_argument("-m", "--mapids", metavar="MAPID", type=int, nargs='+',
-						help="indexes from sharecfg/chapter_template")
-	mapgroup.add_argument("-e", "--eventid", type=int, nargs=1,
-						help="index prefix from sharecfg/chapter_template for events")
-	parser.add_argument("--mult", "--multiplier", type=int, nargs='?', default=10000,
-						help="multiplier of the event id index prefix")
+	mapgroup.add_argument("-m", "--mapids", metavar="MAPID", type=int, nargs="+", help="indexes from sharecfg/chapter_template")
+	mapgroup.add_argument("-e", "--eventid", type=int, nargs=1, help="index prefix from sharecfg/chapter_template for events")
+	parser.add_argument(
+		"--mult", "--multiplier", type=int, nargs="?", default=10000, help="multiplier of the event id index prefix"
+	)
 	args = parser.parse_args()
 
 	client = Client[args.client]
@@ -436,10 +454,11 @@ def main():
 	mapstrings = []
 	for mapid in sorted(mapids):
 		mapdata = get_chapter(mapid, api, client)
-		mapstrings.append( mapdata["ID"] + "=" + template_map.fill(mapdata) )
+		mapstrings.append(mapdata["ID"] + "=" + template_map.fill(mapdata))
 
 	wikitext = "<tabber>\n" + "\n|-|\n".join(mapstrings) + "\n</tabber>"
 	Utility.output(wikitext)
+
 
 if __name__ == "__main__":
 	main()

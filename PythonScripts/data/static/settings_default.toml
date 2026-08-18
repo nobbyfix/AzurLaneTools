@@ -4,4 +4,5 @@ source_json_path = "../SrcJson"
 # which json data repository is used
 # "AzurLaneTools" for https://github.com/AzurLaneTools/AzurLaneData
 # "nobbyfix" for https://github.com/nobbyfix/AzurLaneSourceJson
-jsonloader_variant = "AzurLaneTools"
+# "Nagami" for https://github.com/JustNagami/al-json
+jsonloader_variant = "Nagami"
