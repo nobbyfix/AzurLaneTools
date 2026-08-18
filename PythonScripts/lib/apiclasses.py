@@ -83,31 +83,25 @@ class AwardDisplay:
 	unimplemented:
 	10		DROP_TYPE_OPERATION
 	13		DROP_TYPE_WORLD_COLLECTION
-	19		DROP_TYPE_LOVE_LETTER
 	22		DROP_TYPE_META_PT
-	23		DROP_TYPE_SKIN_TIMELIMIT
-	26		DROP_TYPE_DORM3D_FURNITURE
-	27		DROP_TYPE_DORM3D_GIFT
-	28		DROP_TYPE_DORM3D_SKIN
 	29		DROP_TYPE_LIVINGAREA_COVER
-	31		DROP_TYPE_COMBAT_UI_STYLE
 	33		DROP_TYPE_ACTIVITY_MEDAL
-	41		DROP_TYPE_ISLAND_ITEM
 	42		DROP_TYPE_ISLAND_OVERFLOWITEM
-	43		DROP_TYPE_ISLAND_ABILITY
-
-	1000	DROP_TYPE_USE_ACTIVITY_DROP
-	1001	DROP_TYPE_RYZA_DROP
-	1002	DROP_TYPE_WORKBENCH_DROP
+	44		DROP_TYPE_ISLAND_INVITATION
+	48		DROP_TYPE_ISLAND_COLLECTION_FRAMENT
+	
+	99		DROP_TYPE_TIMESTAMP
+	101		DROP_TYPE_ISLAND_TRANS_ITEM
+	
+	1000	DROP_TYPE_USE_ACTIVITY_DROP		# just used as a flag
 	1003	DROP_TYPE_FEAST_DROP
-	1005	DROP_TYPE_HOLIDAY_VILLA
 	"""
 
 	# see "const.lua" for all drop types and "model/vo/drop.lua" for which the data source is
 	def resolve(self) -> DataRef:
 		if self.type == 1:
 			return ApiDataRef(id=self.refid, module="player_resource_reward")
-		if self.type in [2, 8]:
+		if self.type in [2, 8, 19, 1005]:
 			return ApiDataRef(id=self.refid, module="all_item_data_statistics")
 		if self.type == 3:
 			return SharecfgDataRef(id=self.refid, module="equip_data_statistics")
@@ -135,8 +129,38 @@ class AwardDisplay:
 			return SharecfgDataRef(id=self.refid, module="benefit_buff_template")
 		if self.type == 25:
 			return SharecfgDataRef(id=self.refid, module="commander_data_template")
+		if self.type == 26:
+			return SharecfgDataRef(id=self.refid, module="dorm3d_furniture_template")
+		if self.type == 27:
+			return SharecfgDataRef(id=self.refid, module="dorm3d_gift")
+		if self.type == 28:
+			return SharecfgDataRef(id=self.refid, module="dorm3d_resource")
+		if self.type == 31:
+			return SharecfgDataRef(id=self.refid, module="item_data_battleui")
+		if self.type == 41:
+			return SharecfgDataRef(id=self.refid, module="island_item_data_template")
+		if self.type == 43:
+			return SharecfgDataRef(id=self.refid, module="island_ability_template")
+		if self.type == 45:
+			return SharecfgDataRef(id=self.refid, module="island_furniture_template")
+		if self.type == 46:
+			return SharecfgDataRef(id=self.refid, module="island_dress_template")
+		if self.type == 47:
+			return SharecfgDataRef(id=self.refid, module="island_skin_template")
+		if self.type == 49:
+			return SharecfgDataRef(id=self.refid, module="island_collection")
+		if self.type == 50:
+			return SharecfgDataRef(id=self.refid, module="island_speedup_ticket")
+		if self.type == 51:
+			return SharecfgDataRef(id=self.refid, module="island_action")
+		if self.type == 52:
+			return SharecfgDataRef(id=self.refid, module="island_card_diy")
 		if self.type == 100:
 			return SharecfgDataRef(id=self.refid, module="drop_data_restore")
+		if self.type == 1001:
+			return SharecfgDataRef(id=self.refid, module="activity_ryza_item")
+		if self.type == 1002:
+			return SharecfgDataRef(id=self.refid, module="activity_workbench_item")
 		raise NotImplementedError(f"Cannot resolve award of type {self.type}: Unknown or unimplemented type.")
 
 	def load(self, api: "ALJsonAPI", client: Client) -> Awardable | None:
